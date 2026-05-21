@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soletrando Tecnologia — Servidoras no Comando</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:           #030308;
+      --bg-card:      rgba(255,255,255,0.03);
+      --bg-hover:     rgba(255,255,255,0.055);
+      --border:       rgba(255,255,255,0.07);
+      --border-focus: rgba(167,139,250,0.4);
+      --lavanda:      #A78BFA;
+      --ambar:        #F5A623;
+      --verde:        #34D399;
+      --rosa:         #FB7185;
+      --cyan:         #22D3EE;
+      --blue:         #60A5FA;
+      --text:         #F7F7F8;
+      --muted:        #6B6B80;
+      --muted2:       #4a4a5a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* AMBIENT */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 15% 10%, rgba(167,139,250,0.05) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 85% 80%, rgba(34,211,238,0.04) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* BACK BTN */
+    .back-btn {
+      position: fixed; top: 1.25rem; left: 1.25rem; z-index: 100;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      background: rgba(10,10,18,0.9); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.78rem; font-weight: 500; transition: color 0.2s, border-color 0.2s;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--border-focus); }
+    .back-btn svg { width: 14px; height: 14px; }
+
+    /* HERO */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 7rem 1.5rem 3.5rem;
+      max-width: 860px; margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: 100px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+      color: var(--lavanda); text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .hero-title span { color: var(--lavanda); }
+
+    .hero-desc {
+      font-size: 1.05rem; color: var(--muted);
+      line-height: 1.7; max-width: 560px; margin: 0 auto 2.5rem;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800;
+      color: var(--lavanda);
+    }
+    .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* SEARCH */
+    .search-wrap {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto 1.5rem;
+      padding: 0 1.5rem;
+    }
+    .search-icon {
+      position: absolute; left: 2.75rem; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none;
+    }
+    .search-icon svg { width: 17px; height: 17px; }
+    #search-input {
+      width: 100%; padding: 0.9rem 1.1rem 0.9rem 3rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text); font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    #search-input::placeholder { color: var(--muted2); }
+    #search-input:focus {
+      border-color: var(--border-focus);
+      background: rgba(167,139,250,0.04);
+    }
+    #search-clear {
+      position: absolute; right: 2.75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      display: none; padding: 0.2rem;
+    }
+    #search-clear svg { width: 15px; height: 15px; }
+
+    /* FILTER TABS */
+    .filter-wrap {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto 3rem;
+      padding: 0 1.5rem;
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    .filter-btn {
+      padding: 0.4rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--muted); font-size: 0.78rem; font-weight: 500;
+      cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .filter-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+    .filter-btn.active {
+      background: rgba(167,139,250,0.12);
+      border-color: rgba(167,139,250,0.35);
+      color: var(--lavanda);
+    }
+
+    /* ALPHABET JUMP */
+    .alpha-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(3,3,8,0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex; gap: 0.1rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+    .alpha-btn {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: none; border: none;
+      color: var(--muted2); font-size: 0.72rem; font-weight: 600;
+      font-family: 'DM Mono', monospace;
+      cursor: pointer; border-radius: 6px; transition: all 0.15s;
+    }
+    .alpha-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .alpha-btn.has-terms { color: var(--muted); }
+    .alpha-btn.has-terms:hover { color: var(--lavanda); background: rgba(167,139,250,0.08); }
+
+    /* MAIN CONTENT */
+    .main {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
+      padding: 0 1.5rem 6rem;
+    }
+
+    /* LETTER GROUP */
+    .letter-group { margin-bottom: 3rem; }
+    .letter-anchor {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem; font-weight: 800;
+      color: var(--lavanda); opacity: 0.35;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      scroll-margin-top: 80px;
+    }
+
+    /* TERM CARD */
+    .term-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 0.6rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .term-card:hover { border-color: rgba(255,255,255,0.12); }
+    .term-card.open { border-color: rgba(167,139,250,0.25); }
+
+    .term-trigger {
+      width: 100%; padding: 1.1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem;
+      background: none; border: none; cursor: pointer;
+      text-align: left; transition: background 0.15s;
+    }
+    .term-trigger:hover { background: var(--bg-hover); }
+
+    .term-cat-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .term-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); flex: 1;
+    }
+
+    .term-mini {
+      font-size: 0.82rem; color: var(--muted);
+      flex: 2; text-align: left;
+      display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .term-cat-badge {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.2rem 0.6rem;
+      border-radius: 100px; border: 1px solid;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .term-arrow {
+      width: 18px; height: 18px; color: var(--muted2); flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .term-card.open .term-arrow { transform: rotate(180deg); }
+
+    /* EXPANDED BODY */
+    .term-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .term-card.open .term-body { max-height: 600px; }
+
+    .term-inner {
+      padding: 0 1.25rem 1.4rem;
+      border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .term-inner { grid-template-columns: 1fr; }
+      .term-mini { display: none; }
+    }
+
+    .term-block-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted2); margin-bottom: 0.35rem;
+    }
+    .term-block-text {
+      font-size: 0.88rem; color: var(--muted); line-height: 1.65;
+    }
+    .term-block-text strong { color: var(--text); font-weight: 500; }
+
+    .term-pronunc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem; color: var(--ambar);
+      letter-spacing: 0.03em;
+    }
+
+    .term-example {
+      grid-column: 1 / -1;
+      background: rgba(167,139,250,0.05);
+      border: 1px solid rgba(167,139,250,0.1);
+      border-radius: 10px; padding: 0.85rem 1rem;
+    }
+    .term-example .term-block-label { color: var(--lavanda); opacity: 0.7; }
+    .term-example .term-block-text { font-style: italic; color: var(--text); opacity: 0.8; }
+
+    /* CATEGORY COLORS */
+    .cat-ia    { --cc: var(--lavanda); }
+    .cat-dados { --cc: var(--cyan);    }
+    .cat-dev   { --cc: var(--verde);   }
+    .cat-seg   { --cc: var(--rosa);    }
+    .cat-infra { --cc: var(--ambar);   }
+    .cat-neg   { --cc: var(--blue);    }
+
+    .term-cat-dot     { background: var(--cc); }
+    .term-cat-badge   { color: var(--cc); border-color: color-mix(in srgb, var(--cc) 30%, transparent); background: color-mix(in srgb, var(--cc) 8%, transparent); }
+
+    /* EMPTY STATE */
+    #empty-state {
+      text-align: center; padding: 4rem 1rem; display: none;
+    }
+    #empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    #empty-state p { color: var(--muted); }
+
+    /* COUNT BADGE */
+    #results-count {
+      text-align: center; font-size: 0.78rem; color: var(--muted2);
+      margin-bottom: 2rem; display: none;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+    /* FADE IN */
+    .term-card { animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  Início
+</a>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">📖 Vocabulário Digital</div>
+  <h1 class="hero-title">Soletrando<br><span>Tecnologia</span></h1>
+  <p class="hero-desc">O vocabulário mínimo para entrar em qualquer conversa sobre tecnologia sem se perder. Definição simples, como se fala e como usar numa frase.</p>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="total-count">0</div><div class="stat-label">Termos</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Categorias</div></div>
+    <div class="stat"><div class="stat-num">A→Z</div><div class="stat-label">Ordenados</div></div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+  </div>
+  <input type="search" id="search-input" placeholder="Buscar termo... ex: algoritmo, API, nuvem" autocomplete="off">
+  <button id="search-clear" aria-label="Limpar busca">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-wrap">
+  <button class="filter-btn active" data-cat="all">Todos</button>
+  <button class="filter-btn" data-cat="ia">🤖 Inteligência Artificial</button>
+  <button class="filter-btn" data-cat="dados">📊 Dados</button>
+  <button class="filter-btn" data-cat="dev">💻 Desenvolvimento</button>
+  <button class="filter-btn" data-cat="seg">🔒 Segurança</button>
+  <button class="filter-btn" data-cat="infra">⚙️ Infraestrutura</button>
+  <button class="filter-btn" data-cat="neg">📋 Gestão & Projetos</button>
+</div>
+
+<!-- ALPHABET NAV -->
+<nav class="alpha-nav" id="alpha-nav"></nav>
+
+<!-- MAIN -->
+<main class="main">
+  <p id="results-count"></p>
+  <div id="glossary-container"></div>
+  <div id="empty-state">
+    <div class="empty-icon">🔍</div>
+    <p>Nenhum termo encontrado.<br>Tente outra busca.</p>
+  </div>
+</main>
+
+<script>
+// ─── DADOS ───────────────────────────────────────────────────────────────────
+const TERMS = [
+  // A
+  { letter:'A', name:'Agile / Ágil', cat:'neg', mini:'Método de trabalho em ciclos curtos',
+    def:'Forma de organizar projetos em ciclos curtos chamados <strong>sprints</strong>, com entregas parciais frequentes em vez de esperar o produto completo.',
+    pronunc:'Ágil (port.) / "éi-djail" (ing.)',
+    example:'A equipe de TI adotou o método ágil e passou a entregar novas funcionalidades a cada duas semanas.' },
+
+  { letter:'A', name:'Algoritmo', cat:'dev', mini:'Sequência de passos para resolver um problema',
+    def:'Conjunto de instruções ordenadas que um computador segue para resolver um problema. Todo programa é, na essência, um algoritmo.',
+    pronunc:'Al-go-RÍT-mo',
+    example:'O algoritmo do feed de notícias decide quais publicações aparecem primeiro para cada usuária.' },
+
+  { letter:'A', name:'API', cat:'dev', mini:'Como sistemas diferentes conversam entre si',
+    def:'<strong>Application Programming Interface</strong>. Uma "tomada padronizada" que permite a sistemas diferentes trocar dados. Você não precisa saber como o outro sistema funciona por dentro — só usar a API dele.',
+    pronunc:'"a-pê-í" (sigla) ou "éi-pii-ái" (ing.)',
+    example:'O aplicativo de ponto eletrônico usa uma API do gov.br para verificar o CPF da servidora.' },
+
+  { letter:'A', name:'Automação', cat:'dev', mini:'Fazer a máquina repetir o que você faria',
+    def:'Uso de tecnologia para executar tarefas repetitivas sem intervenção humana. Pode ser simples (um script que renomeia arquivos) ou complexa (um robô que preenche formulários).',
+    pronunc:'Au-to-ma-ÇÃO',
+    example:'A automação do envio de relatórios mensais liberou três horas da minha semana.' },
+
+  // B
+  { letter:'B', name:'Backend', cat:'dev', mini:'A parte invisível que faz o sistema funcionar',
+    def:'Toda a lógica que roda nos servidores: salvar dados, autenticar usuárias, processar regras de negócio. A usuária nunca vê, mas depende disso o tempo todo.',
+    pronunc:'"bék-énd"',
+    example:'Quando você envia um formulário, é o backend que valida os dados e os salva no banco.' },
+
+  { letter:'B', name:'Banco de Dados', cat:'dados', mini:'Onde o sistema guarda as informações',
+    def:'Sistema organizado para armazenar, buscar e atualizar dados. Funciona como uma planilha inteligente que o programa acessa em milissegundos.',
+    pronunc:'Ban-co de Da-dos',
+    example:'O banco de dados do sistema de ponto guarda o registro de cada entrada e saída das servidoras.' },
+
+  { letter:'B', name:'Big Data', cat:'dados', mini:'Volumes gigantes de dados demais para Excel',
+    def:'Conjunto de dados tão grande ou complexo que ferramentas convencionais não conseguem processar. Exige tecnologias específicas para armazenar, processar e analisar.',
+    pronunc:'"big déi-ta"',
+    example:'O Ministério analisa big data de saúde pública para identificar surtos antes que se alastrem.' },
+
+  { letter:'B', name:'Bug', cat:'dev', mini:'Erro no código que causa comportamento inesperado',
+    def:'Falha num programa que faz ele agir diferente do esperado. Pode ser um erro de lógica, um dado inesperado ou uma incompatibilidade entre sistemas.',
+    pronunc:'"bâg"',
+    example:'Tinha um bug no sistema que fazia o relatório mostrar datas no formato americano.' },
+
+  // C
+  { letter:'C', name:'Cache', cat:'infra', mini:'Guardar o que já foi buscado para não buscar de novo',
+    def:'Mecanismo que guarda temporariamente resultados de operações custosas para servir mais rápido na próxima vez. Por isso às vezes o site "congela" numa versão antiga.',
+    pronunc:'"cásh"',
+    example:'O site lento melhorou depois que o time ativou o cache nas páginas mais acessadas.' },
+
+  { letter:'C', name:'ChatBot', cat:'ia', mini:'Sistema que simula uma conversa',
+    def:'Programa que conversa com usuárias via texto ou voz. Pode seguir roteiros fixos (chatbot de regras) ou usar IA para entender perguntas livres.',
+    pronunc:'"shát-bot"',
+    example:'O chatbot da ouvidoria responde perguntas frequentes às 3h da manhã, sem precisar de uma servidora disponível.' },
+
+  { letter:'C', name:'Cloud / Nuvem', cat:'infra', mini:'Computadores de outra empresa que você aluga pela internet',
+    def:'Infraestrutura de servidores remotos acessados pela internet. Em vez de ter servidores físicos no prédio, o órgão aluga capacidade de provedores como AWS, Azure ou Google Cloud.',
+    pronunc:'"claud" / Nu-vem',
+    example:'Migramos o sistema de folha de pagamento para a nuvem e paramos de perder dados em quedas de energia.' },
+
+  { letter:'C', name:'Código-fonte', cat:'dev', mini:'O texto que o programador escreve para criar o programa',
+    def:'Conjunto de instruções escritas numa linguagem de programação (Python, JavaScript etc.) que, quando executadas, formam um software.',
+    pronunc:'"có-di-go fon-te"',
+    example:'A equipe publicou o código-fonte do sistema em repositório aberto para que outros órgãos possam reusá-lo.' },
+
+  { letter:'C', name:'Copilot', cat:'ia', mini:'IA da Microsoft integrada ao pacote Office',
+    def:'Assistente de IA da Microsoft disponível no Word, Excel, Outlook e Teams. Ajuda a redigir, resumir documentos, gerar fórmulas e criar apresentações por instrução em linguagem natural.',
+    pronunc:'"có-pai-lot"',
+    example:'Usei o Copilot no Outlook para resumir 40 e-mails acumulados durante o recesso.' },
+
+  { letter:'C', name:'Criptografia', cat:'seg', mini:'Transformar dados para que só quem tem a chave entenda',
+    def:'Técnica que embaralha informações usando algoritmos matemáticos. Sem a chave correta, os dados são ilegíveis. Base de toda comunicação segura na internet.',
+    pronunc:'Crip-to-GRA-fia',
+    example:'Os dados pessoais das servidoras são armazenados com criptografia para cumprir a LGPD.' },
+
+  { letter:'C', name:'CSV', cat:'dados', mini:'Formato simples de planilha em texto puro',
+    def:'<strong>Comma-Separated Values</strong>. Arquivo de texto onde cada linha é um registro e as colunas são separadas por vírgulas (ou ponto-e-vírgula). Qualquer sistema lê e exporta CSV.',
+    pronunc:'"cê-es-vê"',
+    example:'Exportei a lista de beneficiárias em CSV para cruzar com outra base em Python.' },
+
+  // D
+  { letter:'D', name:'Dashboard', cat:'dados', mini:'Painel visual com indicadores em tempo real',
+    def:'Tela que concentra gráficos e métricas-chave de um sistema ou processo. Facilita a tomada de decisão ao mostrar o estado atual de algo de forma visual.',
+    pronunc:'"dásh-bord"',
+    example:'O dashboard de gestão de contratos mostra quantos vencem nos próximos 30 dias.' },
+
+  { letter:'D', name:'Dados Abertos', cat:'dados', mini:'Informações públicas disponíveis para qualquer pessoa usar',
+    def:'Dados publicados pelo governo ou organizações em formatos legíveis por máquina, sem restrição de uso. Base da transparência e do reuso de informação pública.',
+    pronunc:'Da-dos A-ber-tos',
+    example:'O Portal de Dados Abertos do governo federal tem bases que qualquer cidadão pode baixar e analisar.' },
+
+  { letter:'D', name:'Deploy', cat:'dev', mini:'Colocar o sistema no ar para o mundo acessar',
+    def:'Processo de publicar uma versão do software no ambiente de produção — o servidor real que as usuárias acessam. Antes do deploy, só a equipe de desenvolvimento vê.',
+    pronunc:'"di-PLÓI"',
+    example:'Fizemos o deploy da nova versão do portal na quinta à noite para evitar impacto no horário de pico.' },
+
+  { letter:'D', name:'DevOps', cat:'infra', mini:'Cultura de integrar desenvolvimento e operações',
+    def:'Prática que une equipes de desenvolvimento (Dev) e operações de infraestrutura (Ops) para entregar software com mais velocidade e estabilidade, com automação e colaboração contínua.',
+    pronunc:'"dév-ops"',
+    example:'Com DevOps, o tempo entre escrever o código e ele chegar à produção caiu de semanas para horas.' },
+
+  // E
+  { letter:'E', name:'Encriptação', cat:'seg', mini:'Bloquear dados com chave digital',
+    def:'Sinônimo prático de criptografar: converter dados legíveis em formato codificado. Usada em discos, arquivos e comunicações para proteger contra acesso não autorizado.',
+    pronunc:'En-crip-ta-ÇÃO',
+    example:'O notebook institucional tem encriptação de disco completo; se for roubado, os dados não são acessíveis.' },
+
+  // F
+  { letter:'F', name:'Firewall', cat:'seg', mini:'Barreira que filtra o que entra e sai da rede',
+    def:'Sistema (hardware ou software) que monitora e controla o tráfego de rede. Bloqueia acessos não autorizados e filtra ameaças antes que atinjam os sistemas internos.',
+    pronunc:'"fáir-uôl"',
+    example:'O firewall do órgão bloqueou o acesso ao servidor na tentativa de ataque detectada pelo CTIR.' },
+
+  { letter:'F', name:'Framework', cat:'dev', mini:'Estrutura pronta para construir software mais rápido',
+    def:'Conjunto de ferramentas, bibliotecas e convenções que aceleram o desenvolvimento. Em vez de construir tudo do zero, a equipe usa o framework como base.',
+    pronunc:'"fréim-uôrk"',
+    example:'O time escolheu o framework React para construir o portal porque ele tem vasta documentação em português.' },
+
+  { letter:'F', name:'Frontend', cat:'dev', mini:'Tudo que aparece na tela e a usuária interage',
+    def:'A parte visual e interativa de um sistema: botões, menus, formulários, gráficos. Roda no navegador da usuária e se comunica com o backend.',
+    pronunc:'"frónt-énd"',
+    example:'A equipe de frontend reformulou o portal para funcionar melhor em celular.' },
+
+  // G
+  { letter:'G', name:'Git', cat:'dev', mini:'Sistema que guarda o histórico de cada alteração no código',
+    def:'Ferramenta de controle de versão que registra toda mudança feita no código. Permite voltar a versões anteriores, trabalhar em paralelo e identificar quem alterou o quê.',
+    pronunc:'"git"',
+    example:'Quando o novo código quebrou o sistema, usamos o Git para voltar à versão estável de ontem.' },
+
+  { letter:'G', name:'GPT', cat:'ia', mini:'Família de modelos de linguagem da OpenAI',
+    def:'<strong>Generative Pre-trained Transformer</strong>. Tipo de modelo de IA treinado em grandes volumes de texto para gerar linguagem natural. Base do ChatGPT e de outros produtos.',
+    pronunc:'"gê-pê-tê"',
+    example:'O ChatGPT é baseado no modelo GPT-4, treinado com textos da internet até 2023.' },
+
+  // H
+  { letter:'H', name:'Hardware', cat:'infra', mini:'A parte física do computador',
+    def:'Componentes físicos de um sistema computacional: processador, memória, disco, teclado, monitor. Contrasta com software (programas e dados).',
+    pronunc:'"rárduôr"',
+    example:'O servidor caiu porque o hardware antigo superaqueceu durante o pico de acessos.' },
+
+  { letter:'H', name:'Hash', cat:'seg', mini:'Impressão digital de um arquivo ou senha',
+    def:'Resultado de uma função matemática que transforma qualquer dado em uma sequência fixa de caracteres. A mesma entrada sempre gera o mesmo hash; qualquer mudança gera um hash completamente diferente.',
+    pronunc:'"rásh"',
+    example:'O sistema guarda o hash da senha, nunca a senha em si — assim, mesmo quem acessa o banco não vê a senha real.' },
+
+  { letter:'H', name:'HTTP / HTTPS', cat:'infra', mini:'Protocolo pelo qual páginas web são transferidas',
+    def:'<strong>HyperText Transfer Protocol</strong>. Regras de comunicação entre navegador e servidor web. O S do HTTPS indica que a conexão é criptografada (segura).',
+    pronunc:'"a-gá-tê-tê-pê" / "a-gá-tê-tê-pê-ésse"',
+    example:'Sites que ainda usam HTTP (sem o S) podem expor dados das usuárias a interceptações.' },
+
+  // I
+  { letter:'I', name:'IA (Inteligência Artificial)', cat:'ia', mini:'Sistemas que simulam capacidades cognitivas humanas',
+    def:'Campo da computação que cria sistemas capazes de aprender, raciocinar e executar tarefas que antes exigiam inteligência humana. Inclui reconhecimento de imagem, linguagem natural e tomada de decisão.',
+    pronunc:'"í-a" ou "in-te-li-GÊN-cia ar-ti-fi-CI-al"',
+    example:'A IA do sistema de triagem de processos reduziu em 60% o tempo de classificação inicial.' },
+
+  { letter:'I', name:'IA Generativa', cat:'ia', mini:'IA que cria conteúdo novo a partir de uma instrução',
+    def:'Categoria de IA capaz de gerar texto, imagem, código ou áudio a partir de um prompt. Exemplos: ChatGPT, Gemini, Claude, Midjourney.',
+    pronunc:'"í-a je-ne-ra-TÍ-va"',
+    example:'Com IA generativa, a servidora escreveu um primeiro rascunho de nota técnica em 5 minutos.' },
+
+  { letter:'I', name:'Infraestrutura', cat:'infra', mini:'A base tecnológica que sustenta os sistemas',
+    def:'Conjunto de servidores, redes, armazenamento e serviços de nuvem que mantêm os sistemas rodando. Quem cuida é a equipe de infraestrutura ou TI.',
+    pronunc:'In-fra-es-tru-TU-ra',
+    example:'A migração da infraestrutura para a nuvem reduziu em 30% o custo operacional de TI do órgão.' },
+
+  { letter:'I', name:'Interface', cat:'dev', mini:'Ponto de contato entre a usuária e o sistema',
+    def:'A camada por onde humanos interagem com um sistema. Pode ser visual (UI gráfica), por voz, linha de comando ou outra forma. Boa interface é aquela que não exige manual.',
+    pronunc:'In-ter-FA-ce',
+    example:'A nova interface do portal foi testada com servidoras de diferentes níveis de familiaridade digital.' },
+
+  { letter:'I', name:'IoT (Internet das Coisas)', cat:'infra', mini:'Objetos físicos conectados à internet',
+    def:'Rede de dispositivos físicos (sensores, câmeras, eletrodomésticos, veículos) que coletam e trocam dados pela internet. Cada objeto vira uma fonte de dados.',
+    pronunc:'"i-ó-tê" ou "internet das coisas"',
+    example:'Os sensores de presença nos prédios públicos são IoT: registram ocupação em tempo real para gestão de energia.' },
+
+  // J
+  { letter:'J', name:'JSON', cat:'dev', mini:'Formato leve para trocar dados entre sistemas',
+    def:'<strong>JavaScript Object Notation</strong>. Formato de texto simples e legível por humanos para estruturar dados. Usado em APIs e arquivos de configuração.',
+    pronunc:'"djéi-son"',
+    example:'A API retorna os dados da servidora em JSON: nome, cargo, órgão, matrícula.' },
+
+  // L
+  { letter:'L', name:'LGPD', cat:'seg', mini:'Lei que protege dados pessoais no Brasil',
+    def:'<strong>Lei Geral de Proteção de Dados</strong> (Lei nº 13.709/2018). Regula como dados pessoais devem ser coletados, armazenados e usados. Toda organização pública ou privada que trata dados pessoais deve segui-la.',
+    pronunc:'"el-gê-pê-dê"',
+    example:'O sistema não pode compartilhar dados de servidoras com outros órgãos sem base legal prevista na LGPD.' },
+
+  { letter:'L', name:'LLM', cat:'ia', mini:'Modelo de IA treinado para entender e gerar linguagem',
+    def:'<strong>Large Language Model</strong>. Tipo de IA treinado em enormes volumes de texto para compreender e produzir linguagem natural. Base do ChatGPT, Gemini, Claude e outros.',
+    pronunc:'"el-el-em"',
+    example:'Os LLMs aprenderam padrões de linguagem lendo bilhões de páginas da web, livros e artigos.' },
+
+  { letter:'L', name:'Log', cat:'infra', mini:'Registro automático do que aconteceu no sistema',
+    def:'Arquivo que registra eventos, erros e ações dentro de um sistema. Fundamental para diagnosticar problemas e rastrear acessos.',
+    pronunc:'"lóg"',
+    example:'Consultamos os logs do servidor e descobrimos que o erro começou depois da atualização das 2h.' },
+
+  // M
+  { letter:'M', name:'Machine Learning', cat:'ia', mini:'IA que aprende com dados sem ser programada regra a regra',
+    def:'Subcampo da IA onde o sistema aprende padrões a partir de exemplos (dados), sem que cada regra seja programada manualmente. Quanto mais dados, melhor o aprendizado.',
+    pronunc:'"me-CHÍN ler-ning"',
+    example:'O sistema de detecção de fraudes usa machine learning para aprender com casos passados.' },
+
+  { letter:'M', name:'Metadados', cat:'dados', mini:'Dados que descrevem outros dados',
+    def:'Informações sobre um arquivo ou registro: quem criou, quando, onde, tamanho, formato. O conteúdo do documento é o dado; as informações sobre ele são os metadados.',
+    pronunc:'Me-ta-DA-dos',
+    example:'Mesmo sem ler o e-mail, os metadados revelam com quem você se comunicou e com que frequência.' },
+
+  { letter:'M', name:'Microsserviços', cat:'dev', mini:'Dividir um sistema grande em partes independentes',
+    def:'Arquitetura onde um sistema é composto por pequenos serviços autônomos que se comunicam via API. Cada serviço pode ser desenvolvido, implantado e escalado de forma independente.',
+    pronunc:'Mi-cros-ser-VI-ços',
+    example:'O portal do governo foi reestruturado em microsserviços para que a queda de um módulo não derrube todo o site.' },
+
+  // N
+  { letter:'N', name:'No-Code', cat:'dev', mini:'Construir sistemas sem escrever código',
+    def:'Plataformas que permitem criar aplicativos, automações e sites por meio de interfaces visuais, sem programação. Exemplos: Lovable, Glide, Notion, Power Automate.',
+    pronunc:'"nô-cód"',
+    example:'A servidora criou um formulário de pesquisa de satisfação sem precisar acionar a equipe de TI, usando no-code.' },
+
+  // P
+  { letter:'P', name:'Phishing', cat:'seg', mini:'Golpe por e-mail ou mensagem que imita fonte confiável',
+    def:'Ataque onde o criminoso se passa por instituição legítima para roubar dados (senhas, CPF, cartão). Pode chegar por e-mail, SMS, WhatsApp ou sites falsos.',
+    pronunc:'"fí-shing"',
+    example:'A servidora recebeu um e-mail falso imitando o RH pedindo atualização de dados bancários — era phishing.' },
+
+  { letter:'P', name:'Pipeline', cat:'dados', mini:'Fluxo automático de transformação de dados ou código',
+    def:'Sequência de etapas automatizadas onde a saída de uma etapa é a entrada da próxima. Usado em processamento de dados (ETL) e entrega de software (CI/CD).',
+    pronunc:'"páip-láin"',
+    example:'O pipeline de dados captura as informações do sistema legado, limpa e carrega no data warehouse toda madrugada.' },
+
+  { letter:'P', name:'Prompt', cat:'ia', mini:'A instrução que você escreve para a IA executar',
+    def:'Texto de entrada que guia a IA. Quanto mais claro, específico e contextualizado, melhor a resposta. Escrever bons prompts é a habilidade central para usar IA generativa com eficiência.',
+    pronunc:'"prómt"',
+    example:'Meu prompt especificava o cargo, o objetivo do texto e o público-alvo — a resposta da IA foi muito mais útil.' },
+
+  { letter:'P', name:'Protocolo', cat:'infra', mini:'Conjunto de regras que define como sistemas se comunicam',
+    def:'Acordo sobre formato, sequência e regras de troca de mensagens entre sistemas. Sem protocolos, sistemas diferentes não conseguem se entender.',
+    pronunc:'Pro-to-CO-lo',
+    example:'O HTTPS é o protocolo que garante comunicação segura entre o navegador e o servidor.' },
+
+  // R
+  { letter:'R', name:'Ransomware', cat:'seg', mini:'Vírus que sequestra seus arquivos e exige resgate',
+    def:'Tipo de malware que criptografa os dados da vítima e exige pagamento (geralmente em criptomoeda) para restaurar o acesso. Um dos ataques mais devastadores para órgãos públicos.',
+    pronunc:'"rán-som-uôr"',
+    example:'O órgão teve todos os sistemas paralisados por três dias após um ataque de ransomware via e-mail infectado.' },
+
+  { letter:'R', name:'Repositório', cat:'dev', mini:'Local centralizado onde o código-fonte é armazenado',
+    def:'Espaço (geralmente na nuvem) onde toda a equipe guarda, versiona e compartilha o código de um projeto. GitHub e GitLab são os mais usados.',
+    pronunc:'Re-po-si-TÓ-rio',
+    example:'O código do sistema de gestão foi publicado no repositório do governo federal para transparência.' },
+
+  { letter:'R', name:'Responsivo', cat:'dev', mini:'Site ou app que se adapta a qualquer tamanho de tela',
+    def:'Design que reorganiza automaticamente o layout dependendo do dispositivo — celular, tablet ou desktop. Padrão obrigatório desde que a maioria dos acessos vem do celular.',
+    pronunc:'Res-pon-SI-vo',
+    example:'O portal precisa ser responsivo porque 70% das servidoras acessam pelo celular.' },
+
+  // S
+  { letter:'S', name:'SaaS', cat:'infra', mini:'Software que você usa pela internet, sem instalar nada',
+    def:'<strong>Software as a Service</strong>. Modelo onde o software é acessado via navegador e mantido pelo fornecedor. Pagamento geralmente por assinatura. Exemplos: Google Workspace, Microsoft 365, Zoom.',
+    pronunc:'"sáas" ou "sê-a-a-ésse"',
+    example:'O governo migrou para um SaaS de e-mail e eliminou a manutenção de servidores próprios de correio.' },
+
+  { letter:'S', name:'Servidor', cat:'infra', mini:'Computador poderoso que fornece serviços a outros computadores',
+    def:'Máquina (física ou virtual) que processa requisições e fornece dados ou serviços a clientes na rede. Todo site, app ou API precisa de um servidor rodando.',
+    pronunc:'Ser-VI-dor',
+    example:'O servidor ficou fora do ar durante a manutenção programada no domingo à noite.' },
+
+  { letter:'S', name:'Software', cat:'dev', mini:'O programa, o aplicativo, o sistema',
+    def:'Conjunto de instruções (código) que diz ao hardware o que fazer. Inclui sistemas operacionais, aplicativos, APIs, scripts — qualquer coisa não física num computador.',
+    pronunc:'"sóft-uôr"',
+    example:'O software de gestão documental precisa ser atualizado para corrigir a vulnerabilidade identificada.' },
+
+  { letter:'S', name:'Sprint', cat:'neg', mini:'Ciclo curto de trabalho com entrega definida',
+    def:'Período fixo (geralmente 1 a 4 semanas) em metodologias ágeis onde a equipe se compromete a entregar um conjunto específico de funcionalidades.',
+    pronunc:'"sprint"',
+    example:'No final da sprint, a equipe apresentou o módulo de relatórios funcionando para a gestora revisar.' },
+
+  { letter:'S', name:'SQL', cat:'dados', mini:'Linguagem para consultar e manipular bancos de dados',
+    def:'<strong>Structured Query Language</strong>. Linguagem padrão para interagir com bancos de dados relacionais. Com SQL, você busca, insere, atualiza e exclui dados.',
+    pronunc:'"ésse-quê-el" ou "síquel"',
+    example:'A analista escreveu uma consulta SQL para extrair todos os contratos com valor acima de R$ 1 milhão.' },
+
+  // T
+  { letter:'T', name:'Token', cat:'seg', mini:'Chave digital temporária que prova identidade',
+    def:'Sequência de caracteres gerada pelo sistema após autenticação, usada para provar identidade em requisições seguintes sem reenviar a senha a cada vez.',
+    pronunc:'"tó-ken"',
+    example:'O token de acesso expira em 24 horas; após isso, a usuária precisa autenticar novamente.' },
+
+  // U
+  { letter:'U', name:'UX / UI', cat:'dev', mini:'Design centrado na experiência da usuária',
+    def:'<strong>UX</strong> (User Experience): estudo de como a pessoa se sente usando o produto. <strong>UI</strong> (User Interface): o design visual das telas. UX pesquisa e define; UI projeta e materializa.',
+    pronunc:'"iú-éks" / "iú-ái"',
+    example:'A equipe de UX realizou testes com servidoras reais antes de lançar a nova interface do portal.' },
+
+  // V
+  { letter:'V', name:'Vibe Coding', cat:'ia', mini:'Criar software conversando com IA em linguagem natural',
+    def:'Prática emergente onde a pessoa descreve o que quer construir em linguagem natural e uma IA generativa escreve o código. Reduz a barreira técnica para criar soluções digitais.',
+    pronunc:'"váib có-ding"',
+    example:'Com vibe coding no Lovable, a servidora criou um formulário de cadastro sem saber programar.' },
+
+  { letter:'V', name:'Vulnerabilidade', cat:'seg', mini:'Fraqueza num sistema que pode ser explorada por atacantes',
+    def:'Falha de segurança em software, hardware ou configuração que um atacante pode explorar para acessar dados ou sistemas indevidamente. Deve ser corrigida o mais rápido possível.',
+    pronunc:'Vul-ne-ra-bi-li-DA-de',
+    example:'A vulnerabilidade no sistema de autenticação foi reportada ao CTIR Gov e corrigida em 48 horas.' },
+
+  // W
+  { letter:'W', name:'Wi-Fi', cat:'infra', mini:'Rede sem fio de internet',
+    def:'Tecnologia que permite conectar dispositivos à internet (ou à rede local) sem fio, via ondas de rádio. A segurança da rede Wi-Fi é fundamental, especialmente em redes públicas.',
+    pronunc:'"uái-fái"',
+    example:'Conectar-se ao Wi-Fi público sem VPN expõe seus dados de navegação a interceptações.' },
+];
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+const catMap = {
+  ia:    { label: 'Inteligência Artificial', cls: 'cat-ia'    },
+  dados: { label: 'Dados',                   cls: 'cat-dados' },
+  dev:   { label: 'Desenvolvimento',         cls: 'cat-dev'   },
+  seg:   { label: 'Segurança',               cls: 'cat-seg'   },
+  infra: { label: 'Infraestrutura',          cls: 'cat-infra' },
+  neg:   { label: 'Gestão & Projetos',       cls: 'cat-neg'   },
+};
+
+let currentCat = 'all';
+let currentSearch = '';
+
+function buildAlphaNav() {
+  const letters = [...new Set(TERMS.map(t => t.letter))].sort();
+  const all = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const nav = document.getElementById('alpha-nav');
+  all.forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'alpha-btn' + (letters.includes(l) ? ' has-terms' : '');
+    btn.textContent = l;
+    btn.dataset.l = l;
+    btn.disabled = !letters.includes(l);
+    btn.addEventListener('click', () => {
+      const el = document.getElementById('letter-' + l);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+    nav.appendChild(btn);
+  });
+}
+
+function matchesTerm(t) {
+  if (currentCat !== 'all' && t.cat !== currentCat) return false;
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    return t.name.toLowerCase().includes(q) || t.mini.toLowerCase().includes(q) || t.def.toLowerCase().includes(q);
+  }
+  return true;
+}
+
+function render() {
+  const container = document.getElementById('glossary-container');
+  container.innerHTML = '';
+  const filtered = TERMS.filter(matchesTerm);
+  const countEl = document.getElementById('results-count');
+  const emptyEl = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    countEl.style.display = 'none';
+    emptyEl.style.display = 'block';
+    document.getElementById('alpha-nav').style.display = 'none';
+    return;
+  }
+  document.getElementById('alpha-nav').style.display = '';
+  emptyEl.style.display = 'none';
+
+  if (currentSearch) {
+    countEl.textContent = filtered.length + ' termo' + (filtered.length !== 1 ? 's' : '') + ' encontrado' + (filtered.length !== 1 ? 's' : '');
+    countEl.style.display = 'block';
+  } else { countEl.style.display = 'none'; }
+
+  const byLetter = {};
+  filtered.forEach(t => {
+    if (!byLetter[t.letter]) byLetter[t.letter] = [];
+    byLetter[t.letter].push(t);
+  });
+
+  Object.keys(byLetter).sort().forEach(letter => {
+    const group = document.createElement('div');
+    group.className = 'letter-group';
+    group.id = 'letter-' + letter;
+
+    const heading = document.createElement('div');
+    heading.className = 'letter-anchor';
+    heading.textContent = letter;
+    group.appendChild(heading);
+
+    byLetter[letter].forEach(t => {
+      const ci = catMap[t.cat];
+      const card = document.createElement('div');
+      card.className = 'term-card ' + ci.cls;
+      card.innerHTML = `
+        <button class="term-trigger" onclick="toggleCard(this)">
+          <span class="term-cat-dot"></span>
+          <span class="term-name">${t.name}</span>
+          <span class="term-mini">${t.mini}</span>
+          <span class="term-cat-badge">${ci.label}</span>
+          <svg class="term-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="term-body">
+          <div class="term-inner">
+            <div>
+              <div class="term-block-label">Definição</div>
+              <div class="term-block-text">${t.def}</div>
+            </div>
+            <div>
+              <div class="term-block-label">Como se fala</div>
+              <div class="term-pronunc">${t.pronunc}</div>
+            </div>
+            <div class="term-example">
+              <div class="term-block-label">Exemplo de uso</div>
+              <div class="term-block-text">${t.example}</div>
+            </div>
+          </div>
+        </div>`;
+      group.appendChild(card);
+    });
+    container.appendChild(group);
+  });
+}
+
+function toggleCard(btn) {
+  const card = btn.closest('.term-card');
+  const wasOpen = card.classList.contains('open');
+  card.classList.toggle('open', !wasOpen);
+}
+
+// SEARCH
+const searchInput = document.getElementById('search-input');
+const searchClear = document.getElementById('search-clear');
+searchInput.addEventListener('input', () => {
+  currentSearch = searchInput.value.trim();
+  searchClear.style.display = currentSearch ? 'block' : 'none';
+  render();
+});
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  currentSearch = '';
+  searchClear.style.display = 'none';
+  render();
+});
+
+// FILTERS
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    render();
+  });
+});
+
+// INIT
+document.getElementById('total-count').textContent = TERMS.length;
+buildAlphaNav();
+render();
+</script>
+</body>
+</html>

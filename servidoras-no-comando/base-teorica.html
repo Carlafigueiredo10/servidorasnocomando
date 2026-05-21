@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Teórica — Servidoras no Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-ambar: #F5A623;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --accent-cyan: #22D3EE;
+            --accent-blue: #60A5FA;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(251, 113, 133, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(245, 166, 35, 0.03) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(251, 113, 133, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 5rem 2rem 4rem;
+        }
+
+        /* ── Hero ── */
+        .bt-hero {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .bt-hero-tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-rosa);
+            opacity: 0.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .bt-hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+        }
+
+        .bt-hero-desc {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            max-width: 700px;
+        }
+
+        /* ── Section nav ── */
+        .bt-nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .bt-nav a {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .bt-nav a:hover {
+            border-color: rgba(251, 113, 133, 0.3);
+            color: var(--text-primary);
+        }
+
+        .bt-nav a .nav-emoji {
+            margin-right: 0.35rem;
+        }
+
+        /* ── Eixo section ── */
+        .bt-eixo {
+            margin-bottom: 3.5rem;
+        }
+
+        .bt-eixo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .bt-eixo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .bt-eixo-icon-1 { background: rgba(251, 113, 133, 0.1); border: 1px solid rgba(251, 113, 133, 0.15); }
+        .bt-eixo-icon-2 { background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.15); }
+        .bt-eixo-icon-3 { background: rgba(245, 166, 35, 0.1); border: 1px solid rgba(245, 166, 35, 0.15); }
+        .bt-eixo-icon-4 { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.15); }
+
+        .bt-eixo-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .bt-eixo-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Reference card ── */
+        .bt-ref {
+            padding: 1.25rem 1.4rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            margin-bottom: 0.85rem;
+            transition: all 0.25s ease;
+        }
+
+        .bt-ref:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .bt-ref-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+            line-height: 1.35;
+        }
+
+        .bt-ref-meta {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            margin-bottom: 0.6rem;
+        }
+
+        .bt-ref-meta strong {
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+        .bt-ref-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .bt-ref-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-rosa);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .bt-ref-link:hover { opacity: 1; }
+
+        .bt-ref-link svg { width: 12px; height: 12px; }
+
+        /* ── Video refs ── */
+        .bt-video-list {
+            margin-top: 0.5rem;
+            padding-left: 0;
+        }
+
+        .bt-video-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 0.25rem 0;
+        }
+
+        .bt-video-item::before {
+            content: '▸';
+            color: var(--accent-ambar);
+            flex-shrink: 0;
+        }
+
+        /* ── Footer ── */
+        .bt-footer {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .bt-footer p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            line-height: 1.6;
+        }
+
+        .bt-footer a {
+            color: var(--accent-rosa);
+            text-decoration: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html#modulosSection" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar para a plataforma
+    </a>
+
+    <div class="page-container">
+
+        <div class="bt-hero">
+            <div class="bt-hero-tag">Módulo 04 · Base Teórica e Referências</div>
+            <h1>Nossa Base Teórica<br>e Referências</h1>
+            <p class="bt-hero-desc">
+                O projeto Servidoras no Comando Digital é fundamentado em pesquisas acadêmicas, marcos 
+                legais de políticas públicas e nas melhores práticas de inovação tecnológica. Aqui você 
+                encontra todas as referências organizadas por eixo temático.
+            </p>
+        </div>
+
+        <nav class="bt-nav">
+            <a href="#eixo1"><span class="nav-emoji">👩‍💻</span> Mulheres na Tecnologia</a>
+            <a href="#eixo2"><span class="nav-emoji">🧠</span> Letramento Digital</a>
+            <a href="#eixo3"><span class="nav-emoji">🚀</span> IA e Engenharia de Prompt</a>
+            <a href="#eixo4"><span class="nav-emoji">📋</span> Inovação Pública</a>
+        </nav>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- EIXO 1 -->
+        <!-- ══════════════════════════════════════════ -->
+        <section class="bt-eixo" id="eixo1">
+            <div class="bt-eixo-header">
+                <div class="bt-eixo-icon bt-eixo-icon-1">👩‍💻</div>
+                <h2 class="bt-eixo-title">Mulheres na Tecnologia, Efeito Matilda e Síndrome do Impostor</h2>
+            </div>
+            <p class="bt-eixo-subtitle">
+                Estudos que embasam nossa compreensão sobre as barreiras estruturais, o apagamento histórico das mulheres na ciência e os desafios de permanência no setor tecnológico.
+            </p>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Mulheres na informática: quais foram as pioneiras?</div>
+                <div class="bt-ref-meta"><strong>Autores:</strong> Juliana Schwartz, Lindamir S. Casagrande, Sonia A. C. Leszczynski, Marilia G. de Carvalho · <strong>Publicação:</strong> Cadernos Pagu / SciELO (2006)</div>
+                <div class="bt-ref-desc">Artigo fundamental que resgata a história de mulheres como Ada Lovelace e as programadoras do ENIAC, desmistificando a ideia de que a computação é um território inerentemente masculino.</div>
+                <a href="https://www.scielo.br/" target="_blank" rel="noopener" class="bt-ref-link">
+                    Acessar no SciELO
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Julia Hall e o Desenvolvimento do Processo Hall-Héroult: o Efeito Matilda na História da Indústria Química</div>
+                <div class="bt-ref-meta"><strong>Autor:</strong> Lucas dos S. Fernandes · <strong>Publicação:</strong> Revista Química Nova na Escola (QNEsc)</div>
+                <div class="bt-ref-desc">Aborda o "Efeito Matilda" — fenômeno em que descobertas de cientistas mulheres são atribuídas a homens — base teórica crucial para entendermos a invisibilidade feminina na tecnologia.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Síndrome do Impostor no Mercado de Tecnologia da Informação</div>
+                <div class="bt-ref-meta"><strong>Autores:</strong> Luan G. de Souza, Luana Morais, Cintia Kleine, Lucas Schreiber (Orientação: Mariana Neumann) · <strong>Publicação:</strong> TCC — Centro Universitário Unisociesc (2022)</div>
+                <div class="bt-ref-desc">Estudo focado em como o Fenômeno do Impostor afeta a saúde mental de profissionais na área de TI, com base na escala de Pauline Rose Clance.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Barreiras e Desafios Enfrentados Pelas Mulheres no Ambiente Acadêmico e Organizacional do Setor de TI</div>
+                <div class="bt-ref-meta"><strong>Autores:</strong> Patrícia Queiroz Ferreira e Janaina Maria Bueno · <strong>Publicação:</strong> Anais da ANPAD / Universidade Federal de Uberlândia</div>
+                <div class="bt-ref-desc">Mapeia os desafios diários, a cultura androcêntrica (masculinizada) e o "labirinto organizacional" que dificultam a ascensão de mulheres em TI.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Por que as mulheres saem da área de tecnologia — e como evitar isso</div>
+                <div class="bt-ref-meta"><strong>Autora:</strong> Rachel Thomas (Tradução: Maria Lab / PrograMaria) · <strong>Publicação:</strong> Portal PrograMaria (2016)</div>
+                <div class="bt-ref-desc">Traz dados estatísticos sobre a evasão feminina na tecnologia e propõe estratégias de rede de apoio e reconhecimento de ideias.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">O Fenômeno Teto de Vidro na Ascensão à Posição Hierárquica das Mulheres no Mercado Formal</div>
+                <div class="bt-ref-meta"><strong>Autores:</strong> Caroline Dantas Rocha et al. · <strong>Publicação:</strong> XI Simpósio de Excelência em Gestão e Tecnologia (AEDB)</div>
+                <div class="bt-ref-desc">Analisa a barreira sutil e transparente (Glass Ceiling) que impede a passagem das mulheres aos níveis hierárquicos mais elevados de liderança.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Agenda Transversal Mulheres no PPA 2024–2027</div>
+                <div class="bt-ref-meta"><strong>Publicação:</strong> Ministério do Planejamento e Orçamento (MPO) / Governo Federal</div>
+                <div class="bt-ref-desc">Documento oficial que alinha o letramento digital feminino com as políticas de Estado, focando na autonomia econômica e igualdade de decisão e poder para as mulheres.</div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- EIXO 2 -->
+        <!-- ══════════════════════════════════════════ -->
+        <section class="bt-eixo" id="eixo2">
+            <div class="bt-eixo-header">
+                <div class="bt-eixo-icon bt-eixo-icon-2">🧠</div>
+                <h2 class="bt-eixo-title">Letramento Digital e Cibercultura</h2>
+            </div>
+            <p class="bt-eixo-subtitle">
+                Estudos que definem o letramento digital não apenas como o uso de ferramentas, mas como o desenvolvimento de um pensamento crítico, autoral e cidadão perante a máquina.
+            </p>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Novas Práticas de Leitura e Escrita: Letramento na Cibercultura</div>
+                <div class="bt-ref-meta"><strong>Autora:</strong> Magda Soares · <strong>Publicação:</strong> Revista Educação e Sociedade / SciELO (2002)</div>
+                <div class="bt-ref-desc">Obra inaugural no Brasil que diferencia a cultura do papel da cibercultura, definindo o conceito amplo de letramentos digitais.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Literacia Digital: Um guia para promover práticas educativas com tecnologias digitais</div>
+                <div class="bt-ref-meta"><strong>Autores:</strong> Mauricio Capobianco Lopes e Bruna Hamann · <strong>Publicação:</strong> Revista Brasileira de Ensino de Ciência e Tecnologia — RBECT (2025)</div>
+                <div class="bt-ref-desc">Guia que estrutura o letramento digital em eixos práticos (pesquisa, desenvolvimento, comunicação, colaboração e avaliação) para formar cidadãos críticos.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">BNCC e a Cultura Digital</div>
+                <div class="bt-ref-meta"><strong>Publicação:</strong> CIEB (Centro de Inovação para a Educação Brasileira)</div>
+                <div class="bt-ref-desc">Base legal e curricular que fundamenta a transição de um ensino tradicional para a inclusão tecnológica, defendendo que a tecnologia deve servir para criar soluções — e não apenas para consumo.</div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- EIXO 3 -->
+        <!-- ══════════════════════════════════════════ -->
+        <section class="bt-eixo" id="eixo3">
+            <div class="bt-eixo-header">
+                <div class="bt-eixo-icon bt-eixo-icon-3">🚀</div>
+                <h2 class="bt-eixo-title">Inteligência Artificial, Engenharia de Prompt e Vibe Coding</h2>
+            </div>
+            <p class="bt-eixo-subtitle">
+                Referências práticas e teóricas sobre a nova linguagem de programação (o português) e a criação de softwares sem código (No-Code).
+            </p>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">IA Generativa para Gestoras Públicas: Do Comando à Maestria</div>
+                <div class="bt-ref-meta"><strong>Tipo:</strong> Material base da oficina</div>
+                <div class="bt-ref-desc">Guia Prático de Engenharia de Prompt para Mulheres Líderes na Gestão Pública. Ensina o Método PTCF (Persona, Tarefa, Contexto, Formato e Limites) e a criação de "Prompts Mestres".</div>
+                <a href="materiais/engenharia-prompts/iagenerativagestoraspublicas.pdf" target="_blank" class="bt-ref-link">
+                    Abrir material
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Não é programador? Sem problemas: 5 caminhos para entrar no mundo da IA</div>
+                <div class="bt-ref-meta"><strong>Publicação:</strong> Portal Exame (Outubro, 2025)</div>
+                <div class="bt-ref-desc">Artigo que comprova a viabilidade de profissionais de áreas não técnicas (Direito, Administração) migrarem para a tecnologia através de ferramentas Low-Code/No-Code.</div>
+            </div>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">A Revolução do Vibe Coding e Ferramentas No-Code</div>
+                <div class="bt-ref-meta"><strong>Tipo:</strong> Material de apoio técnico (vídeo)</div>
+                <div class="bt-ref-desc">Material sobre as plataformas Lovable e Base44 utilizadas nas oficinas práticas de criação de aplicativos:</div>
+                <div class="bt-video-list">
+                    <div class="bt-video-item">Crie sites e apps em menos de 5 minutos com o LOVABLE — Canal Karine Lago</div>
+                    <div class="bt-video-item">Curso Lovable Gratuito para Iniciantes — Canal NoCode StartUp</div>
+                    <div class="bt-video-item">BASE44, seria melhor que LOVABLE para criar APPs com IA? — Canal Codando Sem Codar</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- EIXO 4 -->
+        <!-- ══════════════════════════════════════════ -->
+        <section class="bt-eixo" id="eixo4">
+            <div class="bt-eixo-header">
+                <div class="bt-eixo-icon bt-eixo-icon-4">📋</div>
+                <h2 class="bt-eixo-title">Inovação Pública e Metodologia de Facilitação</h2>
+            </div>
+            <p class="bt-eixo-subtitle">
+                Materiais que nortearam o design de experiência, gestão de tempo e metodologias ativas aplicadas durante a oficina presencial.
+            </p>
+
+            <div class="bt-ref">
+                <div class="bt-ref-title">Guia Prático para Planejamento de Reuniões e Oficinas</div>
+                <div class="bt-ref-meta"><strong>Autor:</strong> Rodrigo Mota Narcizo · <strong>Publicação:</strong> Rede Conexão Inovação Pública (Fevereiro, 2026)</div>
+                <div class="bt-ref-desc">Playbook interativo que forneceu as diretrizes de governança, o Canvas de Planejamento e as "regras de ouro" (como a Carta na Manga/Plano B logístico) aplicados no design do evento.</div>
+            </div>
+        </section>
+
+        <div class="bt-footer">
+            <p>
+                Referências do projeto <a href="index.html">Servidoras no Comando</a>.<br>
+                Programa Mulheres que Transformam · MGI
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

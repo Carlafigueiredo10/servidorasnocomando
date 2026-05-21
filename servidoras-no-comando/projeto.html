@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre o Projeto — ASCENDA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-cyan: #22D3EE;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 55%;
+            height: 55%;
+            background: radial-gradient(ellipse, rgba(167, 139, 250, 0.05) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(34, 211, 238, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(167, 139, 250, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem 5rem;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .page-badge {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-lavanda);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-lavanda);
+            margin-bottom: 1.25rem;
+        }
+
+        .section-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(167, 139, 250, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 10px;
+        }
+
+        .contact-item svg {
+            width: 20px;
+            height: 20px;
+            color: var(--accent-lavanda);
+            flex-shrink: 0;
+        }
+
+        .contact-item a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-lavanda);
+        }
+
+        @media (max-width: 640px) {
+            .page-container {
+                padding: 4rem 1.5rem 3rem;
+            }
+            .section {
+                padding: 1.75rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar
+    </a>
+
+    <div class="page-container">
+        <header class="page-header">
+            <div class="page-badge">PROJETO</div>
+            <h1 class="page-title">Sobre o ASCENDA</h1>
+            <p class="page-subtitle">Letramento digital e autonomia em tecnologia para mulheres que constroem o serviço público.</p>
+        </header>
+
+        <section id="sobre" class="section">
+            <h2 class="section-title">Sobre</h2>
+            <div class="section-content">
+                <p>O ASCENDA é uma plataforma de letramento digital criada especialmente para mulheres no serviço público brasileiro. Nossa missão é romper barreiras, democratizar o acesso à tecnologia e formar uma geração de servidoras técnicas capacitadas para liderar a transformação digital do Estado.</p>
+                
+                <p>Desenvolvemos conteúdos, trilhas de aprendizagem e ferramentas práticas que capacitam mulheres a usar inteligência artificial, automação e tecnologia para resolver problemas reais do setor público — desde a otimização de processos administrativos até a criação de soluções digitais inovadoras.</p>
+                
+                <p>Mais do que uma plataforma de ensino, o ASCENDA é um movimento de autonomia digital: acreditamos que toda mulher que atua no serviço público tem direito ao conhecimento tecnológico e ao protagonismo na construção de políticas públicas mais eficientes, transparentes e humanas.</p>
+            </div>
+        </section>
+
+        <section id="oficina" class="section">
+            <h2 class="section-title">Oficina Convergência</h2>
+            <div class="section-content">
+                <p>A Oficina Convergência é nossa experiência prática intensiva: em aproximadamente 2 horas, participantes aprendem a criar uma solução digital real usando inteligência artificial e ferramentas de automação.</p>
+                
+                <p>O formato é hands-on: cada participante sai com um aplicativo web funcional publicado, desenvolvido do zero durante a oficina. Não é necessário saber programar — nosso método ensina a usar plataformas como Lovable e Claude para materializar ideias em tecnologia.</p>
+                
+                <p>Mais do que uma capacitação técnica, a oficina é um ritual de passagem: rompe o mito de que "tecnologia não é para mim" e demonstra, na prática, que toda servidora tem potencial para ser autora de soluções digitais.</p>
+            </div>
+        </section>
+
+        <section id="mulheres-transformam" class="section">
+            <h2 class="section-title">Mulheres que Transformam</h2>
+            <div class="section-content">
+                <p>O ASCENDA integra o Programa Mulheres que Transformam, iniciativa do Ministério da Gestão e Inovação em Serviços Públicos (MGI) voltada ao fortalecimento da presença feminina em cargos de liderança e decisão no governo federal.</p>
+                
+                <p>O programa reconhece que a equidade de gênero no setor público passa também pela equidade no acesso à tecnologia. Por isso, o ASCENDA foca especificamente no letramento digital como ferramenta de empoderamento e ascensão profissional de mulheres servidoras.</p>
+                
+                <p>Ao capacitar mulheres em tecnologia, contribuímos para diversificar os perfis de quem constrói políticas públicas digitais — garantindo que as soluções tecnológicas do Estado reflitam as necessidades de toda a sociedade.</p>
+            </div>
+        </section>
+
+        <section id="contato" class="section">
+            <h2 class="section-title">Contato</h2>
+            <div class="section-content">
+                <p>Para dúvidas, parcerias, convites para oficinas ou sugestões de conteúdo, entre em contato:</p>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <a href="https://wa.me/5561998755013">(61) 99875-5013</a>
+                    </div>
+
+                    <div class="contact-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <a href="mailto:carla.figueiredo@gestao.gov.br">carla.figueiredo@gestao.gov.br</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

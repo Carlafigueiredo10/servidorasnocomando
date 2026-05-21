@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Certificado · Servidoras no Comando Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-cyan: #22D3EE;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-primary);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .page-glow {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 30% 30%, rgba(167,139,250,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 70% 70%, rgba(34,211,238,0.05) 0%, transparent 60%);
+        }
+        .card {
+            position: relative; z-index: 1;
+            max-width: 480px; width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        /* ── Loading ── */
+        .state { display: none; }
+        .state.active { display: block; }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(167,139,250,0.2);
+            border-top-color: var(--accent-lavanda);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Válido ── */
+        .check-icon {
+            width: 64px; height: 64px;
+            background: rgba(52,211,153,0.1);
+            border: 1.5px solid rgba(52,211,153,0.3);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--accent-verde);
+        }
+        .valid-badge {
+            display: inline-block;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--accent-verde);
+            border: 1px solid rgba(52,211,153,0.3);
+            border-radius: 20px; padding: 0.25rem 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .cert-nome {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem; font-weight: 800;
+            color: var(--text-primary); margin-bottom: 0.25rem;
+        }
+        .cert-info {
+            font-size: 0.85rem; color: var(--text-secondary);
+            line-height: 1.7; margin-bottom: 1.5rem;
+        }
+        .cert-info strong { color: var(--text-primary); }
+        .cert-detalhe {
+            background: rgba(167,139,250,0.06);
+            border: 1px solid rgba(167,139,250,0.15);
+            border-radius: 12px; padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem; text-align: left;
+        }
+        .cert-detalhe-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.82rem;
+        }
+        .cert-detalhe-row:last-child { border-bottom: none; }
+        .cert-detalhe-key { color: var(--text-secondary); }
+        .cert-detalhe-val { color: var(--text-primary); font-weight: 500; font-family: monospace; font-size: 0.8rem; }
+
+        /* ── Inválido ── */
+        .x-icon {
+            width: 64px; height: 64px;
+            background: rgba(251,113,133,0.1);
+            border: 1.5px solid rgba(251,113,133,0.3);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--accent-rosa);
+        }
+        .invalid-badge {
+            display: inline-block;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--accent-rosa);
+            border: 1px solid rgba(251,113,133,0.3);
+            border-radius: 20px; padding: 0.25rem 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* ── Busca manual ── */
+        .search-box {
+            margin-top: 1.5rem;
+        }
+        .search-input {
+            width: 100%; padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+            font-family: monospace; letter-spacing: 0.05em; text-transform: uppercase;
+            outline: none; text-align: center;
+            transition: border-color 0.2s;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.25); font-family: 'DM Sans'; letter-spacing: 0; text-transform: none; }
+        .search-input:focus { border-color: rgba(167,139,250,0.45); }
+        .search-btn {
+            width: 100%; margin-top: 0.6rem; padding: 0.8rem;
+            background: rgba(167,139,250,0.15);
+            border: 1px solid rgba(167,139,250,0.25);
+            border-radius: 10px; color: var(--accent-lavanda);
+            font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .search-btn:hover { background: rgba(167,139,250,0.25); }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            margin-top: 1.5rem; font-size: 0.75rem;
+            color: var(--text-secondary); text-decoration: none;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text-primary); }
+
+        .page-title {
+            font-family: 'Syne', sans-serif; font-size: 0.8rem;
+            font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--accent-lavanda); margin-bottom: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .state.active { animation: fadeIn 0.4s ease; }
+    </style>
+</head>
+<body>
+<div class="page-glow"></div>
+
+<div class="card">
+    <div class="page-title">✦ Verificação de Certificado</div>
+
+    <!-- Loading -->
+    <div class="state active" id="stateLoading">
+        <div class="spinner"></div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem;">Verificando certificado...</p>
+    </div>
+
+    <!-- Válido -->
+    <div class="state" id="stateValido">
+        <div class="check-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="28" height="28">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="valid-badge">✓ Certificado válido</div>
+        <div class="cert-nome" id="vNome">—</div>
+        <div class="cert-info">
+            participou e concluiu a<br>
+            <strong>Oficina Servidoras no Comando Digital</strong><br>
+            Programa Mulheres que Transformam · MGI
+        </div>
+        <div class="cert-detalhe">
+            <div class="cert-detalhe-row">
+                <span class="cert-detalhe-key">Código</span>
+                <span class="cert-detalhe-val" id="vCodigo">—</span>
+            </div>
+            <div class="cert-detalhe-row">
+                <span class="cert-detalhe-key">Emitido em</span>
+                <span class="cert-detalhe-val" id="vData">—</span>
+            </div>
+            <div class="cert-detalhe-row">
+                <span class="cert-detalhe-key">Órgão</span>
+                <span class="cert-detalhe-val" id="vOrgao">—</span>
+            </div>
+        </div>
+        <a href="index.html" class="back-link">← Servidoras no Comando Digital</a>
+    </div>
+
+    <!-- Inválido -->
+    <div class="state" id="stateInvalido">
+        <div class="x-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="28" height="28">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </div>
+        <div class="invalid-badge">✗ Certificado não encontrado</div>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.5rem;">
+            Este código não corresponde a nenhum certificado emitido.<br>
+            Verifique se digitou corretamente.
+        </p>
+        <div class="search-box">
+            <input class="search-input" type="text" id="searchInput" placeholder="Digite o código (ex: AB3X7K2M)" maxlength="8">
+            <button class="search-btn" onclick="buscarManual()">Verificar este código</button>
+        </div>
+        <a href="index.html" class="back-link">← Servidoras no Comando Digital</a>
+    </div>
+
+    <!-- Sem código na URL -->
+    <div class="state" id="stateBusca">
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            Digite o código de 8 caracteres que aparece no certificado.
+        </p>
+        <div class="search-box">
+            <input class="search-input" type="text" id="searchInput2" placeholder="Ex: AB3X7K2M" maxlength="8">
+            <button class="search-btn" onclick="buscarManual2()">Verificar certificado</button>
+        </div>
+        <a href="index.html" class="back-link">← Servidoras no Comando Digital</a>
+    </div>
+</div>
+
+<script>
+    const NETLIFY_FN = '/.netlify/functions/diagnostico-vote';
+
+    function setState(id) {
+        document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    async function verificar(codigo) {
+        if (!codigo) { setState('stateBusca'); return; }
+
+        setState('stateLoading');
+        try {
+            const res = await fetch(`${NETLIFY_FN}?acao=verificar&codigo=${encodeURIComponent(codigo.toUpperCase())}`);
+            if (!res.ok) throw new Error('not found');
+            const data = await res.json();
+
+            if (data.encontrado) {
+                document.getElementById('vNome').textContent = data.nome || '—';
+                document.getElementById('vCodigo').textContent = data.codigo || codigo;
+                document.getElementById('vData').textContent = data.data || '—';
+                document.getElementById('vOrgao').textContent = data.orgao || '—';
+                setState('stateValido');
+            } else {
+                setState('stateInvalido');
+            }
+        } catch(e) {
+            setState('stateInvalido');
+        }
+    }
+
+    function buscarManual() {
+        const v = document.getElementById('searchInput').value.trim();
+        if (v) verificar(v);
+    }
+
+    function buscarManual2() {
+        const v = document.getElementById('searchInput2').value.trim();
+        if (v) verificar(v);
+    }
+
+    // Tecla Enter nos inputs
+    ['searchInput', 'searchInput2'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.target.id === 'searchInput' ? buscarManual() : buscarManual2(); }
+        });
+    });
+
+    // Iniciar verificação com código da URL
+    const params = new URLSearchParams(window.location.search);
+    const codigo = params.get('id') || params.get('codigo');
+    verificar(codigo);
+</script>
+</body>
+</html>

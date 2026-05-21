@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trilhas de Aprendizagem — Servidoras no Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#030308;
+            --lavanda:#A78BFA;--ambar:#F5A623;--verde:#34D399;--rosa:#FB7185;--cyan:#22D3EE;--blue:#60A5FA;
+            --t1:#A78BFA;--t2:#F5A623;--t3:#22D3EE;--t4:#FB7185;--t5:#34D399;
+            --text:#F7F7F8;--muted:#6B6B80;--border:rgba(255,255,255,0.08);
+        }
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow-x:hidden;min-height:100vh}
+        body::before{content:'';position:fixed;top:-20%;left:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(245,166,35,0.04) 0%,transparent 70%);filter:blur(80px);z-index:0;pointer-events:none}
+
+        .back-btn{position:fixed;top:1.25rem;left:1.25rem;z-index:100;display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.1rem;background:rgba(10,10,18,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:10px;color:var(--muted);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;transition:all .3s ease}
+        .back-btn:hover{color:var(--text);border-color:rgba(245,166,35,0.3);transform:translateX(-2px)}
+        .back-btn svg{width:16px;height:16px}
+
+        .page{
+            position:relative;
+            z-index:1;
+            max-width:860px;
+            margin:0 auto;
+            padding:5rem 2rem 4rem;
+        }
+        
+        /* Timeline só aparece se houver section.trilha-section */
+        .page:has(.trilha-section)::before{
+            content:"";
+            position:absolute;
+            left:28px;
+            top:0;
+            bottom:0;
+            width:1px;
+            background:linear-gradient(
+                180deg,
+                rgba(103,232,249,0.15),
+                rgba(255,255,255,0.04)
+            );
+            z-index:0;
+        }
+
+        /* Hero */
+        .hero{margin-bottom:2.5rem;animation:fadeUp .6s ease forwards}
+        .hero-tag{font-size:.65rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--ambar);opacity:.7;margin-bottom:.75rem}
+        .hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1.25rem}
+        .hero-desc{font-size:1.05rem;color:var(--muted);line-height:1.75;max-width:700px}
+
+        /* Nav pills */
+        .nav-pills{
+            display:flex;
+            gap:.5rem;
+            flex-wrap:wrap;
+            margin-bottom:2.5rem;
+            animation:fadeUp .6s .1s ease both;
+            
+            position:sticky;
+            top:16px;
+            z-index:200;
+            
+            backdrop-filter:blur(14px);
+            background:rgba(12,14,18,0.65);
+            
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:16px;
+            
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.05) inset,
+                0 18px 40px rgba(0,0,0,0.35);
+            
+            padding:.35rem;
+            transition:all .25s ease;
+            position:relative;
+        }
+        
+        .nav-pills::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            border-radius:inherit;
+            background:linear-gradient(
+                180deg,
+                rgba(255,255,255,0.06),
+                transparent 60%
+            );
+            pointer-events:none;
+        }
+        
+        .nav-pills a{
+            border-radius:10px;
+            border:1px solid transparent;
+            background:transparent;
+            color:var(--muted);
+            padding:.45rem .8rem;
+            font-size:.78rem;
+            font-weight:500;
+            text-decoration:none;
+            transition:all .2s ease;
+            position:relative;
+            z-index:1;
+        }
+        
+        .nav-pills a:hover{
+            background:rgba(255,255,255,0.06);
+            color:var(--text);
+        }
+        
+        .nav-pills a.active{
+            background:rgba(34,211,238,0.12);
+            border-color:rgba(34,211,238,0.35);
+            color:var(--cyan);
+        }
+        
+        .nav-pills a.nav-fundamental{
+            border:1px solid rgba(34,211,238,0.25);
+            background:rgba(34,211,238,0.08);
+            color:var(--t3);
+        }
+        
+        .nav-pills a.nav-fundamental:hover{
+            background:rgba(34,211,238,0.14);
+        }
+
+        /* ── DIAGNOSTIC ── */
+        .diag{
+            background:rgba(255,255,255,0.02);
+            border:1px solid var(--border);
+            border-radius:18px;
+            padding:2.5rem;
+            margin-bottom:3.5rem;
+            animation:fadeUp .6s .15s ease both;
+            scroll-margin-top:110px;
+        }
+        .diag-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.4rem}
+        .diag-sub{font-size:.85rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+        .diag-sub strong{color:var(--ambar)}
+
+        /* Progress */
+        .diag-progress{display:flex;align-items:center;gap:.75rem;margin-bottom:2rem}
+        .diag-bar{flex:1;height:4px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden}
+        .diag-bar-fill{height:100%;width:0%;background:var(--ambar);border-radius:4px;transition:width .4s ease}
+        .diag-step{font-size:.7rem;color:var(--muted);font-weight:600;white-space:nowrap}
+
+        /* Blocks */
+        .diag-block{display:none}
+        .diag-block.active{display:block;animation:fadeUp .3s ease}
+        .diag-block-label{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--ambar);opacity:.5;margin-bottom:1rem}
+
+        /* Question */
+        .dq{margin-bottom:2rem}
+        .dq-text{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:1rem;line-height:1.45}
+        .dq-options{display:flex;flex-direction:column;gap:.5rem}
+        .dq-opt{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s ease;font-size:.82rem;color:var(--muted);line-height:1.4}
+        .dq-opt:hover{border-color:rgba(245,166,35,0.2);color:var(--text)}
+        .dq-opt.selected{border-color:var(--ambar);background:rgba(245,166,35,0.06);color:var(--text)}
+        .dq-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .2s ease;position:relative}
+        .dq-opt.selected .dq-radio{border-color:var(--ambar)}
+        .dq-opt.selected .dq-radio::after{content:'';position:absolute;top:3px;left:3px;width:6px;height:6px;border-radius:50%;background:var(--ambar)}
+
+        /* Slider q7 */
+        .dq-slider-wrap{display:flex;flex-direction:column;gap:.75rem}
+        .dq-slider{-webkit-appearance:none;width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:6px;outline:none}
+        .dq-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ambar);cursor:pointer;box-shadow:0 0 10px rgba(245,166,35,0.3)}
+        .dq-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ambar);cursor:pointer;border:none}
+        .dq-slider-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
+        .dq-slider-val{font-size:1.5rem;font-family:'Syne',sans-serif;font-weight:800;color:var(--ambar);text-align:center}
+
+        /* Nav buttons */
+        .diag-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+        .diag-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.25rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s ease;border:none}
+        .diag-btn-back{background:transparent;color:var(--muted);border:1px solid var(--border)}
+        .diag-btn-back:hover{color:var(--text);border-color:rgba(255,255,255,0.15)}
+        .diag-btn-next{background:rgba(245,166,35,0.12);color:var(--ambar);border:1px solid rgba(245,166,35,0.25)}
+        .diag-btn-next:hover{background:rgba(245,166,35,0.2)}
+        .diag-btn-next:disabled{opacity:.3;cursor:not-allowed}
+        .diag-btn svg{width:14px;height:14px}
+
+        /* ── RESULT ── */
+        .result{display:none;animation:fadeUp .5s ease}
+        .result-box{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:18px;padding:2.5rem;text-align:center;margin-bottom:3rem}
+        .result-tag{font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;opacity:.5;margin-bottom:.75rem}
+        .result-trilha{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:.5rem}
+        .result-desc{font-size:.9rem;color:var(--muted);line-height:1.65;max-width:520px;margin:0 auto 1.5rem}
+        
+        .result-profile-label,
+        .result-reading-label,
+        .result-secondary-label {
+            font-size:.65rem;
+            text-transform:uppercase;
+            letter-spacing:.14em;
+            color:var(--muted);
+            opacity:.7;
+            margin-top:1.25rem;
+            margin-bottom:.35rem;
+        }
+        
+        .result-profile {
+            font-family:'Syne',sans-serif;
+            font-size:1.1rem;
+            font-weight:700;
+            color:var(--text);
+        }
+        
+        .result-reading {
+            font-size:.9rem;
+            line-height:1.7;
+            color:var(--muted);
+            max-width:560px;
+            margin:0 auto 1.25rem;
+        }
+        
+        .result-secondary {
+            font-size:.88rem;
+            color:var(--text);
+            opacity:.9;
+        }
+        
+        .result-score {
+            margin-top:1rem;
+            margin-bottom:1rem;
+            font-size:.8rem;
+            color:var(--muted);
+        }
+        
+        .result-score-value {
+            font-size:1.2rem;
+            font-weight:700;
+            color:var(--text);
+        }
+        
+        .result-cta{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease;cursor:pointer;border:none;margin-top:.5rem}
+        .result-cta svg{width:16px;height:16px}
+        
+        .result-cta-secondary {
+            display:inline-block;
+            color:var(--muted);
+            text-decoration:underline;
+            font-size:.85rem;
+            cursor:pointer;
+            transition:color .3s ease;
+        }
+        .result-cta-secondary:hover {
+            color:var(--text);
+        }
+        
+        .result-note{font-size:.75rem;color:var(--muted);opacity:.5;margin-top:1rem}
+        .result-retry{color:var(--ambar);text-decoration:underline;cursor:pointer;font-size:.75rem;margin-top:.75rem;display:inline-block}
+
+        /* ── TRILHAS ── */
+        .trilha-section{
+            margin-bottom:3.5rem;
+            padding-top:6rem;
+            margin-top:6rem;
+            border-top:1px solid rgba(255,255,255,0.05);
+            scroll-margin-top:110px;
+            
+            /* Section reveal */
+            opacity:0.55;
+            transform:translateY(18px);
+            transition:all .5s ease;
+            
+            /* Timeline positioning */
+            position:relative;
+            padding-left:70px;
+        }
+        
+        .trilha-section.visible{
+            opacity:1;
+            transform:translateY(0);
+            box-shadow:0 0 0 1px rgba(103,232,249,0.08);
+        }
+        
+        .trilha-section::before{
+            content:attr(id);
+            display:block;
+            font-size:.7rem;
+            letter-spacing:.2em;
+            color:var(--muted);
+            margin-bottom:1rem;
+            text-transform:uppercase;
+            opacity:0.5;
+        }
+        
+        /* Timeline node */
+        .trilha-section::after{
+            content:"";
+            position:absolute;
+            left:21px;
+            top:22px;
+            width:14px;
+            height:14px;
+            border-radius:50%;
+            background:var(--accent-cyan);
+            box-shadow:0 0 0 6px rgba(103,232,249,0.08);
+            transition:all .3s ease;
+        }
+        
+        .trilha-section.visible::after{
+            transform:scale(1.2);
+            box-shadow:
+                0 0 0 8px rgba(103,232,249,0.12),
+                0 0 20px rgba(103,232,249,0.35);
+        }
+        
+        .trilha-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+        .trilha-num{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;flex-shrink:0}
+        .trilha-num-1{background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.15);color:var(--t1)}
+        .trilha-num-2{background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.15);color:var(--t2)}
+        .trilha-num-3{background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.15);color:var(--t3)}
+        .trilha-num-4{background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.15);color:var(--t4)}
+        .trilha-num-5{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.15);color:var(--t5)}
+        .trilha-title{
+            font-family:'Syne',sans-serif;
+            font-size:2.2rem;
+            font-weight:700;
+            letter-spacing:-0.02em;
+            margin-bottom:1rem;
+            margin-top:0;
+        }
+        .trilha-info{display:flex;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap}
+        .trilha-info-item{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
+        .trilha-info-item svg{width:13px;height:13px;opacity:.5}
+        .trilha-desc{font-size:.85rem;color:var(--muted);line-height:1.65;margin-bottom:1.25rem}
+        .trilha-entrega{font-size:.8rem;padding:.65rem 1rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;margin-bottom:1.25rem}
+        .trilha-entrega strong{color:var(--text);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.25rem}
+        .trilha-entrega span{color:var(--muted)}
+
+        /* Resources */
+        .trilha-recursos{display:flex;flex-direction:column;gap:.6rem}
+        .trilha-recurso{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;transition:all .2s ease}
+        .trilha-recurso:hover{border-color:rgba(255,255,255,0.1)}
+        .trilha-recurso-name{font-size:.82rem;font-weight:500;color:var(--text)}
+        .trilha-recurso-link{font-size:.65rem;font-weight:600;color:var(--ambar);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s}
+        .trilha-recurso-link:hover{opacity:1}
+
+        /* Transversal */
+        .transversal{
+            background:rgba(255,255,255,0.02);
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:2rem 2.5rem;
+            margin-bottom:3rem;
+            padding-top:6rem;
+            margin-top:6rem;
+            border-top:1px solid rgba(255,255,255,0.05);
+            scroll-margin-top:110px;
+        }
+        .transversal h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.5rem}
+        .transversal-desc{font-size:.85rem;color:var(--muted);line-height:1.65;margin-bottom:1.25rem}
+        .transversal-items{display:flex;flex-direction:column;gap:.5rem}
+
+        /* Footer */
+        .footer{margin-top:2rem;padding-top:2rem;border-top:1px solid var(--border);text-align:center}
+        .footer p{font-size:.75rem;color:var(--muted);opacity:.4;line-height:1.6}
+        .footer a{color:var(--ambar);text-decoration:none}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* ==========================================
+           MOBILE RESPONSIVE
+        ========================================== */
+        @media (max-width: 768px) {
+            .back-btn{
+                position: static;
+                margin-bottom: 1rem;
+                width: fit-content;
+            }
+
+            .page{
+                padding: 1.25rem 1rem 3rem;
+            }
+
+            .page:has(.trilha-section)::before{
+                display: none;
+            }
+
+            .nav-pills{
+                top: 8px;
+                gap: .35rem;
+                padding: .3rem;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .nav-pills::-webkit-scrollbar{
+                display: none;
+            }
+
+            .nav-pills a{
+                white-space: nowrap;
+                font-size: .78rem;
+                padding: .45rem .7rem;
+                flex: 0 0 auto;
+            }
+
+            .trilha-section{
+                padding-left: 0;
+                padding-top: 3rem;
+                margin-top: 3rem;
+                margin-bottom: 2rem;
+                scroll-margin-top: 88px;
+                opacity: 1;
+                transform: none;
+            }
+
+            .trilha-section::before,
+            .trilha-section::after{
+                display: none;
+            }
+
+            .trilha-header{
+                align-items: flex-start;
+            }
+
+            .trilha-title{
+                font-size: 1.05rem;
+                line-height: 1.2;
+            }
+
+            .trilha-info{
+                gap: .75rem;
+            }
+
+            .trilha-recurso{
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .result-box{
+                padding: 1.25rem;
+            }
+
+            .result-cta,
+            .result-cta-secondary{
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+            }
+        }
+        
+        @media(max-width:600px){.diag{padding:1.5rem}.result-box{padding:1.5rem}.transversal{padding:1.5rem}}
+    </style>
+</head>
+<body>
+
+<a href="index.html#modulosSection" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar para a plataforma
+</a>
+
+<div class="page">
+
+    <div class="hero">
+        <div class="hero-tag">Módulo 02 · Trilhas de Aprendizagem</div>
+        <h1>Qual trilha de IA é mais<br>estratégica para você?</h1>
+        <p class="hero-desc">5 trilhas progressivas com cursos gratuitos verificados. Faça o diagnóstico rápido e descubra por onde começar — ou explore todas diretamente.</p>
+    </div>
+
+    <nav class="nav-pills">
+        <a href="#diagnostico" data-target="diagnostico">🧭 Diagnóstico</a>
+        <a href="#trilha0" data-target="trilha0" class="nav-fundamental">📚 Fundamental</a>
+        <a href="#trilha1" data-target="trilha1">Trilha 1</a>
+        <a href="#trilha2" data-target="trilha2">Trilha 2</a>
+        <a href="#trilha3" data-target="trilha3">Trilha 3</a>
+        <a href="#trilha4" data-target="trilha4">Trilha 4</a>
+        <a href="#trilha5" data-target="trilha5">Trilha 5</a>
+        <a href="#transversal" data-target="transversal">⚖️ Governança</a>
+    </nav>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- DIAGNÓSTICO -->
+    <!-- ══════════════════════════════════════ -->
+    <div class="diag" id="diagnostico">
+        <div class="diag-title">🧭 Diagnóstico Rápido</div>
+        <div class="diag-sub">5 minutos. 10 perguntas. <strong>Sem respostas certas ou erradas.</strong></div>
+
+        <div class="diag-progress">
+            <div class="diag-bar"><div class="diag-bar-fill" id="progFill"></div></div>
+            <div class="diag-step" id="progStep">1/10</div>
+        </div>
+
+        <div id="diagBlocks">
+            <!-- BLOCO 1 -->
+            <div class="diag-block active" data-block="1">
+                <div class="diag-block-label">Bloco 1 — Experiência Atual</div>
+                <div class="dq" data-q="1">
+                    <div class="dq-text">1. Você já utiliza IA no trabalho?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="0"><div class="dq-radio"></div>Nunca usei</div>
+                        <div class="dq-opt" data-val="1"><div class="dq-radio"></div>Uso ocasionalmente (resumos, textos, ideias)</div>
+                        <div class="dq-opt" data-val="2"><div class="dq-radio"></div>Uso com frequência</div>
+                        <div class="dq-opt" data-val="3"><div class="dq-radio"></div>Já uso para estruturar fluxos ou organizar tarefas</div>
+                    </div>
+                </div>
+                <div class="dq" data-q="2">
+                    <div class="dq-text">2. Você já criou algum fluxo automatizado (mesmo simples)?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="0"><div class="dq-radio"></div>Não</div>
+                        <div class="dq-opt" data-val="1"><div class="dq-radio"></div>Já usei algo pronto</div>
+                        <div class="dq-opt" data-val="2"><div class="dq-radio"></div>Já configurei uma automação simples</div>
+                        <div class="dq-opt" data-val="3"><div class="dq-radio"></div>Já criei algo do zero</div>
+                    </div>
+                </div>
+                <div class="dq" data-q="3">
+                    <div class="dq-text">3. Você já estruturou dados em tabela para resolver um problema?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="0"><div class="dq-radio"></div>Não</div>
+                        <div class="dq-opt" data-val="1"><div class="dq-radio"></div>Sim, mas sem regra clara</div>
+                        <div class="dq-opt" data-val="2"><div class="dq-radio"></div>Sim, com regras básicas</div>
+                        <div class="dq-opt" data-val="3"><div class="dq-radio"></div>Sim, com lógica de status/condição</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOCO 2 -->
+            <div class="diag-block" data-block="2">
+                <div class="diag-block-label">Bloco 2 — Objetivo</div>
+                <div class="dq" data-q="4">
+                    <div class="dq-text">4. O que você quer alcançar agora?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="entender"><div class="dq-radio"></div>Entender melhor o que é IA</div>
+                        <div class="dq-opt" data-val="produtividade"><div class="dq-radio"></div>Ganhar produtividade</div>
+                        <div class="dq-opt" data-val="analise"><div class="dq-radio"></div>Melhorar relatórios e análise</div>
+                        <div class="dq-opt" data-val="criar"><div class="dq-radio"></div>Criar uma solução digital para meu setor</div>
+                        <div class="dq-opt" data-val="programar"><div class="dq-radio"></div>Aprender a programar</div>
+                    </div>
+                </div>
+                <div class="dq" data-q="5">
+                    <div class="dq-text">5. Se pudesse escolher, você preferiria:</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="usar"><div class="dq-radio"></div>Usar ferramentas prontas</div>
+                        <div class="dq-opt" data-val="adaptar"><div class="dq-radio"></div>Adaptar ferramentas</div>
+                        <div class="dq-opt" data-val="criar"><div class="dq-radio"></div>Criar sua própria solução</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOCO 3 -->
+            <div class="diag-block" data-block="3">
+                <div class="diag-block-label">Bloco 3 — Mentalidade Tecnológica</div>
+                <div class="dq" data-q="6">
+                    <div class="dq-text">6. Quando surge um problema repetitivo no trabalho, você tende a:</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="0"><div class="dq-radio"></div>Resolver manualmente</div>
+                        <div class="dq-opt" data-val="1"><div class="dq-radio"></div>Criar um modelo padrão</div>
+                        <div class="dq-opt" data-val="2"><div class="dq-radio"></div>Organizar numa planilha</div>
+                        <div class="dq-opt" data-val="3"><div class="dq-radio"></div>Pensar em automatizar</div>
+                    </div>
+                </div>
+                <div class="dq" data-q="7">
+                    <div class="dq-text">7. Você se vê como alguém capaz de criar tecnologia?</div>
+                    <div class="dq-slider-wrap">
+                        <div class="dq-slider-val" id="q7val">3</div>
+                        <input type="range" min="1" max="5" value="3" class="dq-slider" id="q7slider">
+                        <div class="dq-slider-labels"><span>1 — Não me vejo capaz</span><span>5 — Totalmente capaz</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOCO 4 -->
+            <div class="diag-block" data-block="4">
+                <div class="diag-block-label">Bloco 4 — Disponibilidade</div>
+                <div class="dq" data-q="8">
+                    <div class="dq-text">8. Quanto tempo por semana você pode dedicar?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="1h"><div class="dq-radio"></div>Até 1 hora</div>
+                        <div class="dq-opt" data-val="2-3h"><div class="dq-radio"></div>2 a 3 horas</div>
+                        <div class="dq-opt" data-val="4-6h"><div class="dq-radio"></div>4 a 6 horas</div>
+                        <div class="dq-opt" data-val="6h+"><div class="dq-radio"></div>Mais de 6 horas</div>
+                    </div>
+                </div>
+                <div class="dq" data-q="9">
+                    <div class="dq-text">9. Você tem acesso a ferramentas no seu órgão?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="navegador"><div class="dq-radio"></div>Apenas navegador</div>
+                        <div class="dq-opt" data-val="m365"><div class="dq-radio"></div>Microsoft 365</div>
+                        <div class="dq-opt" data-val="automacao"><div class="dq-radio"></div>Ferramentas de automação</div>
+                        <div class="dq-opt" data-val="naosei"><div class="dq-radio"></div>Não sei</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOCO 5 -->
+            <div class="diag-block" data-block="5">
+                <div class="diag-block-label">Bloco 5 — Provocação</div>
+                <div class="dq" data-q="10">
+                    <div class="dq-text">10. Se você aprendesse a construir uma ferramenta simples, você aplicaria no seu setor?</div>
+                    <div class="dq-options">
+                        <div class="dq-opt" data-val="naosei"><div class="dq-radio"></div>Não sei</div>
+                        <div class="dq-opt" data-val="talvez"><div class="dq-radio"></div>Talvez</div>
+                        <div class="dq-opt" data-val="sim"><div class="dq-radio"></div>Sim</div>
+                        <div class="dq-opt" data-val="sim-problema"><div class="dq-radio"></div>Sim, já tenho um problema em mente</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diag-nav">
+            <button class="diag-btn diag-btn-back" id="btnBack" style="visibility:hidden" onclick="navBlock(-1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Voltar
+            </button>
+            <button class="diag-btn diag-btn-next" id="btnNext" onclick="navBlock(1)">
+                Próximo
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULTADO -->
+    <div class="result" id="resultado">
+        <div class="result-box" id="resultBox">
+            <div class="result-tag" id="resultTag"></div>
+            <div class="result-trilha" id="resultTrilha"></div>
+            <div class="result-desc" id="resultDesc"></div>
+            
+            <div class="result-profile-label">Perfil detectado</div>
+            <div class="result-profile" id="resultProfile"></div>
+            
+            <div class="result-reading-label">Leitura da sua jornada</div>
+            <div class="result-reading" id="resultReading"></div>
+            
+            <a class="result-cta" id="resultCta">
+                Começar minha trilha recomendada
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            
+            <div class="result-secondary-label">Trilha complementar</div>
+            <a class="result-cta-secondary" id="resultCtaSecondary"></a>
+            
+            <div class="result-score">
+                <span class="result-score-value" id="resultScore"></span>
+                <span class="result-score-label">de aderência à trilha</span>
+            </div>
+            
+            <div class="result-note">Você pode explorar qualquer trilha — o diagnóstico é apenas uma sugestão.</div>
+            <div class="result-retry" onclick="resetDiag()">Refazer diagnóstico</div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- TRILHAS -->
+    <!-- ══════════════════════════════════════ -->
+
+    <section class="trilha-section" id="trilha0">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-0" style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.15);color:var(--t3)">00</div>
+            <h2 class="trilha-title">Trilha Fundamental — Pensamento Analítico e Dados</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>30 a 40 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Fundamental</div>
+        </div>
+        <div class="trilha-desc">Aprenda a entender, organizar e interpretar dados antes de usar IA para análise. Esta é a base para todas as outras trilhas.</div>
+        <div class="trilha-entrega"><strong>Entrega</strong><span>Painel de dados simples criado para seu setor usando dados públicos.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Google Data Analytics Certificate</span><a href="https://www.coursera.org/professional-certificates/google-data-analytics" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">ENAP – Resolução de Problemas com Base em Dados</span><a href="https://www.escolavirtual.gov.br/trilha/216" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Microsoft Learn – Fundamentos de Dados</span><a href="https://learn.microsoft.com/pt-br/training/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        </div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-fundamental-dados.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(34,211,238,0.12);color:var(--t3);border:1px solid rgba(34,211,238,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <section class="trilha-section" id="trilha1">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-1">01</div>
+            <h2 class="trilha-title">Autonomia Digital com IA</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>6 a 8 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Iniciante</div>
+        </div>
+        <div class="trilha-desc">Reduzir medo, ampliar vocabulário e gerar primeiros resultados com IA.</div>
+        <div class="trilha-entrega"><strong>Entrega</strong><span>Criação de assistente funcional para uma tarefa real do seu trabalho.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Microsoft Learn – AI Fluency</span><a href="https://learn.microsoft.com/pt-br/training/paths/ai-fluency/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">ENAP – Transformação Digital no Serviço Público</span><a href="https://www.escolavirtual.gov.br/curso/419" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Google Skills – Introdução à IA Generativa</span><a href="https://www.skills.google/course_templates/536?locale=pt_BR" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-1-autonomia-digital.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(167,139,250,0.12);color:var(--t1);border:1px solid rgba(167,139,250,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <section class="trilha-section" id="trilha2">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-2">02</div>
+            <h2 class="trilha-title">IA para Produtividade e Automação</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>8 a 12 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Intermediário</div>
+        </div>
+        <div class="trilha-desc">Usar IA para eficiência e organização — automatizar o que é repetitivo.</div>
+        <div class="trilha-entrega"><strong>Entrega</strong><span>Automação simples de um processo repetitivo do seu setor.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Microsoft Learn – Copilot no Microsoft 365</span><a href="https://learn.microsoft.com/pt-br/training/paths/get-started-with-microsoft-365-copilot/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Zapier Learn</span><a href="https://learn.zapier.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Make Academy</span><a href="https://academy.make.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-2-ia-produtividade-automacao.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(245,166,35,0.12);color:var(--t2);border:1px solid rgba(245,166,35,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <section class="trilha-section" id="trilha3">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-3">03</div>
+            <h2 class="trilha-title">IA para Dados e Decisão</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>12 a 15 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Intermediário</div>
+        </div>
+        <div class="trilha-desc">Usar IA para coleta, organização, análise e interpretação de dados para apoiar decisões.</div>
+        <div class="trilha-entrega"><strong>Entrega</strong><span>Relatório analítico com evidência e recomendação.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">FGV – Introdução à Inteligência Artificial</span><a href="https://educacao-executiva.fgv.br/cursos/online/curta-media-duracao-online/introducao-inteligencia-artificial-conceitos-basicos" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">FGV – Tópicos em Machine Learning</span><a href="https://educacao-executiva.fgv.br/cursos/online/curta-media-duracao-online/topicos-em-machine-learning" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Kaggle Learn</span><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-3-ia-dados-decisao.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(34,211,238,0.12);color:var(--t3);border:1px solid rgba(34,211,238,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <section class="trilha-section" id="trilha4">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-4">04</div>
+            <h2 class="trilha-title">Construção de Ferramentas</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>10 a 15 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Ruptura Simbólica</div>
+        </div>
+        <div class="trilha-desc">Transformar usuárias em criadoras. Construir micro-sistemas funcionais com ferramentas no-code.</div>
+        <div class="trilha-entrega"><strong>Entrega obrigatória</strong><span>Micro-sistema funcional: formulário + base + regra + saída.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">CS50 – Harvard</span><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Make Academy</span><a href="https://academy.make.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Zapier Learn</span><a href="https://learn.zapier.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Airtable – Documentação oficial</span><a href="https://support.airtable.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-4-construcao.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(251,113,133,0.12);color:var(--t4);border:1px solid rgba(251,113,133,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <section class="trilha-section" id="trilha5">
+        <div class="trilha-header">
+            <div class="trilha-num trilha-num-5">05</div>
+            <h2 class="trilha-title">Programação e Integração com IA</h2>
+        </div>
+        <div class="trilha-info">
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>20 a 30 horas</div>
+            <div class="trilha-info-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Avançado</div>
+        </div>
+        <div class="trilha-desc">Autonomia técnica real. Escrever código, integrar APIs e construir aplicações com IA.</div>
+        <div class="trilha-entrega"><strong>Entrega</strong><span>Script ou aplicação simples com integração via API.</span></div>
+        <div class="trilha-recursos">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">CS50 – Harvard</span><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">freeCodeCamp</span><a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">Python for Everybody</span><a href="https://www.py4e.com/" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-5-programacao.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(52,211,153,0.12);color:var(--t5);border:1px solid rgba(52,211,153,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </section>
+
+    <!-- EIXO TRANSVERSAL -->
+    <div class="transversal" id="transversal">
+        <h2>⚖️ Eixo Transversal — Governança e Uso Responsável</h2>
+        <div class="transversal-desc">Aplicável a todas as trilhas. Temas: LGPD, ética em IA, gestão de risco, uso responsável no setor público, limites e validação humana.</div>
+        <div class="transversal-items">
+            <div class="trilha-recurso"><span class="trilha-recurso-name">ANPD – Radar Tecnológico IA Generativa</span><a href="https://www.gov.br/anpd/pt-br/documentos-e-publicacoes/documentos-de-publicacoes/radar_tecnologico_ia_generativa_anpd.pdf" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">OCDE – AI Principles</span><a href="https://www.oecd.org/en/topics/sub-issues/ai-principles.html" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+            <div class="trilha-recurso"><span class="trilha-recurso-name">NIST – AI Risk Management Framework</span><a href="https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf" target="_blank" rel="noopener" class="trilha-recurso-link">Acessar →</a></div>
+        </div>
+        <div style="margin-top:1.5rem">
+            <a href="trilhas/trilha-governanca.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-radius:10px;background:rgba(96,165,250,0.12);color:#60A5FA;border:1px solid rgba(96,165,250,0.25);font-size:.85rem;font-weight:600;text-decoration:none;transition:all .3s ease">
+                Ver trilha completa →
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Trilhas do projeto <a href="index.html">Servidoras no Comando</a>.<br>Programa Mulheres que Transformam · MGI</p>
+    </div>
+</div>
+
+<script>
+const answers = {};
+let currentBlock = 1;
+const totalBlocks = 5;
+const questionsPerBlock = {1:[1,2,3], 2:[4,5], 3:[6,7], 4:[8,9], 5:[10]};
+const totalQ = 10;
+
+// Options click
+document.querySelectorAll('.dq-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+        const q = opt.closest('.dq');
+        q.querySelectorAll('.dq-opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        const qNum = q.dataset.q;
+        answers['q'+qNum] = opt.dataset.val;
+    });
+});
+
+// Slider
+const slider = document.getElementById('q7slider');
+if(slider){
+    slider.addEventListener('input', () => {
+        document.getElementById('q7val').textContent = slider.value;
+        answers.q7 = slider.value;
+    });
+    answers.q7 = '3';
+}
+
+function navBlock(dir) {
+    const next = currentBlock + dir;
+    if(next < 1) return;
+
+    if(dir > 0 && next <= totalBlocks) {
+        currentBlock = next;
+        showBlock();
+    } else if(dir > 0 && next > totalBlocks) {
+        calcResult();
+    } else {
+        currentBlock = next;
+        showBlock();
+    }
+}
+
+function showBlock() {
+    document.querySelectorAll('.diag-block').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-block="${currentBlock}"]`).classList.add('active');
+
+    document.getElementById('btnBack').style.visibility = currentBlock === 1 ? 'hidden' : 'visible';
+
+    const btn = document.getElementById('btnNext');
+    btn.innerHTML = currentBlock === totalBlocks
+        ? 'Ver resultado <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
+        : 'Próximo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+
+    // Progress
+    let answered = 0;
+    for(let i = 1; i <= totalQ; i++) { if(answers['q'+i] !== undefined) answered++; }
+    document.getElementById('progFill').style.width = ((answered/totalQ)*100)+'%';
+    document.getElementById('progStep').textContent = answered+'/'+totalQ;
+}
+
+const TRILHAS = {
+    0: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha Fundamental — Pensamento Analítico e Dados',
+        desc: 'Aprenda a entender, organizar e interpretar dados antes de usar IA para análise.',
+        color: 'var(--t3)',
+        href: 'trilha-fundamental-dados.html',
+        profile: 'Analista em Formação',
+        reading: 'Você demonstra curiosidade analítica e busca transformar informação em evidência prática. O próximo passo é estruturar raciocínio com dados.',
+        secondary: {name: 'Trilha 2 — Produtividade e Automação', href: '#trilha2'}
+    },
+    1: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha 1 — Autonomia Digital com IA',
+        desc: 'Entender IA, ampliar vocabulário tecnológico e criar seu primeiro assistente funcional.',
+        color: 'var(--t1)',
+        href: '#trilha1',
+        profile: 'Exploradora em Transição',
+        reading: 'Você ainda está formando repertório tecnológico. O momento é entender como a IA funciona e ganhar autonomia no uso diário.',
+        secondary: {name: 'Trilha 2 — Produtividade e Automação', href: '#trilha2'}
+    },
+    2: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha 2 — Produtividade e Automação',
+        desc: 'Usar IA para eficiência e organização — automatizar tarefas repetitivas.',
+        color: 'var(--t2)',
+        href: '#trilha2',
+        profile: 'Operadora Estratégica',
+        reading: 'Você já usa IA. O próximo salto é transformar uso pontual em fluxos de produtividade.',
+        secondary: {name: 'Trilha 4 — Construção de Ferramentas', href: '#trilha4'}
+    },
+    3: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha 3 — IA para Dados e Decisão',
+        desc: 'Usar IA para coletar, organizar, analisar dados e gerar evidências para decisão.',
+        color: 'var(--t3)',
+        href: '#trilha3',
+        profile: 'Analista Orientada por Dados',
+        reading: 'Você demonstra interesse em análise e evidência. O próximo passo é usar IA para ampliar sua capacidade analítica.',
+        secondary: {name: 'Trilha Fundamental — Pensamento Analítico e Dados', href: 'trilha-fundamental-dados.html'}
+    },
+    4: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha 4 — Construção de Ferramentas',
+        desc: 'Construir micro-sistemas e soluções digitais para problemas reais.',
+        color: 'var(--t4)',
+        href: '#trilha4',
+        profile: 'Criadora de Soluções',
+        reading: 'Você já pensa em aplicação prática. Seu momento é construir soluções digitais.',
+        secondary: {name: 'Trilha 3 — IA para Dados e Decisão', href: '#trilha3'}
+    },
+    5: {
+        tag: 'Trilha recomendada',
+        name: 'Trilha 5 — Programação e Integração com IA',
+        desc: 'Escrever código, integrar APIs e construir aplicações com IA.',
+        color: 'var(--t5)',
+        href: '#trilha5',
+        profile: 'Arquiteta Técnica',
+        reading: 'Você busca autonomia técnica profunda. O próximo passo é programar e integrar sistemas.',
+        secondary: {name: 'Trilha 4 — Construção de Ferramentas', href: '#trilha4'}
+    }
+};
+
+function calcResult() {
+    // Logic
+    const q1 = parseInt(answers.q1||'0');
+    const q2 = parseInt(answers.q2||'0');
+    const q3 = parseInt(answers.q3||'0');
+    const q4 = answers.q4||'entender';
+    const q5 = answers.q5||'usar';
+    const q6 = parseInt(answers.q6||'0');
+    const q7 = parseInt(answers.q7||'3');
+    const q10 = answers.q10||'naosei';
+
+    let trilha = 1;
+    let scores = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0};
+
+    // Trilha Fundamental (0): curiosidade analítica + trabalha com dados
+    if(q3 >= 2) scores[0] += 3;
+    if(q4 === 'analise') scores[0] += 2;
+    if(q1 === 0) scores[0] += 1; // pouca experiência com IA
+
+    // Trilha 1: baixa experiência + quer entender
+    if(q1 === 0) scores[1] += 3;
+    if(q4 === 'entender') scores[1] += 2;
+    if(q2 === 0) scores[1] += 1;
+
+    // Trilha 2: já usa IA + quer produtividade
+    if(q1 >= 1) scores[2] += 2;
+    if(q4 === 'produtividade') scores[2] += 3;
+    if(q5 === 'usar') scores[2] += 1;
+
+    // Trilha 3: dados + análise + usa IA
+    if(q3 >= 2) scores[3] += 2;
+    if(q4 === 'analise') scores[3] += 3;
+    if(q1 >= 1) scores[3] += 1;
+
+    // Trilha 4: quer criar + alta autoeficácia + pensa automação
+    if(q4 === 'criar' || q5 === 'criar') scores[4] += 3;
+    if(q7 >= 3) scores[4] += 2;
+    if(q6 >= 3) scores[4] += 1;
+    if(q10 === 'sim' || q10 === 'sim-problema') scores[4] += 2;
+
+    // Trilha 5: explicitly wants to code
+    if(q4 === 'programar') scores[5] += 5;
+    if(q7 >= 4) scores[5] += 1;
+
+    // Find highest score
+    let maxScore = 0;
+    let maxTrilha = 1;
+    for(let t in scores) {
+        if(scores[t] > maxScore) {
+            maxScore = scores[t];
+            maxTrilha = parseInt(t);
+        }
+    }
+
+    trilha = maxTrilha;
+
+    // Refino de decisão para evitar salto precoce para construção
+    if (trilha === 4 && q4 !== 'criar' && q5 !== 'criar' && q10 !== 'sim-problema') {
+        if (scores[0] >= scores[4] - 1) trilha = 0;
+        else if (scores[2] >= scores[4] - 1) trilha = 2;
+    }
+
+    // Refino para priorizar base de dados antes de IA aplicada a dados
+    if (trilha === 3 && q1 === 0 && scores[0] >= scores[3] - 1) {
+        trilha = 0;
+    }
+
+    // Calculate adherence score (percentage)
+    const maxPossible = 10; // approximate max points per trilha
+    const adherence = Math.min(94, Math.max(65, Math.round((maxScore / maxPossible) * 100)));
+
+    answers.trilha = trilha;
+    answers.adherence = adherence;
+
+    // Show result
+    const t = TRILHAS[trilha];
+    document.getElementById('resultTag').textContent = t.tag;
+    document.getElementById('resultTag').style.color = t.color;
+    
+    const rTrilha = document.getElementById('resultTrilha');
+    rTrilha.textContent = t.name;
+    rTrilha.style.color = t.color;
+    
+    document.getElementById('resultDesc').textContent = t.desc;
+    document.getElementById('resultProfile').textContent = t.profile;
+    document.getElementById('resultReading').textContent = t.reading;
+    
+    const ctaSecondary = document.getElementById('resultCtaSecondary');
+    ctaSecondary.textContent = t.secondary.name;
+    ctaSecondary.href = t.secondary.href;
+    
+    document.getElementById('resultScore').textContent = adherence + '%';
+
+    // Set CTAs
+    const cta = document.getElementById('resultCta');
+    cta.href = t.href;
+    
+    // Update CTA text based on trilha
+    if(trilha === 0) {
+        cta.textContent = 'Começar jornada em Pensamento Analítico e Dados';
+    } else {
+        cta.textContent = 'Começar minha trilha recomendada';
+    }
+
+    // Simple color for CTA
+    const colorMap = {0:'34,211,238', 1:'167,139,250', 2:'245,166,35', 3:'34,211,238', 4:'251,113,133', 5:'52,211,153'};
+    const c = colorMap[trilha];
+    cta.style.background = `rgba(${c},0.12)`;
+    cta.style.color = t.color;
+    cta.style.border = `1px solid rgba(${c},0.25)`;
+
+    const box = document.getElementById('resultBox');
+    box.style.borderColor = `rgba(${c},0.2)`;
+
+    document.getElementById('diagnostico').style.display = 'none';
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('resultado').scrollIntoView({behavior:'smooth', block:'start'});
+
+    // Send to sheets
+    sendDiag(trilha, adherence);
+}
+
+async function sendDiag(trilha, adherence) {
+    try {
+        await fetch('/.netlify/functions/diagnostico-vote', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                tipo: 'diagnostico-trilhas',
+                q1: answers.q1||'', q2: answers.q2||'', q3: answers.q3||'',
+                q4: answers.q4||'', q5: answers.q5||'', q6: answers.q6||'',
+                q7: answers.q7||'', q8: answers.q8||'', q9: answers.q9||'',
+                q10: answers.q10||'', trilha: 'Trilha '+trilha, adherence: adherence+'%'
+            })
+        });
+    } catch(e) { console.log('Erro ao enviar diagnóstico:', e); }
+}
+
+function resetDiag() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    answers.q7 = '3';
+    if(slider) slider.value = 3;
+    document.getElementById('q7val').textContent = '3';
+    document.querySelectorAll('.dq-opt').forEach(o => o.classList.remove('selected'));
+    currentBlock = 1;
+    showBlock();
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('diagnostico').style.display = 'block';
+    document.getElementById('diagnostico').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+showBlock();
+
+// ==========================================
+// STICKY NAV COM INTERSECTION OBSERVER
+// ==========================================
+const sections = document.querySelectorAll("section[id], div[id='diagnostico'], div[id='transversal']");
+const navButtons = document.querySelectorAll(".nav-pills a");
+
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            navButtons.forEach(btn => btn.classList.remove("active"));
+            
+            const id = entry.target.id;
+            const activeBtn = document.querySelector(`.nav-pills a[data-target="${id}"]`);
+            
+            if(activeBtn){
+                activeBtn.classList.add("active");
+            }
+        }
+    });
+}, {threshold:0.5});
+
+sections.forEach(section => observer.observe(section));
+
+// ==========================================
+// SECTION REVEAL (trilhas entram em cena)
+// ==========================================
+const trilhaSections = document.querySelectorAll('section[id^="trilha"]');
+
+const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            entry.target.classList.add("visible");
+        }
+    });
+},{threshold:0.25});
+
+trilhaSections.forEach(sec => revealObserver.observe(sec));
+
+// Ativar primeira trilha visível imediatamente
+if(trilhaSections.length > 0){
+    trilhaSections[0].classList.add('visible');
+}
+
+// Scroll suave ao clicar nos botões
+document.querySelectorAll(".nav-pills a").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        
+        if(target){
+            target.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

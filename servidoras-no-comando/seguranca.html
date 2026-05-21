@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segurança e Proteção de Dados — Servidoras no Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-ambar: #F5A623;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --accent-cyan: #22D3EE;
+            --accent-blue: #60A5FA;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 55%;
+            height: 55%;
+            background: radial-gradient(ellipse, rgba(52, 211, 153, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(251, 113, 133, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ── Back button ── */
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        /* ── Container ── */
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem 5rem;
+        }
+
+        /* ── Hero ── */
+        .page-hero {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .page-hero-tag {
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--accent-verde);
+            opacity: 0.8;
+            margin-bottom: 0.85rem;
+        }
+
+        .page-hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.1rem;
+        }
+
+        .page-hero p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            max-width: 620px;
+        }
+
+        /* ── Section label ── */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-label::before,
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        /* ── Semáforo block ── */
+        .semaforo-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.05s ease both;
+        }
+
+        .semaforo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .semaforo-card {
+            padding: 1.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .semaforo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+
+        .semaforo-card.pare { border-top: 3px solid var(--accent-rosa); }
+        .semaforo-card.atencao { border-top: 3px solid var(--accent-ambar); }
+        .semaforo-card.siga { border-top: 3px solid var(--accent-verde); }
+
+        .semaforo-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.4rem;
+        }
+
+        .pare .semaforo-icon { background: rgba(251, 113, 133, 0.1); border: 1px solid rgba(251,113,133,0.2); }
+        .atencao .semaforo-icon { background: rgba(245, 166, 35, 0.1); border: 1px solid rgba(245,166,35,0.2); }
+        .siga .semaforo-icon { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52,211,153,0.2); }
+
+        .semaforo-titulo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .pare .semaforo-titulo { color: var(--accent-rosa); }
+        .atencao .semaforo-titulo { color: var(--accent-ambar); }
+        .siga .semaforo-titulo { color: var(--accent-verde); }
+
+        .semaforo-subtitulo {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .semaforo-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── Lei cards ── */
+        .leis-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.08s ease both;
+        }
+
+        .lei-item {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .lei-item:last-child { margin-bottom: 0; }
+        .lei-item:hover { border-color: rgba(52,211,153,0.2); transform: translateX(3px); }
+
+        .lei-badge {
+            flex-shrink: 0;
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            margin-top: 0.15rem;
+        }
+
+        .lei-badge.marco-civil { background: rgba(34,211,238,0.1); color: var(--accent-cyan); border: 1px solid rgba(34,211,238,0.2); }
+        .lei-badge.lgpd { background: rgba(52,211,153,0.1); color: var(--accent-verde); border: 1px solid rgba(52,211,153,0.2); }
+        .lei-badge.anpd { background: rgba(167,139,250,0.1); color: var(--accent-lavanda); border: 1px solid rgba(167,139,250,0.2); }
+        .lei-badge.ec { background: rgba(245,166,35,0.1); color: var(--accent-ambar); border: 1px solid rgba(245,166,35,0.2); }
+
+        .lei-content { flex: 1; min-width: 0; }
+
+        .lei-nome {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .lei-norma {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            opacity: 0.6;
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .lei-desc {
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── Anonimização block ── */
+        .anon-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .anon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .anon-card {
+            padding: 1.4rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .anon-card:hover { transform: translateY(-2px); }
+
+        .anon-card:nth-child(1) { border-left: 2px solid var(--accent-cyan); }
+        .anon-card:nth-child(2) { border-left: 2px solid var(--accent-lavanda); }
+        .anon-card:nth-child(3) { border-left: 2px solid var(--accent-ambar); }
+        .anon-card:nth-child(4) { border-left: 2px solid var(--accent-verde); }
+        .anon-card:nth-child(5) { border-left: 2px solid var(--accent-blue); }
+
+        .anon-nome {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .anon-card:nth-child(1) .anon-nome { color: var(--accent-cyan); }
+        .anon-card:nth-child(2) .anon-nome { color: var(--accent-lavanda); }
+        .anon-card:nth-child(3) .anon-nome { color: var(--accent-ambar); }
+        .anon-card:nth-child(4) .anon-nome { color: var(--accent-verde); }
+        .anon-card:nth-child(5) .anon-nome { color: var(--accent-blue); }
+
+        .anon-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 0.5rem;
+        }
+
+        .anon-exemplo {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.65;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .anon-full { grid-column: 1 / -1; }
+
+        /* ── Alert box ── */
+        .alert-box {
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .alert-box.warning {
+            background: rgba(245, 166, 35, 0.06);
+            border: 1px solid rgba(245, 166, 35, 0.2);
+        }
+
+        .alert-box.info {
+            background: rgba(52, 211, 153, 0.05);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+
+        .alert-box.danger {
+            background: rgba(251, 113, 133, 0.05);
+            border: 1px solid rgba(251, 113, 133, 0.2);
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .alert-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        .alert-text strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-box.warning .alert-text strong { color: var(--accent-ambar); }
+        .alert-box.info .alert-text strong { color: var(--accent-verde); }
+        .alert-box.danger .alert-text strong { color: var(--accent-rosa); }
+
+        /* ── Checklist ── */
+        .checklist-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.12s ease both;
+        }
+
+        .checklist-card {
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .checklist-header {
+            padding: 1.1rem 1.5rem;
+            background: rgba(52, 211, 153, 0.05);
+            border-bottom: 1px solid rgba(52, 211, 153, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .checklist-header-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--accent-verde);
+        }
+
+        .checklist-header-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+            opacity: 0.6;
+        }
+
+        .checklist-items {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item:hover { transform: translateX(4px); }
+
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid rgba(52, 211, 153, 0.3);
+            background: rgba(52, 211, 153, 0.04);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-top: 1px;
+        }
+
+        .check-box.checked {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: var(--accent-verde);
+        }
+
+        .check-box svg {
+            width: 11px;
+            height: 11px;
+            color: var(--accent-verde);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .check-box.checked svg { opacity: 1; }
+
+        .check-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .check-label strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .check-label.done {
+            text-decoration: line-through;
+            opacity: 0.45;
+        }
+
+        /* ── Pode usar / Não pode bloco ── */
+        .pode-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.14s ease both;
+        }
+
+        .pode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .pode-col {
+            padding: 1.5rem;
+            border-radius: 14px;
+        }
+
+        .pode-col.sim {
+            background: rgba(52, 211, 153, 0.04);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+
+        .pode-col.nao {
+            background: rgba(251, 113, 133, 0.04);
+            border: 1px solid rgba(251, 113, 133, 0.15);
+        }
+
+        .pode-col-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pode-col.sim .pode-col-title { color: var(--accent-verde); }
+        .pode-col.nao .pode-col-title { color: var(--accent-rosa); }
+
+        .pode-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin-bottom: 0.75rem;
+        }
+
+        .pode-list-item:last-child { margin-bottom: 0; }
+
+        .pode-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 0.45rem;
+        }
+
+        .pode-col.sim .pode-dot { background: var(--accent-verde); }
+        .pode-col.nao .pode-dot { background: var(--accent-rosa); }
+
+        /* ── Riscos block ── */
+        .riscos-block {
+            margin-bottom: 3.5rem;
+            animation: fadeUp 0.6s 0.16s ease both;
+        }
+
+        .risco-item {
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.35rem 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .risco-item:hover { border-color: rgba(251,113,133,0.2); transform: translateX(3px); }
+        .risco-item:last-child { margin-bottom: 0; }
+
+        .risco-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(251, 113, 133, 0.08);
+            border: 1px solid rgba(251,113,133,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .risco-content { flex: 1; }
+
+        .risco-titulo {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .risco-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── Manifesto / Quote ── */
+        .manifesto-quote {
+            margin: 2rem 0 3.5rem;
+            padding: 2rem 2rem 2rem 2.25rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--accent-verde);
+            border-radius: 0 14px 14px 0;
+            animation: fadeUp 0.6s 0.18s ease both;
+        }
+
+        .manifesto-quote p {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .manifesto-quote cite {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            margin-top: 0.6rem;
+            font-style: normal;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ── Footer ── */
+        .page-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        .page-footer p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            line-height: 1.7;
+        }
+
+        .page-footer a {
+            color: var(--accent-verde);
+            text-decoration: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .semaforo-grid { grid-template-columns: 1fr; }
+            .anon-grid { grid-template-columns: 1fr; }
+            .pode-grid { grid-template-columns: 1fr; }
+            .page-container { padding: 5rem 1.25rem 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html#modulosSection" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar para a plataforma
+    </a>
+
+    <div class="page-container">
+
+        <!-- Hero -->
+        <div class="page-hero">
+            <div class="page-hero-tag">Módulo · Segurança e Proteção de Dados</div>
+            <h1>Uso Seguro de IA<br>no Serviço Público</h1>
+            <p>
+                Seu órgão não possui IA institucional? Sem licença com governança de dados?
+                Ainda assim, é possível usar IA de forma responsável — desde que você conheça
+                os limites, respeite a legislação e aplique as técnicas certas antes de interagir com qualquer ferramenta.
+            </p>
+        </div>
+
+        <!-- Alerta norma interna -->
+        <div class="alert-box danger" style="margin-bottom:3rem; animation: fadeUp 0.6s 0.04s ease both;">
+            <div class="alert-icon">🏛️</div>
+            <div class="alert-text">
+                <strong>Além da LGPD, observe as regras internas do seu órgão</strong>
+                Mesmo quando não há dado sensível no conteúdo, o uso de ferramentas externas de IA pode depender de orientação interna, norma de segurança da informação, política de uso de nuvem ou autorização institucional. Consulte a área de TI ou jurídica do seu órgão antes de adotar qualquer ferramenta.
+            </div>
+        </div>
+
+        <!-- Semáforo: Pare / Atenção / Siga -->
+        <div class="semaforo-block">
+            <div class="section-label">Regras de ouro</div>
+
+            <div class="semaforo-grid">
+                <div class="semaforo-card pare">
+                    <div class="semaforo-icon">🛑</div>
+                    <div class="semaforo-titulo">PARE</div>
+                    <div class="semaforo-subtitulo">Dados Sensíveis</div>
+                    <div class="semaforo-desc">
+                        Nunca insira CPF, RG, dados de saúde, segredos de justiça ou qualquer dado pessoal identificável em ferramentas de IA abertas. Anonimize antes: use [[NOME]], [[CPF]], [[ENDEREÇO]].
+                    </div>
+                </div>
+
+                <div class="semaforo-card atencao">
+                    <div class="semaforo-icon">⚠️</div>
+                    <div class="semaforo-titulo">ATENÇÃO</div>
+                    <div class="semaforo-subtitulo">Alucinações</div>
+                    <div class="semaforo-desc">
+                        A IA pode inventar fatos, leis ou estatísticas com total confiança. Você é responsável pela assinatura do documento. Sempre revise, confira as fontes e valide o conteúdo gerado.
+                    </div>
+                </div>
+
+                <div class="semaforo-card siga">
+                    <div class="semaforo-icon">✅</div>
+                    <div class="semaforo-titulo">SIGA</div>
+                    <div class="semaforo-subtitulo">Produtividade</div>
+                    <div class="semaforo-desc">
+                        Use IA para estruturar textos, resumir documentos públicos, redigir minutas, revisar ortografia, traduzir e organizar ideias. Essas tarefas não expõem dados sensíveis.
+                    </div>
+                </div>
+            </div>
+
+            <div class="manifesto-quote" style="margin-top:1.5rem; margin-bottom:0;">
+                <p>"A IA é sua copiloto, não a comandante."</p>
+                <cite>Princípio do uso responsável no serviço público</cite>
+            </div>
+        </div>
+
+        <!-- Legislação -->
+        <div class="leis-block">
+            <div class="section-label">Marco legal</div>
+
+            <div class="lei-item">
+                <div class="lei-badge marco-civil">Lei 12.965/2014</div>
+                <div class="lei-content">
+                    <div class="lei-nome">Marco Civil da Internet</div>
+                    <div class="lei-desc">
+                        Estabelece princípios, garantias, direitos e deveres para o uso da internet no Brasil e dialoga com a proteção da privacidade e dos dados pessoais no ambiente digital. Foi alterado pela LGPD e segue como referência normativa para o uso responsável da rede.
+                    </div>
+                </div>
+            </div>
+
+            <div class="lei-item">
+                <div class="lei-badge lgpd">Lei 13.709/2018</div>
+                <div class="lei-content">
+                    <div class="lei-nome">LGPD — Lei Geral de Proteção de Dados</div>
+                    <div class="lei-desc">
+                        Regula o tratamento de dados pessoais por pessoas físicas e jurídicas, públicas e privadas. Seu objetivo é proteger os direitos fundamentais de liberdade e privacidade. Entrou em vigor em setembro de 2020 e alterou o Marco Civil da Internet.
+                    </div>
+                </div>
+            </div>
+
+            <div class="lei-item">
+                <div class="lei-badge anpd">Lei 13.853/2019</div>
+                <div class="lei-content">
+                    <div class="lei-nome">Criação da ANPD</div>
+                    <div class="lei-desc">
+                        Alterou a LGPD e criou a Autoridade Nacional de Proteção de Dados (ANPD), responsável por fiscalizar e regulamentar a aplicação da lei no país.
+                    </div>
+                </div>
+            </div>
+
+            <div class="lei-item">
+                <div class="lei-badge ec">EC nº 115/2022</div>
+                <div class="lei-content">
+                    <div class="lei-nome">Proteção de Dados como Direito Constitucional</div>
+                    <div class="lei-desc">
+                        Incluiu a proteção de dados pessoais no rol de direitos e garantias fundamentais da Constituição Federal (art. 5º, inciso LXXIX). Isso eleva a proteção de dados ao status de direito constitucional, com implicações para toda a administração pública.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- O que pode e não pode usar -->
+        <div class="pode-block">
+            <div class="section-label">O que usar — e o que evitar</div>
+
+            <div class="pode-grid">
+                <div class="pode-col sim">
+                    <div class="pode-col-title">
+                        <span>✅</span> Pode usar
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Dados públicos e de acesso aberto (portais de transparência, diários oficiais)
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Dados previamente tratados para reduzir o risco de identificação
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Textos institucionais sem identificadores pessoais
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Legislações, normas, editais e documentos de domínio público
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Documentos administrativos de acesso público, desde que sem conteúdo sigiloso, restrito ou com dados pessoais identificáveis
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Imagens de plantas ou documentos com dados sensíveis já removidos
+                    </div>
+                </div>
+
+                <div class="pode-col nao">
+                    <div class="pode-col-title">
+                        <span>🚫</span> Não inserir
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        CPF, RG, passaporte, título de eleitor ou qualquer documento pessoal
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Dados de saúde, prontuários, laudos médicos ou informações de saúde mental
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Processos sob segredo de justiça ou informações sigilosas
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Informações de servidores ou cidadãos sem consentimento e base legal
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Dados de origem racial, étnica, religiosa, biométrica ou de orientação sexual
+                    </div>
+                    <div class="pode-list-item">
+                        <div class="pode-dot"></div>
+                        Documentos classificados ou de acesso restrito pelo órgão
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Técnicas de anonimização -->
+        <div class="anon-block">
+            <div class="section-label">Técnicas de anonimização</div>
+
+            <div class="alert-box warning" style="margin-bottom:1.5rem;">
+                <div class="alert-icon">⚡</div>
+                <div class="alert-text">
+                    <strong>Importante: anonimização é feita ANTES de abrir a IA</strong>
+                    Você prepara o dado no seu computador — remove, substitui ou generaliza os identificadores — e só então compartilha o conteúdo tratado com a ferramenta de IA.
+                </div>
+            </div>
+
+            <div class="anon-grid">
+                <div class="anon-card">
+                    <div class="anon-nome">Supressão (Masking)</div>
+                    <div class="anon-desc">Remove ou substitui atributos identificadores diretos como nome, CPF ou endereço.</div>
+                    <div class="anon-exemplo">Ex.: "003.456.789-00" → "XXX.XXX.XXX-XX"</div>
+                </div>
+
+                <div class="anon-card">
+                    <div class="anon-nome">Generalização</div>
+                    <div class="anon-desc">Reduz a precisão dos dados para evitar identificação, mantendo utilidade estatística.</div>
+                    <div class="anon-exemplo">Ex.: data de nascimento completa → apenas o ano de nascimento</div>
+                </div>
+
+                <div class="anon-card">
+                    <div class="anon-nome">Perturbação (Noise Addition)</div>
+                    <div class="anon-desc">Introduz ruído estatístico nos dados para dificultar a reidentificação de indivíduos.</div>
+                    <div class="anon-exemplo">Ex.: alterar levemente valores de renda ou idade em bases de treinamento</div>
+                </div>
+
+                <div class="anon-card">
+                    <div class="anon-nome">Agregação</div>
+                    <div class="anon-desc">Combina dados individuais em grupos, eliminando a granularidade identificadora.</div>
+                    <div class="anon-exemplo">Ex.: estatísticas por faixa etária, em vez de idades individuais</div>
+                </div>
+
+                <div class="anon-card anon-full">
+                    <div class="anon-nome">Pseudonimização ⚠️ (não é anonimização plena)</div>
+                    <div class="anon-desc">Substitui identificadores por códigos ou chaves — a reversão ainda é possível, por isso exige controles adicionais. Útil em ambientes controlados, mas não deve ser tratada como anonimização total.</div>
+                    <div class="anon-exemplo">Ex.: "João Silva" → "Usuário_A3F2" (ainda pode ser revertido com a tabela de correspondência)</div>
+                </div>
+            </div>
+
+            <div class="alert-box info" style="margin-top:1rem;">
+                <div class="alert-icon">🛡️</div>
+                <div class="alert-text">
+                    <strong>K-anonimato, L-diversidade e T-closeness</strong>
+                    Técnicas mais avançadas que garantem que cada registro não possa ser distinguido de pelo menos outros k-1 registros, com diversidade de valores sensíveis dentro dos grupos. Relevantes para tratar bases de dados maiores antes de usar em análise com IA.
+                </div>
+            </div>
+        </div>
+
+        <!-- Riscos essenciais -->
+        <div class="riscos-block">
+            <div class="section-label">Riscos que toda servidora precisa conhecer</div>
+
+            <div class="risco-item">
+                <div class="risco-icon">🤖</div>
+                <div class="risco-content">
+                    <div class="risco-titulo">Alucinação da IA</div>
+                    <div class="risco-desc">
+                        Modelos de linguagem podem produzir informações falsas com aparência de verdadeiras — leis inexistentes, jurisprudência inventada, dados incorretos. A responsabilidade pelo conteúdo validado e utilizado oficialmente é sempre humana, não da IA.
+                    </div>
+                </div>
+            </div>
+
+            <div class="risco-item">
+                <div class="risco-icon">🔓</div>
+                <div class="risco-content">
+                    <div class="risco-titulo">Exposição de dados pessoais</div>
+                    <div class="risco-desc">
+                        Ferramentas de IA abertas podem armazenar e processar os dados inseridos, conforme seus termos de uso e políticas de privacidade. Por isso, conteúdos com dados pessoais, sensíveis ou sigilosos não devem ser inseridos sem autorização institucional e proteção adequada.
+                    </div>
+                </div>
+            </div>
+
+            <div class="risco-item">
+                <div class="risco-icon">⚖️</div>
+                <div class="risco-content">
+                    <div class="risco-titulo">Responsabilidade legal do servidor</div>
+                    <div class="risco-desc">
+                        O uso inadequado de dados pessoais no serviço público pode gerar responsabilização administrativa, civil e, conforme o caso concreto, outras consequências legais. O servidor público responde pelos atos que pratica no exercício de suas funções.
+                    </div>
+                </div>
+            </div>
+
+            <div class="risco-item">
+                <div class="risco-icon">🎭</div>
+                <div class="risco-content">
+                    <div class="risco-titulo">Viés algorítmico</div>
+                    <div class="risco-desc">
+                        Modelos de IA são treinados com dados históricos que podem refletir e ampliar desigualdades. No serviço público, usar IA para decisões que afetam cidadãos sem revisão humana pode perpetuar discriminações estruturais.
+                    </div>
+                </div>
+            </div>
+
+            <div class="risco-item">
+                <div class="risco-icon">📋</div>
+                <div class="risco-content">
+                    <div class="risco-titulo">Falta de rastreabilidade</div>
+                    <div class="risco-desc">
+                        Documentos produzidos com IA devem ser identificados, revisados e validados pela servidora antes de qualquer uso oficial. A transparência sobre o uso de ferramentas automatizadas é um princípio da boa gestão pública.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist de segurança -->
+        <div class="checklist-block">
+            <div class="section-label">Checklist de segurança</div>
+
+            <!-- Antes de usar -->
+            <div class="checklist-card" style="margin-bottom:1rem;">
+                <div class="checklist-header">
+                    <span style="font-size:1.1rem;">🔍</span>
+                    <div class="checklist-header-title">Antes de usar qualquer ferramenta de IA</div>
+                    <div class="checklist-header-sub">Clique para marcar</div>
+                </div>
+                <div class="checklist-items">
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Verifiquei a política de dados da ferramenta:</strong> ela armazena o que eu envio? Usa para treinar modelos?</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>O conteúdo que vou inserir é público ou já foi anonimizado?</strong> Nunca use dados pessoais identificáveis em IA aberta.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>O uso está alinhado com as normas do meu órgão?</strong> Verifique se há instrução normativa ou orientação interna sobre uso de IA.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Ao preparar o dado -->
+            <div class="checklist-card" style="margin-bottom:1rem; border-color: rgba(245,166,35,0.15);">
+                <div class="checklist-header" style="background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.1);">
+                    <span style="font-size:1.1rem;">✂️</span>
+                    <div class="checklist-header-title" style="color: var(--accent-ambar);">Ao preparar o dado (antes de copiar para a IA)</div>
+                    <div class="checklist-header-sub">Clique para marcar</div>
+                </div>
+                <div class="checklist-items">
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(245,166,35,0.3); background:rgba(245,166,35,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Removi CPF, RG, nome completo e endereço</strong> do texto ou documento que vou usar.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(245,166,35,0.3); background:rgba(245,166,35,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Não há dados de saúde, biométricos ou de orientação sexual</strong> no conteúdo — esses são dados sensíveis com proteção reforçada na LGPD.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(245,166,35,0.3); background:rgba(245,166,35,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Não há processos sigilosos, segredos de justiça ou documentos de acesso restrito</strong> no que vou enviar.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(245,166,35,0.3); background:rgba(245,166,35,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Substituí identificadores por marcadores neutros</strong> quando necessário: [[NOME]], [[CPF]], [[ENDEREÇO]], [[DATA]].</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Após receber a resposta -->
+            <div class="checklist-card" style="border-color: rgba(251,113,133,0.15);">
+                <div class="checklist-header" style="background: rgba(251,113,133,0.05); border-color: rgba(251,113,133,0.1);">
+                    <span style="font-size:1.1rem;">🔎</span>
+                    <div class="checklist-header-title" style="color: var(--accent-rosa);">Após receber a resposta da IA</div>
+                    <div class="checklist-header-sub">Clique para marcar</div>
+                </div>
+                <div class="checklist-items">
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(251,113,133,0.3); background:rgba(251,113,133,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Revisei o conteúdo gerado</strong> e não vou usá-lo como documento oficial sem leitura crítica e validação.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(251,113,133,0.3); background:rgba(251,113,133,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Verifiquei fatos, leis e dados citados:</strong> a IA pode alucinar com total confiança — a responsabilidade é minha.</div>
+                    </div>
+
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="check-box" style="border-color:rgba(251,113,133,0.3); background:rgba(251,113,133,0.04);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="check-label"><strong>Sei quem assina e responde:</strong> a IA não tem responsabilidade legal. Eu tenho.</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Regra simples para lembrar -->
+        <div style="margin-bottom:3.5rem; animation: fadeUp 0.6s 0.19s ease both;">
+            <div class="section-label">Regra simples para lembrar</div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden;">
+                <div style="padding: 1.1rem 1.5rem; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border);">
+                    <span style="font-family:'Syne',sans-serif; font-size:0.88rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.1em;">Antes de inserir qualquer conteúdo em IA aberta</span>
+                </div>
+                <div style="padding: 0.5rem 0;">
+                    <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <div style="width:10px; height:10px; border-radius:50%; background:var(--accent-verde); flex-shrink:0;"></div>
+                        <div style="flex:1;"><span style="font-weight:600; color:var(--accent-verde);">Dado público</span> <span style="font-size:0.85rem; color:var(--text-secondary);">→ avalie o uso com revisão crítica do resultado</span></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <div style="width:10px; height:10px; border-radius:50%; background:var(--accent-ambar); flex-shrink:0;"></div>
+                        <div style="flex:1;"><span style="font-weight:600; color:var(--accent-ambar);">Dado pessoal</span> <span style="font-size:0.85rem; color:var(--text-secondary);">→ não inserir sem tratamento adequado de anonimização</span></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <div style="width:10px; height:10px; border-radius:50%; background:var(--accent-rosa); flex-shrink:0;"></div>
+                        <div style="flex:1;"><span style="font-weight:600; color:var(--accent-rosa);">Dado sensível, sigiloso ou restrito</span> <span style="font-size:0.85rem; color:var(--text-secondary);">→ não inserir em ferramentas abertas</span></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 1.5rem;">
+                        <div style="width:10px; height:10px; border-radius:50%; background:var(--text-secondary); flex-shrink:0; opacity:0.5;"></div>
+                        <div style="flex:1;"><span style="font-weight:600; color:var(--text-secondary);">Na dúvida</span> <span style="font-size:0.85rem; color:var(--text-secondary);">→ não use ferramenta aberta. Consulte a área de TI ou jurídica do seu órgão</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manifesto final -->
+        <div class="manifesto-quote">
+            <p>"Tecnologia segura não é aquela que impede o uso — é aquela que garante que o uso seja responsável, rastreável e a serviço das pessoas."</p>
+            <cite>Servidoras no Comando Digital · MGI</cite>
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            <p>
+                Conteúdo educativo sobre uso responsável de IA, proteção de dados e boas práticas no serviço público.<br>
+                <a href="index.html">Servidoras no Comando Digital</a> · Programa Mulheres que Transformam · MGI
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleCheck(item) {
+            const box = item.querySelector('.check-box');
+            const label = item.querySelector('.check-label');
+            const isChecked = box.classList.toggle('checked');
+            label.classList.toggle('done', isChecked);
+            const card = item.closest('.checklist-card');
+            const borderColor = card.style.borderColor || '';
+            if (isChecked) {
+                if (borderColor.includes('245,166,35')) {
+                    box.style.cssText += '; background:rgba(245,166,35,0.15); border-color:var(--accent-ambar);';
+                    box.querySelector('svg').style.color = 'var(--accent-ambar)';
+                } else if (borderColor.includes('251,113,133')) {
+                    box.style.cssText += '; background:rgba(251,113,133,0.15); border-color:var(--accent-rosa);';
+                    box.querySelector('svg').style.color = 'var(--accent-rosa)';
+                }
+            } else {
+                box.style.background = '';
+                box.style.borderColor = '';
+                box.querySelector('svg').style.color = '';
+            }
+        }
+    </script>
+
+</body>
+</html>

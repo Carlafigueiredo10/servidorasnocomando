@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#06060c" />
+  <title>Oficina Mobile · Servidoras no Comando</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink: #06060c;
+      --v: #7c3aed; --v2: #a78bfa; --vd: rgba(124,58,237,.15);
+      --t: #06b6d4; --t2: #67e8f9; --td: rgba(6,182,212,.12);
+      --a: #f59e0b; --ad: rgba(245,158,11,.12);
+      --e: #10b981; --ed: rgba(16,185,129,.12);
+      --glass: rgba(255,255,255,.04);
+      --glass-2: rgba(255,255,255,.025);
+      --rim: rgba(255,255,255,.08);
+      --tx: #f0f4ff; --tx2: #8a94a8; --tx3: #404860;
+      --mono: "Space Mono", monospace;
+      --head: "Syne", sans-serif;
+      --body: "DM Sans", sans-serif;
+      --radius-md: 14px;
+      --pad-x: 16px;
+      --section-gap: 32px;
+      --tap: 48px;
+      --content-max: 520px;
+    }
+
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--ink); color: var(--tx); font-family: var(--body);
+      font-size: 16px; line-height: 1.6; overflow-x: hidden;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      text-rendering: optimizeLegibility;
+    }
+
+    body::after {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='.05'/%3E%3C/svg%3E");
+      opacity: .12;
+    }
+
+    .amb { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .amb span { position: absolute; border-radius: 50%; filter: blur(70px); will-change: transform; }
+    .amb span:nth-child(1) { width: 340px; height: 340px; background: radial-gradient(circle,rgba(124,58,237,.18),transparent 70%); top: -120px; right: -120px; animation: drift 18s ease-in-out infinite; }
+    .amb span:nth-child(2) { width: 280px; height: 280px; background: radial-gradient(circle,rgba(6,182,212,.1),transparent 70%); bottom: 8%; left: -120px; animation: drift 22s ease-in-out infinite reverse; }
+    @keyframes drift { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(30px); } }
+
+    #prog {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0%; z-index: 300;
+      background: linear-gradient(90deg,var(--v),var(--t));
+      box-shadow: 0 0 10px rgba(6,182,212,.2); transition: width .08s linear;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,6,12,.84);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--rim);
+      padding: calc(10px + env(safe-area-inset-top,0px)) var(--pad-x) 10px;
+      display: flex; align-items: center; justify-content: space-between; min-height: 56px;
+    }
+    .topbar-label, .topbar-live {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .topbar-label { color: var(--tx3); }
+    .topbar-live { display: flex; align-items: center; gap: 6px; color: var(--e); }
+    .topbar-live::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--e); box-shadow: 0 0 8px var(--e); animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+    main { position: relative; z-index: 1; width: 100%; max-width: var(--content-max); margin: 0 auto; padding: 0 var(--pad-x); }
+
+    /* HERO */
+    .hero { padding: 30px 0 26px; text-align: center; transform: translateZ(0); }
+    .hero-eyebrow {
+      display: inline-block; padding: 6px 14px; border-radius: 999px;
+      border: 1px solid var(--rim); background: var(--glass);
+      font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--v2); margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-family: var(--head); font-size: clamp(2.2rem,9vw,3.4rem);
+      font-weight: 800; line-height: .95; letter-spacing: -.04em; margin-bottom: 14px;
+    }
+    .hero h1 em, .finale h2 em {
+      font-style: normal;
+      background: linear-gradient(120deg,var(--t2),var(--v2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero h1 em {
+      filter: drop-shadow(0 0 10px rgba(6,182,212,.4)) drop-shadow(0 0 22px rgba(124,58,237,.3));
+    }
+    .hero-sub { font-size: .96rem; color: var(--tx2); font-weight: 300; max-width: 33ch; margin: 0 auto 24px; }
+
+    .chips { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .chip {
+      min-height: 36px; padding: 8px 12px; border-radius: 999px;
+      border: 1px solid var(--rim); background: var(--glass);
+      font-size: .78rem; display: flex; align-items: center; gap: 6px;
+    }
+    .chip b { font-family: var(--mono); color: var(--t2); }
+
+    /* BUTTONS */
+    .cta-primary, .btn-action { min-height: var(--tap); }
+    .copy-btn, .fill-input, .check-item { min-height: var(--tap); }
+
+    .cta-primary, .btn-action {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px 16px; border-radius: 12px;
+      text-decoration: none; border: none; cursor: pointer;
+      font-size: .97rem; font-weight: 500; font-family: var(--body);
+      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+    .cta-primary:active, .btn-action:active, .copy-btn:active {
+      transform: scale(.97);
+      box-shadow: 0 2px 10px rgba(124,58,237,.2), 0 0 12px rgba(6,182,212,.25);
+    }
+    .cta-primary, .btn-v {
+      background: linear-gradient(135deg,var(--v),var(--t));
+      color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,.24);
+    }
+    .btn-v {
+      background: linear-gradient(135deg,var(--v),var(--t));
+      color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,.24);
+    }
+    .btn-e { background: var(--ed); color: var(--e); border: 1px solid rgba(16,185,129,.25); }
+    .cta-primary svg, .btn-action svg, .copy-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* STEP DIVIDERS */
+    .step-div { display: flex; align-items: center; gap: 10px; margin: var(--section-gap) 0 18px; }
+    .step-div-line { flex: 1; height: 1px; background: var(--rim); }
+    .step-div-inner { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .step-num, .card-tag, .prompt-head-label, .credit-title, .fill-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .step-label { font-family: var(--head); font-size: .84rem; font-weight: 700; color: var(--tx2); }
+    .sd1 .step-num { color: var(--v2); }
+    .sd2 .step-num { color: var(--t2); }
+    .sd3 .step-num { color: var(--a); }
+    .sd4 .step-num { color: var(--e); }
+
+    /* CARDS */
+    .card, .prompt-wrap, .credit-meter, .finale, details {
+      background: var(--glass); border: 1px solid var(--rim); border-radius: var(--radius-md);
+    }
+    .card { padding: 18px; margin-bottom: 14px; }
+    .card-tag { margin-bottom: 8px; }
+    .card h3 { font-family: var(--head); font-size: 1.08rem; font-weight: 700; margin-bottom: 8px; line-height: 1.15; }
+    .card p, .callout p { font-size: .9rem; color: var(--tx2); font-weight: 300; line-height: 1.65; }
+
+    .timer-banner {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--rim);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    }
+    .timer-num { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; min-width: 38px; text-align: center; line-height: 1; }
+    .timer-min { font-size: .68rem; color: var(--tx3); font-family: var(--mono); text-align: center; }
+    .timer-title { font-size: .92rem; font-weight: 500; line-height: 1.3; }
+
+    /* CALLOUTS */
+    .callout { border-radius: 12px; padding: 15px; margin-bottom: 14px; border-left: 3px solid; }
+    .callout-v { background: var(--vd); border-color: var(--v); }
+    .callout-t { background: var(--td); border-color: var(--t); }
+    .callout-a { background: var(--ad); border-color: var(--a); }
+    .callout-e { background: var(--ed); border-color: var(--e); }
+    .callout-emoji { font-size: 1.1rem; margin-bottom: 4px; }
+    .callout-title { font-weight: 500; font-size: .92rem; margin-bottom: 4px; }
+
+    /* PROMPT */
+    .prompt-wrap { overflow: hidden; margin-bottom: 14px; }
+    .prompt-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border-bottom: 1px solid var(--rim); background: var(--glass-2);
+    }
+    .prompt-head-label { color: var(--tx3); line-height: 1.4; }
+    .copy-btn {
+      flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 14px; border-radius: 8px; background: var(--v); color: #fff;
+      font-size: .82rem; font-weight: 500; font-family: var(--body); border: none; cursor: pointer;
+      transition: background .15s ease, transform .12s ease;
+    }
+    .copy-btn.ok { background: var(--e); }
+    .prompt-body { padding: 14px; }
+    .prompt-body pre {
+      font-family: var(--mono); font-size: .72rem; line-height: 1.8; color: var(--t2);
+      white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;
+    }
+    .prompt-body pre .ph { color: var(--a); font-style: italic; }
+
+    /* FORM */
+    .fill-field { margin-bottom: 12px; }
+    .fill-label { color: var(--tx3); margin-bottom: 5px; display: block; }
+    .fill-input {
+      width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--rim);
+      border-radius: 10px; padding: 12px; color: var(--tx); font-family: var(--body);
+      font-size: .96rem; outline: none; appearance: none;
+      transition: border .2s ease, background .2s ease;
+    }
+    .fill-input:focus { border-color: var(--v); background: rgba(255,255,255,.06); }
+    .fill-input::placeholder { color: var(--tx3); }
+
+    /* STEP LIST */
+    .step-list, .checklist, .credit-rows { display: flex; flex-direction: column; gap: 10px; }
+    .step-item, .check-item { background: var(--glass); border: 1px solid var(--rim); border-radius: 12px; }
+    .step-item { display: flex; gap: 12px; align-items: flex-start; padding: 14px; }
+    .step-dot {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: .76rem; font-weight: 700; margin-top: 1px;
+    }
+    .step-dot.v { background: var(--vd); color: var(--v2); border: 1px solid rgba(124,58,237,.3); }
+    .step-dot.t { background: var(--td); color: var(--t2); border: 1px solid rgba(6,182,212,.3); }
+    .step-dot.a { background: var(--ad); color: var(--a);  border: 1px solid rgba(245,158,11,.3); }
+    .step-dot.e { background: var(--ed); color: var(--e);  border: 1px solid rgba(16,185,129,.3); }
+    .step-text strong { display: block; font-size: .92rem; font-weight: 500; margin-bottom: 3px; }
+    .step-text span { font-size: .84rem; color: var(--tx2); font-weight: 300; line-height: 1.55; }
+
+    /* CHECKLIST */
+    .check-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      font-size: .9rem; cursor: pointer; user-select: none;
+      transition: background .15s ease, opacity .15s ease;
+    }
+    .check-item:active { background: rgba(255,255,255,.06); }
+    .check-item.done { opacity: .58; }
+    .check-box {
+      width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+      border: 1px solid var(--rim); display: flex; align-items: center; justify-content: center;
+      transition: background .15s ease, border .15s ease;
+    }
+    .check-item.done .check-box { background: var(--e); border-color: var(--e); }
+    .check-box svg { width: 11px; height: 11px; stroke: #fff; opacity: 0; transition: opacity .15s ease; }
+    .check-item.done .check-box svg { opacity: 1; }
+
+    /* DO/DONT */
+    .dodont { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+    .dodont-col { border-radius: 12px; padding: 14px; font-size: .84rem; }
+    .dodont-col.dont { background: rgba(244,63,94,.08); border: 1px solid rgba(244,63,94,.2); }
+    .dodont-col.do   { background: var(--ed); border: 1px solid rgba(16,185,129,.2); }
+    .dodont-col h4 { font-size: .74rem; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .dodont-col.dont h4 { color: #f43f5e; }
+    .dodont-col.do   h4 { color: var(--e); }
+    .dodont-col ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .dodont-col li { color: var(--tx2); font-weight: 300; line-height: 1.45; }
+
+    /* CREDIT METER */
+    .credit-meter { padding: 16px; margin-bottom: 14px; }
+    .credit-title { color: var(--tx3); margin-bottom: 12px; }
+    .credit-row { display: flex; align-items: center; gap: 10px; }
+    .credit-row-label { font-size: .8rem; min-width: 104px; color: var(--tx2); line-height: 1.3; }
+    .credit-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+    .credit-bar { height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.16,1,.3,1); }
+    .credit-bar.v { background: var(--v); }
+    .credit-bar.a { background: var(--a); }
+    .credit-bar.e { background: var(--e); }
+    .credit-count { font-family: var(--mono); font-size: .76rem; color: var(--tx3); min-width: 34px; text-align: right; }
+
+    /* FINALE */
+    .finale {
+      text-align: center; padding: 28px 18px 32px;
+      background: linear-gradient(135deg,rgba(124,58,237,.08),rgba(6,182,212,.05));
+      margin-bottom: 34px;
+    }
+    .finale-emoji { font-size: 2.3rem; margin-bottom: 12px; }
+    .finale h2 { font-family: var(--head); font-size: clamp(1.6rem,7vw,2.2rem); font-weight: 800; line-height: 1; margin-bottom: 10px; }
+    .finale p { font-size: .92rem; color: var(--tx2); font-weight: 300; max-width: 28ch; margin: 0 auto 20px; line-height: 1.65; }
+    .finale-footer { font-family: var(--mono); font-size: .68rem; color: var(--tx3); margin-top: 18px; line-height: 1.6; }
+
+    /* DETAILS */
+    details { overflow: hidden; margin-bottom: 14px; }
+    summary {
+      padding: 14px 16px; cursor: pointer; font-size: .9rem; font-weight: 500;
+      list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    summary::-webkit-details-marker { display: none; }
+
+    /* ANIMATE */
+    .r { opacity: 0; transform: translateY(24px) scale(.98); transition: opacity .55s ease, transform .6s cubic-bezier(.16,1,.3,1); }
+    .r.in { opacity: 1; transform: none; }
+
+    /* BOTÃO VOLTAR */
+    .back-btn {
+      position: fixed; top: 14px; left: 14px; z-index: 200;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 12px; background: rgba(6,6,12,.95); backdrop-filter: blur(16px);
+      border: 1px solid var(--rim); border-radius: 10px;
+      color: var(--tx2); text-decoration: none; font-size: .8rem; font-weight: 500;
+      transition: all .2s ease;
+    }
+    .back-btn:hover { color: var(--tx); border-color: var(--v); }
+    .back-btn svg { width: 14px; height: 14px; }
+
+    /* TABS DE PROGRESSÃO */
+    .tabs-progress {
+      display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+    }
+    .tab {
+      padding: 10px 16px; border-radius: 20px; border: 1px solid var(--rim);
+      background: var(--glass); font-weight: 600; font-size: .85rem;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all .2s ease; margin-right: 4px; /* fallback */
+      color: var(--tx2);
+    }
+    .tab:last-child { margin-right: 0; }
+    .tab.active { background: var(--v); color: white; border-color: var(--v); }
+    .tab:not(.active):active { background: rgba(255,255,255,.08); }
+
+    /* CONTEÚDO DAS ABAS */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ABA 3: COPIAR PROMPT */
+    .prompt-launch { text-align: center; padding: 24px 18px; margin-bottom: 24px; }
+    .prompt-launch-emoji { font-size: 2.8rem; margin-bottom: 14px; }
+    .prompt-launch h2 {
+      font-family: var(--head); font-size: clamp(1.5rem,6vw,2rem);
+      font-weight: 800; line-height: 1.1; margin-bottom: 16px;
+    }
+    .prompt-launch-steps {
+      background: var(--glass); border: 1px solid var(--rim); border-radius: 14px;
+      padding: 16px; margin-bottom: 20px; text-align: left;
+    }
+    .prompt-launch-steps h3 {
+      font-size: .7rem; font-family: var(--mono); letter-spacing: .1em;
+      text-transform: uppercase; color: var(--tx3); margin-bottom: 12px;
+    }
+    .prompt-launch-steps ol {
+      list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 8px;
+    }
+    .prompt-launch-steps li {
+      counter-increment: step; font-size: .88rem; color: var(--tx2);
+      padding-left: 28px; position: relative; line-height: 1.5;
+    }
+    .prompt-launch-steps li::before {
+      content: counter(step); position: absolute; left: 0; top: 0;
+      width: 20px; height: 20px; border-radius: 50%; background: var(--v);
+      color: white; font-size: .7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-copy-prompt {
+      width: 100%; min-height: var(--tap); border-radius: 14px; border: none;
+      background: linear-gradient(135deg,var(--v),var(--t));
+      color: white; font-family: var(--head); font-size: 1rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-bottom: 24px;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn-copy-prompt:active { transform: scale(.98); }
+    .btn-copy-prompt.copied { background: var(--e); }
+    .prompt-display {
+      background: rgba(255,255,255,.02); border: 1px solid var(--rim);
+      border-radius: 14px; padding: 16px; max-height: 400px; overflow-y: auto;
+      text-align: left;
+    }
+    .prompt-display-title {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--tx3); margin-bottom: 10px;
+    }
+    .prompt-display pre {
+      font-family: var(--mono); font-size: .76rem; line-height: 1.6;
+      color: var(--tx2); white-space: pre-wrap; word-wrap: break-word;
+    }
+
+    /* GUARDAR MEU APP */
+    .save-app { margin-top: 18px; }
+    .save-app-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--tx3); margin-bottom: 8px; display: block;
+    }
+    .save-app-text { font-size: .88rem; color: var(--tx2); margin-bottom: 12px; line-height: 1.55; font-weight: 300; }
+    .save-input {
+      width: 100%; border-radius: 10px; border: 1px solid var(--rim);
+      background: rgba(255,255,255,.05); color: var(--tx);
+      padding: 12px; font-size: .9rem; font-family: var(--body); outline: none;
+      margin-bottom: 10px; appearance: none;
+      transition: border .2s ease, background .2s ease;
+    }
+    .save-input:focus { border-color: var(--v); background: rgba(255,255,255,.06); }
+    .save-input::placeholder { color: var(--tx3); }
+    .save-row { display: flex; gap: 8px; }
+    .save-row .btn-action { flex: 1; }
+    .btn-fav {
+      width: 48px; flex-shrink: 0; border-radius: 12px; border: 1px solid var(--rim);
+      background: var(--glass); font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s ease, border .2s ease;
+      min-height: var(--tap);
+    }
+    .btn-fav.saved { background: var(--ad); border-color: rgba(245,158,11,.3); }
+
+    /* MINI DASHBOARD — Meus Apps */
+    .my-apps { margin-top: 14px; display: none; }
+    .my-apps.visible { display: block; }
+    .my-apps-head {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--tx3); margin-bottom: 8px;
+    }
+    .my-apps-list { display: flex; flex-direction: column; gap: 8px; }
+    .my-app-card {
+      background: var(--glass); border: 1px solid var(--rim); border-radius: 12px;
+      padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .my-app-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .my-app-info { flex: 1; min-width: 0; }
+    .my-app-name { font-size: .86rem; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .my-app-url { font-size: .74rem; color: var(--tx3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--mono); }
+    .my-app-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .my-app-btn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--rim);
+      background: var(--glass); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: background .15s ease;
+    }
+    .my-app-btn:active { background: rgba(255,255,255,.1); }
+    .my-app-btn svg { width: 14px; height: 14px; stroke: var(--tx2); }
+    .my-app-btn.del svg { stroke: #f43f5e; }
+
+    .bottom-safe { height: calc(16px + env(safe-area-inset-bottom,0px)); }
+
+    /* JOURNEY HUD */
+    .journey {
+      position: sticky; top: 56px; z-index: 90;
+      background: rgba(6,6,12,.7);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rim);
+    }
+    .journey-bar { display: flex; gap: 6px; padding: 8px 16px; }
+    .journey-step { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.06); transition: background .4s ease; }
+    .journey-step.active { background: linear-gradient(90deg,var(--v),var(--t)); box-shadow: 0 0 8px rgba(6,182,212,.3); }
+
+    /* FAB TOPO */
+    .fab-top {
+      position: fixed; bottom: calc(24px + env(safe-area-inset-bottom,0px)); right: 18px;
+      width: 44px; height: 44px; border-radius: 50%; z-index: 200;
+      background: var(--glass); border: 1px solid var(--rim);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; opacity: 0; pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .fab-top.visible { opacity: 1; pointer-events: auto; }
+    .fab-top:active { transform: scale(.92); }
+    .fab-top svg { width: 18px; height: 18px; stroke: var(--tx2); }
+
+    /* MISSÃO PÓS-OFICINA */
+    .mission {
+      border-radius: 14px;
+      border: 1px solid var(--rim);
+      background: linear-gradient(135deg, rgba(124,58,237,.06), rgba(6,182,212,.04));
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .mission-head {
+      padding: 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      list-style: none;
+    }
+    .mission-head::-webkit-details-marker { display: none; }
+    .mission-badge {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--t2);
+      white-space: nowrap;
+    }
+    .mission-title { flex: 1; font-weight: 500; font-size: .9rem; line-height: 1.3; }
+    .mission-chevron { flex-shrink: 0; transition: transform .3s ease; stroke: var(--tx3); }
+    details.mission[open] .mission-chevron { transform: rotate(180deg); }
+    .mission-body { padding: 0 16px 18px; border-top: 1px solid var(--rim); }
+    .mission-intro {
+      font-size: .88rem; color: var(--tx2); margin: 12px 0 16px;
+      line-height: 1.6; font-weight: 300;
+    }
+    .mission-learn {
+      background: rgba(6,182,212,.08); border: 1px solid rgba(6,182,212,.2);
+      padding: 14px; border-radius: 10px; margin-top: 16px; font-size: .84rem;
+      color: var(--tx2); line-height: 1.6;
+    }
+    .mission-learn-title { font-weight: 600; color: var(--tx); margin-bottom: 6px; }
+    .mission-extra {
+      margin-top: 14px; font-size: .84rem; color: var(--tx2);
+      background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.18);
+      border-radius: 10px; padding: 14px;
+    }
+    .mission-extra strong { display: block; color: var(--a); margin-bottom: 6px; }
+
+    /* Fase 2 — cards de missões futuras */
+    .missions-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .mission-card {
+      background: var(--glass); border: 1px solid var(--rim); border-radius: 12px;
+      padding: 14px; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .mission-card-icon {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .mission-card-icon.v { background: var(--vd); }
+    .mission-card-icon.t { background: var(--td); }
+    .mission-card-icon.a { background: var(--ad); }
+    .mission-card-icon.e { background: var(--ed); }
+    .mission-card-body strong { display: block; font-size: .88rem; font-weight: 500; margin-bottom: 3px; }
+    .mission-card-body span { font-size: .8rem; color: var(--tx2); font-weight: 300; line-height: 1.5; }
+    .mission-card-tag {
+      font-family: var(--mono); font-size: 9px; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+
+    @media (min-width: 420px) {
+      :root { --pad-x: 18px; }
+      .dodont { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation: none !important; transition: none !important; }
+      .r { opacity: 1; transform: none; }
+      .fab-top { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="amb"><span></span><span></span></div>
+  <div id="prog"></div>
+
+  <!-- Botão Voltar -->
+  <a href="construindo-tecnologia.html" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Voltar
+  </a>
+
+  <div class="topbar">
+    <span class="topbar-label">oficina · modo celular</span>
+    <span class="topbar-live">ao vivo</span>
+  </div>
+
+  <!-- Journey HUD — 5 etapas -->
+  <div class="journey" id="journeyHUD">
+    <div class="journey-bar">
+      <div class="journey-step" data-step="0"></div>
+      <div class="journey-step" data-step="1"></div>
+      <div class="journey-step" data-step="2"></div>
+      <div class="journey-step" data-step="3"></div>
+      <div class="journey-step" data-step="4"></div>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- TABS DE PROGRESSÃO -->
+    <section class="r" style="margin-top: 20px;">
+      <div class="tabs-progress">
+        <button class="tab active" onclick="switchTab(0)">① Roteiro</button>
+        <button class="tab" onclick="switchTab(1)">② Missões</button>
+        <button class="tab" onclick="switchTab(2)">③ Meu Aplicativo</button>
+      </div>
+    </section>
+
+    <!-- ABA 1: ROTEIRO -->
+    <div class="tab-content active" id="tab-0">
+
+    <!-- HERO -->
+    <section class="hero r">
+      <div class="hero-eyebrow">Servidoras no Comando Digital</div>
+      <h1>Seu app<br/>no ar em<br/><em>20 min.</em></h1>
+      <p class="hero-sub">Siga cada etapa nesta tela. No final você terá um aplicativo real publicado na internet.</p>
+      <div class="chips">
+        <span class="chip">⏱ <b>20</b> min</span>
+        <span class="chip">💳 <b>5</b> créditos</span>
+        <span class="chip">📱 só o celular</span>
+      </div>
+      <a href="https://lovable.dev" target="_blank" class="cta-primary">
+        Abrir a Lovable agora
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+      </a>
+    </section>
+
+    <!-- ANTES DE COMEÇAR -->
+    <div class="step-div sd1 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Antes de começar</span>
+        <span class="step-label">Checklist de largada</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--v2)">2</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">Conta criada na Lovable?</div></div>
+      </div>
+      <div class="callout callout-v">
+        <div class="callout-emoji">📲</div>
+        <div class="callout-title">Cadastro gratuito</div>
+        <p>Entre em <strong>lovable.dev</strong>, clique em <em>Sign up</em> e use seu e-mail. Plano Free é suficiente — não precisa de cartão de crédito.</p>
+      </div>
+      <div class="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Conta criada na Lovable
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Já estou logada
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Sei qual tarefa quero resolver com o app
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 1 -->
+    <div class="step-div sd2 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Etapa 1</span>
+        <span class="step-label">Definir a ideia</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--t2)">3</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">Qual é o seu app?</div></div>
+      </div>
+      <div class="card">
+        <div class="card-tag" style="color:var(--t2)">Preencha mentalmente</div>
+        <h3>Responda às 3 perguntas</h3>
+        <div class="step-list" style="margin-top:12px">
+          <div class="step-item">
+            <div class="step-dot t">1</div>
+            <div class="step-text">
+              <strong>Qual problema resolve?</strong>
+              <span>Ex: controlar capacitações, acompanhar contratos, registrar demandas…</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot t">2</div>
+            <div class="step-text">
+              <strong>Quais dados vou registrar?</strong>
+              <span>Ex: nome, data, status, responsável… Liste pelo menos 3 campos.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot t">3</div>
+            <div class="step-text">
+              <strong>O que o usuário faz?</strong>
+              <span>Ex: preenche formulário, visualiza lista, filtra por status…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout-t">
+        <div class="callout-emoji">💡</div>
+        <div class="callout-title">Exemplos prontos por área</div>
+        <p>
+          <strong>Gestão de pessoas:</strong> Registro de Capacitações<br/>
+          <strong>Comunicação:</strong> Banco de Ofícios<br/>
+          <strong>Planejamento:</strong> Gestão de Projetos<br/>
+          <strong>Atendimento:</strong> Fila de Demandas<br/>
+          <strong>Contratos:</strong> Rastreador de Contratos
+        </p>
+      </div>
+    </div>
+
+    <!-- ETAPA 2 -->
+    <div class="step-div sd3 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Etapa 2</span>
+        <span class="step-label">Montar o prompt</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--a)">3</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">Preencha os campos em laranja e copie</div></div>
+      </div>
+      <div class="callout callout-a">
+        <div class="callout-emoji">✍️</div>
+        <div class="callout-title">Como usar este prompt</div>
+        <p>Substitua apenas as partes em <strong style="color:var(--a)">LARANJA</strong>. O restante já está configurado para funcionar na Lovable com 1 crédito — não altere mais nada.</p>
+      </div>
+      <div class="card">
+        <div class="card-tag" style="color:var(--a)">Personalize aqui antes de copiar</div>
+        <h3 style="margin-bottom:16px">Seus dados</h3>
+        <div class="fill-field">
+          <label class="fill-label" for="f-nome">Nome do app</label>
+          <input class="fill-input" id="f-nome" placeholder="Ex: Registro de Capacitações" maxlength="60" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-desc">O que ele faz (1 frase)</label>
+          <input class="fill-input" id="f-desc" placeholder="Ex: registrar e acompanhar capacitações de servidoras" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-f1">Funcionalidade principal</label>
+          <input class="fill-input" id="f-f1" placeholder="Ex: preencher formulário com nome, curso e data" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-c1">Campo 1 do banco de dados</label>
+          <input class="fill-input" id="f-c1" placeholder="Ex: Nome da servidora — texto" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-c2">Campo 2 do banco de dados</label>
+          <input class="fill-input" id="f-c2" placeholder="Ex: Nome do curso — texto" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-c3">Campo 3 do banco de dados</label>
+          <input class="fill-input" id="f-c3" placeholder="Ex: Data de realização — data" autocomplete="off"/>
+        </div>
+        <div class="fill-field">
+          <label class="fill-label" for="f-c4">Campo 4 (com opções)</label>
+          <input class="fill-input" id="f-c4" placeholder="Ex: Status — opções: Concluída, Em andamento, Planejada" autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="prompt-wrap">
+        <div class="prompt-head">
+          <span class="prompt-head-label">Prompt para a Lovable — 1 crédito</span>
+          <button class="copy-btn" id="copyMainBtn" onclick="copyMainPrompt()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copiar
+          </button>
+        </div>
+        <div class="prompt-body">
+          <pre id="mainPromptText">Crie um aplicativo web completo e funcional com as seguintes especificações:
+
+APLICATIVO: <span class="ph" id="pt-nome">[NOME DO APP]</span>
+DESCRIÇÃO: <span class="ph" id="pt-desc">[O QUE ELE FAZ EM 1 FRASE]</span>
+
+PÚBLICO: Servidoras públicas do governo federal
+
+FUNCIONALIDADES PRINCIPAIS:
+1. <span class="ph" id="pt-f1">[FUNCIONALIDADE PRINCIPAL]</span>
+2. Listar todos os registros em cards com busca e filtro
+3. Editar e excluir registros existentes
+
+DADOS A REGISTRAR (banco de dados):
+- <span class="ph" id="pt-c1">[CAMPO 1: tipo]</span>
+- <span class="ph" id="pt-c2">[CAMPO 2: tipo]</span>
+- <span class="ph" id="pt-c3">[CAMPO 3: tipo]</span>
+- <span class="ph" id="pt-c4">[CAMPO 4: seleção com opções]</span>
+
+INTERFACE:
+- Design limpo, moderno e responsivo (mobile-first)
+- Cores: roxo (#7C3AED) e ciano (#0891B2), fundo escuro
+- Navegação simples: tela inicial → formulário → lista
+- Cards para exibir cada registro com botões de editar e excluir
+- Botões grandes e fáceis de tocar no celular
+
+BACKEND:
+- Banco de dados Supabase integrado para salvar os registros
+- Sem necessidade de login (acesso aberto)
+- CRUD completo: criar, listar, editar e excluir registros
+
+TELAS:
+1. Tela inicial: apresentação e botão para adicionar registro
+2. Formulário: campos para preencher os dados
+3. Lista: todos os registros com busca e filtro por status
+
+Construa o app completo de uma vez, incluindo frontend,
+backend Supabase e todas as funcionalidades listadas.
+O app deve estar pronto para publicar sem ajustes adicionais.</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 3 -->
+    <div class="step-div sd4 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Etapa 3</span>
+        <span class="step-label">Enviar e esperar</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--e)">8</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">A Lovable está construindo o seu app</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-dot v">1</div>
+          <div class="step-text">
+            <strong>Cole o prompt na Lovable</strong>
+            <span>Abra a Lovable, crie um novo projeto e cole o texto que você copiou.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot v">2</div>
+          <div class="step-text">
+            <strong>Aguarde sem interromper</strong>
+            <span>A geração leva 2–4 minutos. Não clique em nada enquanto ela trabalha.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot v">3</div>
+          <div class="step-text">
+            <strong>Ative o banco de dados</strong>
+            <span>Quando aparecer <em>"Enable Supabase"</em> ou <em>"Connect Database"</em>, clique. É gratuito e automático.</span>
+          </div>
+        </div>
+      </div>
+      <div class="callout callout-a" style="margin-top:14px">
+        <div class="callout-emoji">⚠️</div>
+        <div class="callout-title">Sobre os créditos</div>
+        <p>Cada prompt enviado = 1 crédito. Você tem 5 por dia no plano gratuito. <strong>Não clique em "Regenerate"</strong> sem precisar — guarde créditos para ajustes.</p>
+      </div>
+      <div class="credit-meter">
+        <div class="credit-title">Gestão dos seus 5 créditos</div>
+        <div class="credit-rows">
+          <div class="credit-row">
+            <span class="credit-row-label">Gerar o app completo</span>
+            <div class="credit-bar-wrap"><div class="credit-bar v" style="width:20%"></div></div>
+            <span class="credit-count">1</span>
+          </div>
+          <div class="credit-row">
+            <span class="credit-row-label">Ajuste (se precisar)</span>
+            <div class="credit-bar-wrap"><div class="credit-bar a" style="width:40%"></div></div>
+            <span class="credit-count">0–2</span>
+          </div>
+          <div class="credit-row">
+            <span class="credit-row-label">Reserva de segurança</span>
+            <div class="credit-bar-wrap"><div class="credit-bar e" style="width:40%"></div></div>
+            <span class="credit-count">2–4</span>
+          </div>
+        </div>
+      </div>
+      <a href="https://lovable.dev" target="_blank" class="btn-action btn-v">
+        Abrir a Lovable
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+      </a>
+    </div>
+
+    <!-- ETAPA 4 -->
+    <div class="step-div sd1 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Etapa 4</span>
+        <span class="step-label">Testar o app</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--v2)">3</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">Verifique antes de publicar</div></div>
+      </div>
+      <div class="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Formulário abre e fecha normalmente
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Consigo preencher e salvar um registro
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          O registro aparece na lista depois de salvar
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Testei no celular (modo mobile do preview)
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="1 6 4.5 9.5 11 2.5"/></svg></div>
+          Consigo editar e excluir um registro
+        </div>
+      </div>
+    </div>
+
+    <!-- SE ALGO DEU ERRADO -->
+    <div class="r" style="margin-top:6px">
+      <details>
+        <summary>
+          Algo não funcionou? Prompts de ajuste
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div style="padding:0 16px 16px;border-top:1px solid var(--rim)">
+          <p style="font-size:.84rem;color:var(--tx2);margin:12px 0 12px;font-weight:300;line-height:1.6">Use 1 crédito para cada ajuste. Seja específica — descreva exatamente o que precisa mudar.</p>
+
+          <div class="prompt-wrap" style="margin-bottom:10px">
+            <div class="prompt-head">
+              <span class="prompt-head-label">Banco de dados não salvou</span>
+              <button class="copy-btn" onclick="copyFix(this,0)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar
+              </button>
+            </div>
+            <div class="prompt-body"><pre>O banco de dados não está salvando.
+Configure o Supabase corretamente:
+- Crie as tabelas necessárias
+- Conecte o formulário para salvar
+- Conecte a lista para exibir os dados
+Teste: preencher deve aparecer na lista.</pre></div>
+          </div>
+
+          <div class="prompt-wrap" style="margin-bottom:10px">
+            <div class="prompt-head">
+              <span class="prompt-head-label">Layout quebrado no celular</span>
+              <button class="copy-btn" onclick="copyFix(this,1)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar
+              </button>
+            </div>
+            <div class="prompt-body"><pre>Revise o layout para mobile:
+- Corrija elementos cortados ou sobrepostos
+- Botões com mínimo 48px de altura (fáceis de tocar)
+- Textos legíveis sem zoom
+- Não mude funcionalidades, apenas o visual.</pre></div>
+          </div>
+
+          <div class="prompt-wrap">
+            <div class="prompt-head">
+              <span class="prompt-head-label">Adicionar campo de busca</span>
+              <button class="copy-btn" onclick="copyFix(this,2)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copiar
+              </button>
+            </div>
+            <div class="prompt-body"><pre>Na lista de registros, adicione:
+- Campo de busca por texto no topo
+- O resultado atualiza em tempo real
+- Não mude layout, cores ou outros elementos.</pre></div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- DO/DONT -->
+    <div class="r">
+      <p style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Regras de ouro</p>
+      <div class="dodont">
+        <div class="dodont-col dont">
+          <h4>❌ Não faça</h4>
+          <ul>
+            <li>Mandar o prompt em partes</li>
+            <li>Mudar cor → novo prompt</li>
+            <li>Clicar em Regenerate à toa</li>
+            <li>Refazer do zero</li>
+          </ul>
+        </div>
+        <div class="dodont-col do">
+          <h4>✅ Faça</h4>
+          <ul>
+            <li>1 prompt completo e detalhado</li>
+            <li>Edição visual para cores</li>
+            <li>Ajuste cirúrgico específico</li>
+            <li>Evoluir o que existe</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 5 -->
+    <div class="step-div sd4 r">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num">Etapa 5</span>
+        <span class="step-label">Publicar</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="timer-banner">
+        <div><div class="timer-num" style="color:var(--e)">2</div><div class="timer-min">min</div></div>
+        <div class="timer-detail"><div class="timer-title">O app vai ao ar</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-dot e">1</div>
+          <div class="step-text">
+            <strong>Clique em "Publish"</strong>
+            <span>Botão no canto superior direito da Lovable. A plataforma gera a URL pública.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot e">2</div>
+          <div class="step-text">
+            <strong>Copie o link</strong>
+            <span>Vai aparecer algo como <em style="color:var(--t2)">seuapp.lovable.app</em> — endereço público do seu app.</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot e">3</div>
+          <div class="step-text">
+            <strong>Compartilhe com a turma</strong>
+            <span>Mande o link no grupo. Qualquer pessoa acessa de qualquer dispositivo.</span>
+          </div>
+        </div>
+      </div>
+      <a href="https://lovable.dev" target="_blank" class="btn-action btn-e" style="margin-top:14px">
+        Ir para a Lovable e publicar
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+      </a>
+
+      <!-- GUARDAR MEU APP -->
+      <div class="save-app">
+        <span class="save-app-label">📎 Guardar meu app</span>
+        <p class="save-app-text">Cole o link do seu aplicativo para salvá-lo e compartilhá-lo. Você pode voltar a esta página e acessar depois.</p>
+        <input
+          id="appLinkInput"
+          class="save-input"
+          type="url"
+          inputmode="url"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          placeholder="seuapp.lovable.app"
+        />
+        <div class="save-row">
+          <button class="btn-action btn-v" onclick="saveAppLink()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            Guardar e compartilhar
+          </button>
+          <button class="btn-fav" id="favBtn" onclick="toggleFav()" title="Favoritar">⭐</button>
+        </div>
+
+        <!-- MINI DASHBOARD -->
+        <div class="my-apps" id="myApps">
+          <div class="my-apps-head">Meus apps criados</div>
+          <div class="my-apps-list" id="myAppsList"></div>
+        </div>
+      </div>
+
+    </div><!-- /etapa5 -->
+
+    <!-- FINALE -->
+    <div class="finale r" style="margin-top:32px">
+      <div class="finale-emoji">🏆</div>
+      <h2>Você <em>criou</em><br/>tecnologia.</h2>
+      <p>Do zero, pelo celular, em 20 minutos — um aplicativo real publicado na internet.</p>
+      <a href="https://servidorasnocomando.netlify.app" target="_blank" class="btn-action btn-v">
+        Explorar o site do programa
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+      </a>
+      <div class="finale-footer">Servidoras no Comando Digital<br/>Programa Mulheres que Transformam · MGI</div>
+    </div>
+
+    </div>
+    <!-- FIM ABA 1: ROTEIRO -->
+
+    <!-- ABA 2: MISSÕES -->
+    <div class="tab-content" id="tab-1">
+
+    <!-- MISSÃO PÓS-OFICINA -->
+    <div class="step-div r" style="margin-top:32px">
+      <div class="step-div-line"></div>
+      <div class="step-div-inner">
+        <span class="step-num" style="color:var(--t2)">Após a oficina</span>
+        <span class="step-label">Missões desbloqueadas</span>
+      </div>
+      <div class="step-div-line"></div>
+    </div>
+
+    <div class="r">
+      <div class="callout callout-t" style="margin-bottom:12px">
+        <div class="callout-emoji">🌱</div>
+        <div class="callout-title">A jornada não acabou aqui</div>
+        <p>Você saiu da oficina com um app funcionando. Estas missões te levam para o próximo nível — no seu ritmo, quando quiser.</p>
+      </div>
+    </div>
+
+    <!-- MISSÃO 1 -->
+    <div class="r">
+      <details class="mission">
+        <summary class="mission-head">
+          <div class="mission-badge">🔓 Missão 1 · Essencial</div>
+          <div class="mission-title">Conectar seu app a um banco de dados real</div>
+          <svg class="mission-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="mission-body">
+          <p class="mission-intro">Durante a oficina você criou um aplicativo funcionando. Agora vamos dar o próximo passo: fazer com que os dados realmente fiquem salvos para sempre.</p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-dot t">1</div>
+              <div class="step-text">
+                <strong>Abra novamente seu projeto na Lovable</strong>
+                <span>Entre em lovable.dev e abra o app que você criou hoje.</span>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-dot t">2</div>
+              <div class="step-text">
+                <strong>Ative o banco de dados</strong>
+                <span>Clique em <em>"Enable Supabase"</em> ou <em>"Connect Database"</em> — é gratuito e automático.</span>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-dot t">3</div>
+              <div class="step-text">
+                <strong>Teste salvar um registro</strong>
+                <span>Preencha o formulário e veja o dado aparecer na lista. Se aparecer: missão cumprida.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission-learn">
+            <div class="mission-learn-title">🧠 O que você acabou de aprender</div>
+            <p>Todo aplicativo real possui três partes:<br/>
+            • <strong style="color:var(--tx)">Interface</strong> — o que as pessoas veem<br/>
+            • <strong style="color:var(--tx)">Lógica</strong> — o que o sistema faz<br/>
+            • <strong style="color:var(--tx)">Banco de dados</strong> — onde as informações ficam guardadas<br/><br/>
+            Você acabou de conectar as três.</p>
+          </div>
+
+          <div class="mission-extra">
+            <strong>🚀 Desafio extra</strong>
+            <p>Adicione mais um campo ao seu aplicativo e teste se ele também está sendo salvo no banco. Use 1 crédito e um prompt cirúrgico.</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- MISSÃO 2 -->
+    <div class="r">
+      <details class="mission">
+        <summary class="mission-head">
+          <div class="mission-badge">🔓 Missão 2 · Evolução</div>
+          <div class="mission-title">Criar um segundo app para outra necessidade</div>
+          <svg class="mission-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="mission-body">
+          <p class="mission-intro">Você já sabe o ciclo completo: prompt → geração → banco → publicação. Agora repita com uma nova ideia — vai ser muito mais rápido.</p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-dot v">1</div>
+              <div class="step-text">
+                <strong>Identifique outra dor no seu trabalho</strong>
+                <span>Qual processo ainda é feito em papel, e-mail ou planilha compartilhada?</span>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-dot v">2</div>
+              <div class="step-text">
+                <strong>Volte à Etapa 2 desta página</strong>
+                <span>Preencha os campos do formulário com a nova ideia e copie o prompt.</span>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-dot v">3</div>
+              <div class="step-text">
+                <strong>Compartilhe com sua equipe</strong>
+                <span>Mande o link para alguém usar. O feedback real melhora tudo.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission-learn">
+            <div class="mission-learn-title">🧠 O que você está praticando</div>
+            <p>Pensamento de produto: identificar problema → definir solução mínima → construir → testar com usuários reais. Essa é a habilidade que separa quem usa tecnologia de quem cria tecnologia.</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- PRÓXIMAS MISSÕES (bloqueadas visualmente) -->
+    <div class="r">
+      <p style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Em breve · próximas missões</p>
+      <div class="missions-grid">
+        <div class="mission-card">
+          <div class="mission-card-icon a">🎨</div>
+          <div class="mission-card-body">
+            <div class="mission-card-tag" style="color:var(--a)">Missão 3</div>
+            <strong>Personalizar o visual do seu app</strong>
+            <span>Cores, logo, tipografia — transformar o app genérico em algo com a sua identidade.</span>
+          </div>
+        </div>
+        <div class="mission-card">
+          <div class="mission-card-icon e">👥</div>
+          <div class="mission-card-body">
+            <div class="mission-card-tag" style="color:var(--e)">Missão 4</div>
+            <strong>Adicionar login e controle de acesso</strong>
+            <span>Quem pode ver? Quem pode editar? Permissões por perfil de usuário.</span>
+          </div>
+        </div>
+        <div class="mission-card">
+          <div class="mission-card-icon v">📊</div>
+          <div class="mission-card-body">
+            <div class="mission-card-tag" style="color:var(--v2)">Missão 5</div>
+            <strong>Criar painel de visualização de dados</strong>
+            <span>Gráficos e indicadores que transformam seus registros em inteligência.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+    <!-- FIM ABA 2: MISSÕES -->
+
+    <!-- ABA 3: COPIAR PROMPT -->
+    <div class="tab-content" id="tab-2">
+      
+      <section class="r" style="margin-top:24px">
+        <div class="prompt-launch">
+          <div class="prompt-launch-emoji">🚀</div>
+          <h2>Crie seu aplicativo agora</h2>
+          
+          <div class="prompt-launch-steps">
+            <h3>Como usar</h3>
+            <ol>
+              <li>Abra <a href="https://lovable.dev" target="_blank" rel="noopener" style="color:var(--t);text-decoration:underline">lovable.dev</a></li>
+              <li>Cole o prompt abaixo</li>
+              <li>Clique em Generate</li>
+              <li>Seu app estará pronto em ~8 min</li>
+            </ol>
+          </div>
+
+          <button class="btn-copy-prompt" id="btnCopyFullPrompt" onclick="copyFullPrompt()">
+            <span id="btnCopyText">📋 Copiar Prompt Completo</span>
+          </button>
+
+          <div class="prompt-display">
+            <div class="prompt-display-title">PROMPT PRONTO — Gerenciador de Tarefas</div>
+            <pre id="fullPromptText">PERSONA
+Você é um Product Designer sênior, UX Strategist e Arquiteto de Aplicações no-code, especializado em criar sistemas web de alta clareza, alto valor percebido e experiência visual profissional para equipes do setor público.
+Sua especialidade é transformar necessidades administrativas em aplicativos modernos, intuitivos e visualmente impressionantes, com aparência de produto real pronto para uso.
+Seu tom deve ser objetivo, elegante, confiável e profissional. Você projeta interfaces que geram efeito "UAU" sem exagero visual, priorizando:
+clareza
+credibilidade
+facilidade de uso
+excelente organização da informação
+MISSÃO PRINCIPAL
+Crie um aplicativo web completo de gerenciamento de tarefas para uma servidora pública, sua equipe e sua unidade.
+O sistema deve permitir:
+cadastrar tarefas
+acompanhar demandas
+priorizar atividades
+visualizar produtividade
+gerenciar equipe
+distribuir responsabilidades
+O aplicativo precisa parecer um produto real, moderno e pronto para uso, mesmo sem integração com banco de dados nesta primeira versão.
+PRINCÍPIOS DO PRODUTO
+O sistema deve ser construído com foco em:
+simplicidade de uso
+organização visual impecável
+sensação de ferramenta profissional
+navegação intuitiva
+valor percebido já na primeira tela
+forte impacto visual para demonstração em oficina
+ESTRUTURA DO APLICATIVO
+O aplicativo deve possuir as seguintes áreas principais:
+Dashboard
+Tarefas
+Equipe
+Kanban
+Calendário ou Timeline
+Cadastro / edição de tarefa
+1) DASHBOARD PRINCIPAL
+Criar uma tela inicial com visão executiva da operação da unidade.
+Ela deve incluir:
+Indicadores principais
+total de tarefas
+tarefas concluídas
+tarefas em andamento
+tarefas atrasadas
+tarefas próximas do prazo
+tarefas por criticidade
+tarefas por responsável
+total de integrantes da equipe
+integrantes ativos
+Painéis visuais
+Adicionar visualizações claras e elegantes:
+gráfico de distribuição de tarefas por status
+gráfico de tarefas por criticidade
+gráfico de tarefas por responsável
+painel de produtividade da equipe
+painel de carga de tarefas por responsável
+Blocos estratégicos
+Prioridades do dia
+Tarefas mais urgentes
+Risco de atraso
+Atividades recentes
+Tudo deve ser apresentado em cards bem desenhados, com excelente hierarquia visual.
+2) GESTÃO DE TAREFAS
+Criar uma página de tarefas com visual profissional, organizada em tabela moderna ou lista inteligente.
+Cada tarefa deve possuir:
+título
+descrição
+responsável (selecionado da aba Equipe)
+unidade ou equipe
+data de criação
+prazo de entrega
+status
+criticidade
+observações opcionais
+3) STATUS OPERACIONAL
+Cada tarefa deve possuir um status operacional:
+Em andamento
+Concluída
+Atrasada
+Esses status devem ser exibidos com etiquetas visuais claras.
+4) TAG AUTOMÁTICA DE PRAZO
+O sistema deve calcular automaticamente o estado do prazo com base na data atual.
+Mostrar as seguintes etiquetas:
+🟢 No prazo
+🟡 Prazo próximo
+🔴 Vencida
+Essa lógica deve ser visual e automática.
+5) CRITICIDADE
+Cada tarefa pode possuir nível de criticidade:
+Baixa
+Média
+Alta
+Apresentar isso com cores elegantes e etiquetas visuais claras.
+Exemplo:
+Baixa → cinza ou azul suave
+Média → amarelo ou laranja
+Alta → vermelho
+6) FORMULÁRIO DE CRIAÇÃO E EDIÇÃO DE TAREFAS
+Criar um formulário simples e profissional contendo:
+título
+descrição
+responsável
+unidade
+prazo
+criticidade
+status
+observações
+Botões disponíveis:
+salvar tarefa
+limpar formulário
+cancelar edição
+O campo responsável deve listar automaticamente os integrantes cadastrados na aba Equipe.
+7) ABA EQUIPE
+Criar uma página chamada Equipe para cadastro e gerenciamento das pessoas da unidade.
+Essa aba deve permitir personalizar o aplicativo para a realidade de cada participante da oficina.
+Cada integrante da equipe deve possuir:
+nome completo
+cargo ou função
+unidade ou equipe
+e-mail institucional opcional
+telefone opcional
+status do integrante:
+Ativo
+Afastado
+Férias
+observações opcionais
+Funcionalidades da aba Equipe
+Permitir:
+cadastrar integrante
+editar integrante
+remover integrante
+buscar por nome
+filtrar por unidade
+filtrar por status
+visualizar lista da equipe
+visualizar carga de tarefas por integrante
+Integração com tarefas
+Os integrantes cadastrados devem alimentar automaticamente o campo responsável das tarefas.
+Regras:
+mostrar preferencialmente integrantes ativos
+exibir nome e unidade
+integrar dados aos gráficos de produtividade
+integrar dados ao painel de carga por responsável
+8) FILTROS E PRODUTIVIDADE
+Adicionar filtros para:
+responsável
+unidade
+status
+criticidade
+prazo
+busca por palavra-chave
+Ordenação por:
+prazo mais próximo
+maior criticidade
+mais recentes
+responsável
+maior carga de tarefas
+9) VISÕES ALTERNATIVAS
+Para elevar o impacto visual do aplicativo, incluir:
+Kanban
+Colunas:
+Em andamento
+Concluída
+Atrasada
+Cartões com:
+título
+responsável
+prazo
+criticidade
+Calendário ou Timeline
+Exibir tarefas distribuídas por data.
+Permitir visualizar:
+tarefas da semana
+tarefas do mês
+prazos próximos
+10) SEÇÕES DE INTELIGÊNCIA OPERACIONAL
+Adicionar também:
+Prioridades da semana
+Lista automática com tarefas de maior criticidade e prazo próximo.
+Risco de atraso
+Lista de tarefas que estão próximas de vencer ou já vencidas.
+Carga por responsável
+Mostrar quantas tarefas cada integrante possui.
+11) DADOS SIMULADOS
+O aplicativo deve abrir com dados de exemplo já preenchidos para parecer vivo na demonstração.
+Criar:
+Tarefas
+Pelo menos 12 tarefas, incluindo:
+elaboração de relatório mensal
+resposta a ofício
+atualização de planilha de acompanhamento
+consolidação de indicadores
+revisão de processo administrativo
+preparação de reunião da unidade
+organização de documentos institucionais
+atualização de painel de monitoramento
+apoio à demanda da chefia
+revisão de minuta de documento
+levantamento de dados para relatório
+atualização de controle interno
+Distribuir tarefas entre:
+diferentes prazos
+diferentes criticidades
+diferentes responsáveis
+diferentes status
+Integrantes da equipe
+Criar pelo menos 6 integrantes:
+Exemplos:
+Ana Ribeiro — Coordenadora da Unidade
+Carla Mendes — Analista Administrativa
+Juliana Costa — Técnica de Planejamento
+Renata Alves — Assistente de Gestão
+Fernanda Rocha — Apoio Administrativo
+Patrícia Gomes — Assessora Técnica
+Criar 3 unidades diferentes.
+Incluir pelo menos:
+1 integrante em férias
+1 integrante afastado
+12) ESTRUTURA VISUAL
+O aplicativo deve possuir:
+sidebar lateral moderna
+dashboard inicial
+página de tarefas
+página de equipe
+formulário de tarefa
+visão Kanban
+visão calendário ou timeline
+13) ESTILO VISUAL
+Design:
+moderno
+limpo
+elegante
+profissional
+responsivo
+Aplicar:
+cards bem desenhados
+boa tipografia
+espaçamento generoso
+uso inteligente de cores
+indicadores visuais claros
+aparência de software institucional moderno
+O aplicativo deve transmitir eficiência, organização e controle operacional.
+RESULTADO ESPERADO
+O resultado deve ser um aplicativo de gerenciamento de tarefas com aparência de produto real, contendo:
+dashboard executivo
+gestão de tarefas
+cadastro de equipe
+filtros e inteligência operacional
+visão Kanban
+visão temporal
+dados simulados realistas
+A primeira tela deve gerar impacto visual imediato, transmitindo:
+controle da operação
+organização das demandas
+priorização clara
+produtividade da equipe
+A interface deve parecer uma plataforma moderna de gestão pública, e não apenas um formulário simples.
+</pre>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <!-- FIM ABA 3: COPIAR PROMPT -->
+
+    <div class="bottom-safe"></div>
+  </main>
+
+  <!-- FAB voltar ao topo -->
+  <button class="fab-top" id="fabTop" aria-label="Voltar ao topo">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </button>
+
+  <script>
+    // progress bar
+    const prog = document.getElementById("prog");
+    window.addEventListener("scroll", () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      prog.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + "%";
+    }, { passive: true });
+
+    // FAB topo
+    const fabTop = document.getElementById("fabTop");
+    fabTop.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    window.addEventListener("scroll", () => {
+      fabTop.classList.toggle("visible", window.scrollY > 300);
+    }, { passive: true });
+
+    // Journey HUD — detecta qual etapa está visível
+    const journeySteps = document.querySelectorAll(".journey-step");
+    const stepDivs = document.querySelectorAll(".step-div");
+    function updateJourney() {
+      const viewMid = window.scrollY + window.innerHeight * 0.4;
+      let active = -1;
+      stepDivs.forEach((div, i) => {
+        if (div.offsetTop <= viewMid) active = i;
+      });
+      journeySteps.forEach((s, i) => {
+        s.classList.toggle("active", i <= active);
+      });
+    }
+    window.addEventListener("scroll", updateJourney, { passive: true });
+    updateJourney();
+
+    // intersection observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.06 });
+    document.querySelectorAll(".r").forEach((el, i) => {
+      el.style.transitionDelay = (i % 5) * 55 + "ms";
+      io.observe(el);
+    });
+
+    // checklist
+    function toggleCheck(el) { el.classList.toggle("done"); }
+
+    // NAVEGAÇÃO ENTRE ABAS
+    function switchTab(index) {
+      // Remove active de todas as abas e conteúdos
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      // Adiciona active na aba e conteúdo clicados
+      document.querySelectorAll('.tab')[index].classList.add('active');
+      document.getElementById(`tab-${index}`).classList.add('active');
+      
+      // Scroll suave para o topo
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // COPIAR PROMPT COMPLETO
+    function copyFullPrompt() {
+      const pre = document.getElementById("fullPromptText");
+      const btn = document.getElementById("btnCopyFullPrompt");
+      const btnText = document.getElementById("btnCopyText");
+      
+      if (!pre || !btn || !btnText) return;
+      
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btnText.textContent = "✅ Prompt Copiado!";
+        btn.classList.add("copied");
+        
+        setTimeout(() => {
+          btnText.textContent = "📋 Copiar Prompt Completo";
+          btn.classList.remove("copied");
+        }, 2500);
+      }).catch(err => {
+        console.error('Erro ao copiar:', err);
+        alert('Não foi possível copiar. Tente selecionar e copiar manualmente.');
+      });
+    }
+
+
+    // live prompt update
+    const fields = {
+      "f-nome":"pt-nome","f-desc":"pt-desc","f-f1":"pt-f1",
+      "f-c1":"pt-c1","f-c2":"pt-c2","f-c3":"pt-c3","f-c4":"pt-c4",
+    };
+    const defaults = {
+      "f-nome":"[NOME DO APP]","f-desc":"[O QUE ELE FAZ EM 1 FRASE]",
+      "f-f1":"[FUNCIONALIDADE PRINCIPAL]","f-c1":"[CAMPO 1: tipo]",
+      "f-c2":"[CAMPO 2: tipo]","f-c3":"[CAMPO 3: tipo]","f-c4":"[CAMPO 4: seleção com opções]",
+    };
+    Object.entries(fields).forEach(([inputId, spanId]) => {
+      const input = document.getElementById(inputId);
+      const span  = document.getElementById(spanId);
+      if (!input || !span) return;
+      input.addEventListener("input", () => {
+        span.textContent = input.value.trim() || defaults[inputId];
+      });
+    });
+
+    // copy main prompt
+    function copyMainPrompt() {
+      const pre = document.getElementById("mainPromptText");
+      if (!pre) return;
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        const btn = document.getElementById("copyMainBtn");
+        if (!btn) return;
+        btn.innerHTML = "✓ Copiado!";
+        btn.classList.add("ok");
+        setTimeout(() => {
+          btn.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`;
+          btn.classList.remove("ok");
+        }, 2200);
+      });
+    }
+
+    // copy fix prompts
+    const fixes = [
+      `O banco de dados não está salvando.\nConfigure o Supabase corretamente:\n- Crie as tabelas necessárias\n- Conecte o formulário para salvar\n- Conecte a lista para exibir os dados\nTeste: preencher deve aparecer na lista.`,
+      `Revise o layout para mobile:\n- Corrija elementos cortados ou sobrepostos\n- Botões com mínimo 48px de altura (fáceis de tocar)\n- Textos legíveis sem zoom\n- Não mude funcionalidades, apenas o visual.`,
+      `Na lista de registros, adicione:\n- Campo de busca por texto no topo\n- O resultado atualiza em tempo real\n- Não mude layout, cores ou outros elementos.`,
+    ];
+    function copyFix(btn, idx) {
+      navigator.clipboard.writeText(fixes[idx]).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = "✓ Copiado";
+        btn.classList.add("ok");
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove("ok"); }, 2000);
+      });
+    }
+    // ── GUARDAR MEU APP ──────────────────────────────────────────────
+    const LS_KEY = "servidoras_apps";
+
+    function normalizeUrl(url) {
+      url = url.trim();
+      if (url && !url.startsWith("http")) url = "https://" + url;
+      return url;
+    }
+
+    function loadMyApps() {
+      const apps = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      const container = document.getElementById("myApps");
+      const list = document.getElementById("myAppsList");
+      if (!apps.length) { container.classList.remove("visible"); return; }
+      container.classList.add("visible");
+      list.innerHTML = apps.map((app, i) => `
+        <div class="my-app-card">
+          <div class="my-app-icon">🚀</div>
+          <div class="my-app-info">
+            <div class="my-app-name">${app.name || "Meu app"}</div>
+            <div class="my-app-url">${app.url}</div>
+          </div>
+          <div class="my-app-actions">
+            <button class="my-app-btn" onclick="openApp(${i})" title="Abrir">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+            </button>
+            <button class="my-app-btn" onclick="shareApp(${i})" title="Compartilhar">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            </button>
+            <button class="my-app-btn del" onclick="deleteApp(${i})" title="Remover">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function saveAppLink() {
+      const input = document.getElementById("appLinkInput");
+      const url = normalizeUrl(input.value);
+      if (!url) {
+        input.focus();
+        input.style.borderColor = "#f43f5e";
+        setTimeout(() => input.style.borderColor = "", 1400);
+        return;
+      }
+      // compartilhar via Web Share API (nativo no celular)
+      const payload = { title: "Meu app criado na oficina", text: "Olha o app que eu criei! →", url };
+      if (navigator.share) {
+        navigator.share(payload).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          const btn = document.querySelector(".save-row .btn-action");
+          const orig = btn.innerHTML;
+          btn.innerHTML = "✓ Link copiado!";
+          btn.classList.add("ok");
+          setTimeout(() => { btn.innerHTML = orig; btn.classList.remove("ok"); }, 2200);
+        });
+      }
+      // salvar no localStorage automaticamente junto com o compartilhamento
+      favSaveUrl(url);
+    }
+
+    function favSaveUrl(url) {
+      const apps = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      const already = apps.find(a => a.url === url);
+      if (!already) {
+        // tentar extrair nome do subdomínio
+        let name = url;
+        try { name = new URL(url.startsWith("http") ? url : "https://" + url).hostname.split(".")[0]; } catch(e) {}
+        apps.unshift({ url, name, saved: Date.now() });
+        localStorage.setItem(LS_KEY, JSON.stringify(apps));
+      }
+      const btn = document.getElementById("favBtn");
+      btn.classList.add("saved");
+      btn.title = "Favoritado!";
+      loadMyApps();
+    }
+
+    function toggleFav() {
+      const input = document.getElementById("appLinkInput");
+      const url = normalizeUrl(input.value);
+      if (!url) { input.focus(); return; }
+      favSaveUrl(url);
+    }
+
+    function openApp(i) {
+      const apps = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      if (apps[i]) window.open(apps[i].url, "_blank");
+    }
+
+    function shareApp(i) {
+      const apps = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      if (!apps[i]) return;
+      const payload = { title: "Meu app criado na oficina", text: "Olha o app que eu criei! →", url: apps[i].url };
+      if (navigator.share) navigator.share(payload).catch(() => {});
+      else navigator.clipboard.writeText(apps[i].url);
+    }
+
+    function deleteApp(i) {
+      const apps = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      apps.splice(i, 1);
+      localStorage.setItem(LS_KEY, JSON.stringify(apps));
+      loadMyApps();
+    }
+
+    // carregar apps ao iniciar
+    loadMyApps();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institucional — ASCENDA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-cyan: #22D3EE;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 55%;
+            height: 55%;
+            background: radial-gradient(ellipse, rgba(34, 211, 238, 0.05) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(167, 139, 250, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(34, 211, 238, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem 5rem;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .page-badge {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 1.25rem;
+        }
+
+        .section-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-content ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .section-content ul li {
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-content ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+        }
+
+        .external-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .external-link:hover {
+            opacity: 0.8;
+        }
+
+        .external-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @media (max-width: 640px) {
+            .page-container {
+                padding: 4rem 1.5rem 3rem;
+            }
+            .section {
+                padding: 1.75rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar
+    </a>
+
+    <div class="page-container">
+        <header class="page-header">
+            <div class="page-badge">INSTITUCIONAL</div>
+            <h1 class="page-title">Governo e Compliance</h1>
+            <p class="page-subtitle">Informações oficiais, políticas públicas e compromissos com transparência e proteção de dados.</p>
+        </header>
+
+        <section id="mgi" class="section">
+            <h2 class="section-title">Ministério da Gestão e Inovação</h2>
+            <div class="section-content">
+                <p>O Ministério da Gestão e Inovação em Serviços Públicos (MGI) é o órgão federal responsável por modernizar a administração pública brasileira, promover a eficiência do Estado e liderar a transformação digital do governo.</p>
+                
+                <p>O MGI desenvolve políticas de gestão de pessoas, inovação tecnológica, simplificação de processos e governança digital — sempre com foco em tornar o serviço público mais eficiente, transparente e centrado no cidadão.</p>
+                
+                <p>O ASCENDA integra a estratégia do MGI de capacitação digital de servidores públicos, com ênfase em equidade de gênero e inclusão de mulheres em áreas tecnológicas da administração pública.</p>
+                
+                <p>
+                    <a href="https://www.gov.br/gestao" target="_blank" rel="noopener" class="external-link">
+                        Acesse o site oficial do MGI
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                    </a>
+                </p>
+            </div>
+        </section>
+
+        <section id="governo" class="section">
+            <h2 class="section-title">Governo Federal</h2>
+            <div class="section-content">
+                <p>O ASCENDA é uma iniciativa pública federal vinculada ao Ministério da Gestão e Inovação em Serviços Públicos, desenvolvida no âmbito do Programa Mulheres que Transformam.</p>
+                
+                <p>A plataforma alinha-se aos compromissos do governo federal com:</p>
+                
+                <ul>
+                    <li>Equidade de gênero no serviço público</li>
+                    <li>Transformação digital do Estado</li>
+                    <li>Capacitação e desenvolvimento de servidores</li>
+                    <li>Democratização do acesso à tecnologia</li>
+                    <li>Inovação e modernização da gestão pública</li>
+                </ul>
+                
+                <p>Todos os conteúdos, ferramentas e capacitações oferecidos são gratuitos e destinados exclusivamente a servidoras públicas federais, estaduais e municipais.</p>
+            </div>
+        </section>
+
+        <section id="termos" class="section">
+            <h2 class="section-title">Termos de Uso</h2>
+            <div class="section-content">
+                <p>Ao utilizar a plataforma ASCENDA, você concorda com os seguintes termos:</p>
+                
+                <p><strong>1. Finalidade da Plataforma:</strong> O ASCENDA é uma ferramenta educacional gratuita destinada ao letramento digital de mulheres no serviço público. O acesso e uso da plataforma são exclusivos para fins de capacitação profissional.</p>
+                
+                <p><strong>2. Responsabilidade do Usuário:</strong> As participantes são responsáveis por manter a confidencialidade de suas credenciais de acesso e por todas as atividades realizadas em suas contas.</p>
+                
+                <p><strong>3. Propriedade Intelectual:</strong> Todo o conteúdo disponibilizado na plataforma (textos, imagens, vídeos, materiais didáticos) é de propriedade do Ministério da Gestão e Inovação ou de parceiros autorizados. É permitido o uso para fins educacionais, vedada a reprodução comercial sem autorização.</p>
+                
+                <p><strong>4. Uso Adequado:</strong> É proibido utilizar a plataforma para fins ilícitos, disseminar conteúdo ofensivo ou prejudicial, ou realizar qualquer atividade que comprometa a segurança e funcionamento do sistema.</p>
+                
+                <p><strong>5. Modificações:</strong> O MGI reserva-se o direito de modificar estes termos a qualquer momento, mediante notificação prévia aos usuários.</p>
+            </div>
+        </section>
+
+        <section id="privacidade" class="section">
+            <h2 class="section-title">Política de Privacidade</h2>
+            <div class="section-content">
+                <p>O ASCENDA respeita sua privacidade e está comprometido com a proteção de seus dados pessoais, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).</p>
+                
+                <p><strong>Dados Coletados:</strong> Coletamos apenas informações essenciais para o funcionamento da plataforma: nome, e-mail institucional, órgão de lotação, telefone (opcional) e dados de navegação e uso das funcionalidades educacionais.</p>
+                
+                <p><strong>Finalidade:</strong> Os dados são utilizados exclusivamente para:</p>
+                
+                <ul>
+                    <li>Personalizar a experiência de aprendizagem</li>
+                    <li>Gerar certificados de participação</li>
+                    <li>Enviar comunicações sobre novos conteúdos e oficinas</li>
+                    <li>Produzir estatísticas agregadas e anônimas sobre o uso da plataforma</li>
+                </ul>
+                
+                <p><strong>Compartilhamento:</strong> Seus dados pessoais não são vendidos, alugados ou compartilhados com terceiros para fins comerciais. Dados agregados e anonimizados podem ser utilizados em relatórios institucionais e pesquisas sobre políticas públicas de equidade de gênero.</p>
+                
+                <p><strong>Segurança:</strong> Utilizamos medidas técnicas e organizacionais para proteger seus dados contra acesso não autorizado, perda ou alteração. O acesso aos dados pessoais é restrito a servidores públicos autorizados.</p>
+                
+                <p><strong>Seus Direitos:</strong> Você tem direito a acessar, corrigir, excluir ou solicitar a portabilidade de seus dados pessoais a qualquer momento. Para exercer esses direitos, entre em contato pelo e-mail carla.figueiredo@gestao.gov.br.</p>
+                
+                <p><strong>Base Legal:</strong> O tratamento de dados pela plataforma ASCENDA fundamenta-se no exercício regular de competências legais do poder público (Art. 7º, III, LGPD) e na execução de políticas públicas de capacitação de servidores.</p>
+                
+                <p>Para mais informações sobre proteção de dados e segurança da informação, consulte a página 
+                    <a href="seguranca.html" class="external-link">
+                        Segurança e LGPD
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

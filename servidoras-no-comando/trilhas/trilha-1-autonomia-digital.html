@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trilha 1 — Autonomia Digital com IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #030308;
+            --bg-surface: #0A0A12;
+            --bg-elevated: #1E1E2E;
+            
+            --accent-lavanda: #A78BFA;
+            --accent-cyan: #A78BFA;
+            --accent-verde: #22C55E;
+            --accent-rosa: #FB7185;
+            --accent-ambar: #F5A623;
+            
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #475569;
+            
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(10, 10, 18, 0.6);
+            
+            --progress-incomplete: #334155;
+            --progress-active: var(--accent-lavanda);
+            --progress-complete: var(--accent-verde);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ==========================================
+           FILM GRAIN + GRID TÉCNICO
+        ========================================== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        /* ==========================================
+           HERO SECTION
+        ========================================== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            z-index: 3;
+            animation: heroFadeIn 1.5s ease-out;
+        }
+
+        @keyframes heroFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-lavanda), var(--accent-lavanda));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .trilha-meta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .trilha-meta-item {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .hero-visual {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #networkCanvas {
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        /* ==========================================
+           BARRA DE PROGRESSO DA TRILHA
+        ========================================== */
+        .trilha-progress {
+            max-width: 900px;
+            margin: 3rem auto 4rem;
+            padding: 0 2rem;
+            z-index: 3;
+            position: relative;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        #progressPercent {
+            font-weight: 600;
+            color: var(--accent-lavanda);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-lavanda), var(--accent-verde));
+            border-radius: 8px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-meta {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ==========================================
+           BOTÃO VOLTAR
+        ========================================== */
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 1001;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(167, 139, 250, 0.3);
+            transform: translateX(-2px);
+        }
+        
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ==========================================
+           PROGRESS TRACKER (baseado em módulos completados)
+        ========================================== */
+        .progress-tracker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--progress-incomplete);
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-tracker.hidden {
+            opacity: 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-lavanda), var(--accent-verde));
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            bottom: -2px;
+            width: 8px;
+            background: var(--accent-verde);
+            box-shadow: 0 0 20px var(--accent-verde);
+            border-radius: 4px;
+        }
+
+        .progress-label {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-label.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           SIDEBAR HUD (navegação lateral)
+        ========================================== */
+        .sidebar-hud {
+            position: fixed;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-hud {
+                left: 1rem;
+                gap: 0.75rem;
+            }
+            
+            .hud-label {
+                display: none;
+            }
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .hud-item:hover {
+            opacity: 1;
+        }
+
+        .hud-item.active {
+            opacity: 1;
+        }
+
+        .hud-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            background: transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .hud-item.in-progress .hud-dot {
+            background: conic-gradient(var(--accent-lavanda) 50%, transparent 50%);
+            border-color: var(--accent-lavanda);
+        }
+
+        .hud-item.complete .hud-dot {
+            background: var(--accent-verde);
+            border-color: var(--accent-verde);
+            box-shadow: 0 0 12px var(--accent-verde);
+        }
+
+        .hud-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: color 0.3s ease;
+        }
+
+        .hud-item.active .hud-label {
+            color: var(--text-primary);
+        }
+
+        /* ==========================================
+           EIXO CENTRAL (SVG - mais leve)
+        ========================================== */
+        .axis-container {
+            position: fixed;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .axis-container {
+                left: 1.5rem;
+                transform: none;
+                width: 50px;
+            }
+        }
+
+        .axis-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .axis-line {
+            stroke: var(--accent-lavanda);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5 5;
+            animation: dashFlow 20s linear infinite;
+        }
+
+        @keyframes dashFlow {
+            to {
+                stroke-dashoffset: -100;
+            }
+        }
+
+        .axis-node {
+            fill: var(--accent-verde);
+            filter: drop-shadow(0 0 8px var(--accent-verde));
+            transition: all 0.3s ease;
+        }
+
+        .axis-node.incomplete {
+            fill: var(--progress-incomplete);
+            filter: none;
+        }
+
+        .axis-node.in-progress {
+            fill: var(--accent-lavanda);
+            filter: drop-shadow(0 0 8px var(--accent-lavanda));
+        }
+
+        /* ==========================================
+           TRILHA CONTAINER
+        ========================================== */
+        .trilha-container {
+            position: relative;
+            z-index: 3;
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .trilha-container {
+                padding: 4rem 1rem 4rem 4rem;
+            }
+        }
+
+        /* ==========================================
+           MÓDULOS
+        ========================================== */
+        .modulo {
+            position: relative;
+            margin-bottom: 8rem;
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .modulo.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .modulo-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .modulo-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .modulo-content {
+            flex: 1;
+        }
+
+        .modulo-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .modulo-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .modulo-description {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 65ch;
+        }
+
+        /* ==========================================
+           CHECKBOX CONCLUIR MÓDULO
+        ========================================== */
+        .module-complete-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .module-complete-checkbox:hover {
+            border-color: var(--accent-verde);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .module-complete-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent-verde);
+        }
+
+        .module-complete-checkbox label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .module-complete-checkbox.checked {
+            border-color: var(--accent-verde);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .module-complete-checkbox.checked label {
+            color: var(--accent-verde);
+        }
+
+        /* ==========================================
+           RECURSOS (cards de cursos)
+        ========================================== */
+        .recursos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .recurso-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recurso-card:hover {
+            border-color: var(--accent-lavanda);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(167, 139, 250, 0.1);
+        }
+
+        .recurso-instituicao {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-lavanda);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .recurso-nome {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .recurso-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================
+           EXERCÍCIO PRÁTICO
+        ========================================== */
+        .exercicio-pratico {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.05), rgba(167, 139, 250, 0.05));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .exercicio-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .exercicio-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-lavanda);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .exercicio-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .exercicio-description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .exercicio-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .exercicio-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ==========================================
+           DICA ESTRATÉGICA
+        ========================================== */
+        .dica-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--accent-lavanda);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .dica-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .dica-icon {
+            font-size: 1.25rem;
+        }
+
+        .dica-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .dica-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================
+           UNLOCK BADGE
+        ========================================== */
+        .unlock-badge {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--accent-verde);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 320px;
+            z-index: 1000;
+            transform: translateY(120%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .unlock-badge.visible {
+            transform: translateY(0);
+        }
+
+        .unlock-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-verde);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .unlock-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .unlock-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ==========================================
+           PROJETO FINAL
+        ========================================== */
+        .projeto-final {
+            max-width: 900px;
+            margin: 6rem auto 4rem;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .projeto-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .projeto-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(34, 211, 238, 0.12);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent-lavanda);
+            margin-bottom: 1rem;
+        }
+
+        .projeto-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-verde), var(--accent-lavanda));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .projeto-intro {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .projeto-etapas {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .projeto-etapa {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .projeto-etapa:hover {
+            border-color: var(--accent-lavanda);
+            transform: translateX(4px);
+        }
+
+        .projeto-etapa-numero {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-lavanda), var(--accent-verde));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .projeto-etapa-content h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .projeto-etapa-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .projeto-entrega {
+            padding: 1.25rem;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .projeto-entrega strong {
+            color: var(--accent-verde);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           CTA FINAL
+        ========================================== */
+        .cta-final {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), rgba(167, 139, 250, 0.1));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-top: 8rem;
+            margin-bottom: 4rem;
+        }
+
+        .cta-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-verde), var(--accent-lavanda));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 60ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-verde);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-lavanda);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-lavanda);
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        /* ==========================================
+           PARTÍCULAS FLUTUANTES
+        ========================================== */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-lavanda);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: translateY(-100vh) scale(1.5);
+            }
+        }
+
+        /* ==========================================
+           PATCH VISUAL PREMIUM — Apple/Stripe Feel
+        ========================================== */
+        :root {
+            --bg-primary: #05070B;
+            --bg-surface: rgba(255,255,255,0.03);
+            --glass-bg: rgba(255,255,255,0.035);
+            --glass-border: rgba(255,255,255,0.08);
+            --text-primary: #F5F7FA;
+            --text-secondary: #A7B0BE;
+            --text-muted: #667085;
+            --accent-cyan: #C4B5FD;
+            --accent-verde: #4ADE80;
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 600px at 20% -10%, rgba(167,139,250,0.08), transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(251,113,133,0.08), transparent 45%),
+                var(--bg-primary);
+        }
+
+        .hero-content,
+        .modulo-content,
+        .exercicio-pratico,
+        .recurso-card,
+        .dica-box,
+        .trilha-progress,
+        .projeto-final {
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+            box-shadow: 
+                0 1px 0 rgba(255,255,255,0.04) inset,
+                0 24px 60px rgba(0,0,0,0.28);
+        }
+
+        .modulo {
+            margin-bottom: 10rem;
+        }
+
+        .modulo-title {
+            letter-spacing: -0.03em;
+            max-width: 12ch;
+        }
+
+        .modulo-description,
+        .exercicio-description,
+        .dica-text {
+            max-width: 62ch;
+        }
+
+        .recurso-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(167,139,250,0.28);
+            box-shadow: 
+                0 1px 0 rgba(255,255,255,0.05) inset,
+                0 18px 40px rgba(0,0,0,0.32);
+        }
+
+        .hero-title {
+            letter-spacing: -0.05em;
+            line-height: 0.95;
+        }
+
+        .hero-subtitle {
+            max-width: 58ch;
+            color: var(--text-secondary);
+        }
+
+        /* Eixo SVG mais discreto */
+        .axis-container {
+            opacity: 0.35;
+        }
+
+        .axis-line {
+            stroke-width: 1.5;
+        }
+        
+        /* ==========================================
+           MOBILE RESPONSIVE
+        ========================================== */
+        @media (max-width: 768px) {
+            .back-btn{
+                position: static;
+                margin: 1rem;
+                width: fit-content;
+            }
+
+            .progress-tracker,
+            .progress-label,
+            .sidebar-hud,
+            .axis-container,
+            .particles,
+            .hero-visual{
+                display: none !important;
+            }
+
+            .hero{
+                min-height: auto;
+                padding: 2rem 1rem 1rem;
+            }
+
+            .hero-content{
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .hero-title{
+                font-size: clamp(2rem, 10vw, 2.8rem);
+                line-height: 1.02;
+            }
+
+            .hero-subtitle{
+                font-size: .98rem;
+                line-height: 1.6;
+            }
+
+            .trilha-meta{
+                gap: .6rem;
+                justify-content: flex-start;
+            }
+
+            .trilha-meta-item{
+                font-size: .8rem;
+                padding: .45rem .7rem;
+            }
+
+            .trilha-progress{
+                margin: 1.5rem auto 2rem;
+                padding: 0 1rem;
+            }
+
+            .trilha-container{
+                padding: 2rem 1rem 3rem;
+            }
+
+            .modulo{
+                margin-bottom: 4rem;
+                opacity: 1;
+                transform: none;
+            }
+
+            .modulo-header{
+                display: block;
+                gap: 0;
+                margin-bottom: 1rem;
+            }
+
+            .modulo-number{
+                display: inline-block;
+                margin-bottom: .75rem;
+            }
+
+            .modulo-title{
+                max-width: none;
+                font-size: clamp(1.8rem, 8vw, 2.4rem);
+                line-height: 1.05;
+            }
+
+            .modulo-subtitle{
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .modulo-description,
+            .exercicio-description,
+            .dica-text{
+                max-width: none;
+                font-size: .96rem;
+                line-height: 1.65;
+            }
+
+            .recursos-grid{
+                grid-template-columns: 1fr;
+            }
+
+            .recurso-card,
+            .exercicio-pratico,
+            .dica-box,
+            .projeto-final,
+            .modulo-content{
+                border-radius: 16px;
+                padding: 1.25rem;
+                box-shadow:
+                    0 1px 0 rgba(255,255,255,0.04) inset,
+                    0 12px 30px rgba(0,0,0,0.22);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Botão Voltar -->
+    <a href="../trilhas.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Voltar para Trilhas
+    </a>
+
+    <!-- Progress Tracker -->
+    <div class="progress-tracker hidden">
+        <div class="progress-bar"></div>
+    </div>
+    <div class="progress-label hidden">
+        <span id="progressText">0/5 módulos completados</span>
+    </div>
+
+    <!-- Sidebar HUD -->
+    <nav class="sidebar-hud">
+        <a href="#modulo1" class="hud-item" data-module="1">
+            <div class="hud-dot"></div>
+            <span class="hud-label">Despertar Analítico</span>
+        </a>
+        <a href="#modulo2" class="hud-item" data-module="2">
+            <div class="hud-dot"></div>
+            <span class="hud-label">Básico Bem Feito</span>
+        </a>
+        <a href="#modulo3" class="hud-item" data-module="3">
+            <div class="hud-dot"></div>
+            <span class="hud-label">Virada de Chave</span>
+        </a>
+        <a href="#modulo4" class="hud-item" data-module="4">
+            <div class="hud-dot"></div>
+            <span class="hud-label">Visualização</span>
+        </a>
+        <a href="#modulo5" class="hud-item" data-module="5">
+            <div class="hud-dot"></div>
+            <span class="hud-label">Dados + IA</span>
+        </a>
+    </nav>
+
+    <!-- Eixo Central SVG (mais leve que Three.js) -->
+    <div class="axis-container">
+        <svg class="axis-svg" viewBox="0 0 100 1000" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <linearGradient id="axisGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#A78BFA;stop-opacity:0" />
+                    <stop offset="50%" style="stop-color:#A78BFA;stop-opacity:0.8" />
+                    <stop offset="100%" style="stop-color:#22C55E;stop-opacity:0.8" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Linha central -->
+            <line x1="50" y1="0" x2="50" y2="1000" class="axis-line" stroke="url(#axisGradient)" />
+            
+            <!-- Nodes dos módulos -->
+            <circle cx="50" cy="100" r="6" class="axis-node incomplete" data-module="1"/>
+            <circle cx="50" cy="300" r="6" class="axis-node incomplete" data-module="2"/>
+            <circle cx="50" cy="500" r="6" class="axis-node incomplete" data-module="3"/>
+            <circle cx="50" cy="700" r="6" class="axis-node incomplete" data-module="4"/>
+            <circle cx="50" cy="900" r="6" class="axis-node incomplete" data-module="5"/>
+        </svg>
+    </div>
+
+    <!-- Partículas -->
+    <div class="particles" id="particlesContainer"></div>
+
+    <!-- Sueli Chat Sidebar -->
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-visual">
+            <canvas id="networkCanvas"></canvas>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Você já usa IA. Agora aprenda a comandar.</h1>
+            <p class="hero-subtitle">Esta trilha transforma servidoras de usuárias ocasionais em profissionais que entendem, questionam e direcionam a IA com intenção.</p>
+            
+            <div class="trilha-meta">
+                <div class="trilha-meta-item">⏱️ 20–30 horas</div>
+                <div class="trilha-meta-item">📦 5 módulos</div>
+                <div class="trilha-meta-item">🎯 Projeto final</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barra de Progresso da Trilha -->
+    <div class="trilha-progress">
+        <div class="progress-header">
+            <span>Progresso da trilha</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-meta">
+            <span id="progressText">0 de 5 módulos concluídos</span>
+        </div>
+    </div>
+
+    <!-- Trilha Container -->
+    <div class="trilha-container">
+        <!-- MÓDULO 1 -->
+        <article class="modulo" id="modulo1" data-module="1">
+            <div class="modulo-header">
+                <span class="modulo-number">MÓDULO 1</span>
+                <div class="modulo-content">
+                    <h2 class="modulo-title">IA sem Mistério</h2>
+                    <p class="modulo-subtitle">"O Que é IA, Afinal?"</p>
+                    <p class="modulo-description">
+                        IA não é magia nem ameaça: é estatística, padrões e probabilidade. Este módulo desmonta mitos, apresenta os tipos de IA que você já usa sem saber e contextualiza o que está em jogo para servidoras públicas.
+                    </p>
+
+                    <!-- Recursos -->
+                    <div class="recursos-grid">
+                        <div class="recurso-card" onclick="window.open('https://www.escolavirtual.gov.br/curso/1063', '_blank')">
+                            <div class="recurso-instituicao">ENAP • EV.G</div>
+                            <div class="recurso-nome">Inteligência Artificial para o Setor Público</div>
+                            <div class="recurso-meta">
+                                <span>10h</span>
+                                <span>•</span>
+                                <span>Gratuito</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://www.coursera.org/learn/ai-for-everyone', '_blank')">
+                            <div class="recurso-instituicao">DeepLearning.AI • Coursera</div>
+                            <div class="recurso-nome">AI for Everyone</div>
+                            <div class="recurso-meta">
+                                <span>6h</span>
+                                <span>•</span>
+                                <span>Inglês / PT disponível</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://www.escolavirtual.gov.br/curso/1081', '_blank')">
+                            <div class="recurso-instituicao">ENAP • EV.G</div>
+                            <div class="recurso-nome">IA Generativa: Conceitos e Aplicações</div>
+                            <div class="recurso-meta">
+                                <span>4h</span>
+                                <span>•</span>
+                                <span>Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exercício Prático -->
+                    <div class="exercicio-pratico">
+                        <div class="exercicio-header">
+                            <div class="exercicio-icon">✏️</div>
+                            <h3 class="exercicio-title">Exercício Prático</h3>
+                        </div>
+                        <p class="exercicio-description">
+                            Identifique 3 situações na sua rotina de trabalho onde uma IA poderia te ajudar. Para cada uma, escreva: qual tarefa, que tipo de IA (texto, imagem, automação?) e que risco precisaria considerar.
+                        </p>
+                        <div class="exercicio-meta">
+                            <span>⏱️ 45 min</span>
+                            <span>📝 Papel e caneta</span>
+                            <span>🎯 Reflexão crítica</span>
+                        </div>
+                    </div>
+
+                    <!-- Dica Estratégica -->
+                    <div class="dica-box">
+                        <div class="dica-header">
+                            <div class="dica-icon">💡</div>
+                            <span class="dica-title">Dica Estratégica</span>
+                        </div>
+                        <p class="dica-text">
+                            Não precisa entender de programação para entender IA. O que importa é saber perguntar: "Como esse sistema chegou a essa resposta?" e "Posso confiar nessa saída?" São as perguntas que uma servidora pública precisa fazer.
+                        </p>
+                    </div>
+
+                    <!-- Checkbox Concluir -->
+                    <div class="module-complete-checkbox" data-module="1">
+                        <input type="checkbox" id="check-modulo-1">
+                        <label for="check-modulo-1">Marcar este módulo como concluído</label>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- MÓDULO 2 -->
+        <article class="modulo" id="modulo2" data-module="2">
+            <div class="modulo-header">
+                <span class="modulo-number">MÓDULO 2</span>
+                <div class="modulo-content">
+                    <h2 class="modulo-title">Prompts que Funcionam</h2>
+                    <p class="modulo-subtitle">"Engenharia de Prompts Aplicada"</p>
+                    <p class="modulo-description">
+                        A diferença entre uma IA medíocre e uma IA poderosa está em como você pergunta. Este módulo ensina a estrutura de um prompt eficaz: papel, contexto, tarefa, formato e restrições. Com prática.
+                    </p>
+
+                    <div class="recursos-grid">
+                        <div class="recurso-card" onclick="window.open('https://www.promptingguide.ai/pt', '_blank')">
+                            <div class="recurso-instituicao">DAIR.AI</div>
+                            <div class="recurso-nome">Guia de Engenharia de Prompts</div>
+                            <div class="recurso-meta">
+                                <span>Leitura</span>
+                                <span>•</span>
+                                <span>Português</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://learnprompting.org/pt', '_blank')">
+                            <div class="recurso-instituicao">Learn Prompting</div>
+                            <div class="recurso-nome">Curso Livre de Prompting</div>
+                            <div class="recurso-meta">
+                                <span>~5h</span>
+                                <span>•</span>
+                                <span>Gratuito</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercicio-pratico">
+                        <div class="exercicio-header">
+                            <div class="exercicio-icon">📊</div>
+                            <h3 class="exercicio-title">Exercício Prático</h3>
+                        </div>
+                        <p class="exercicio-description">
+                            Pegue uma tarefa real do seu trabalho (um relatório, um parecer, uma resposta de e-mail). Escreva 3 versões do prompt para a mesma tarefa — simples, estruturado e avançado com persona. Compare os resultados.
+                        </p>
+                        <div class="exercicio-meta">
+                            <span>⏱️ 1–2 horas</span>
+                            <span>💻 Claude, ChatGPT ou Gemini</span>
+                            <span>🎯 Tarefa real do trabalho</span>
+                        </div>
+                    </div>
+
+                    <div class="dica-box">
+                        <div class="dica-header">
+                            <div class="dica-icon">⚠️</div>
+                            <span class="dica-title">Atenção</span>
+                        </div>
+                        <p class="dica-text">
+                            Um bom prompt é como uma instrução de trabalho bem escrita: quem você é, o que quer, qual formato espera e o que deve ser evitado. Treine esse padrão até virar instinto.
+                        </p>
+                    </div>
+
+                    <div class="module-complete-checkbox" data-module="2">
+                        <input type="checkbox" id="check-modulo-2">
+                        <label for="check-modulo-2">Marcar este módulo como concluído</label>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- MÓDULO 3 -->
+        <article class="modulo" id="modulo3" data-module="3">
+            <div class="modulo-header">
+                <span class="modulo-number">MÓDULO 3</span>
+                <div class="modulo-content">
+                    <h2 class="modulo-title">Criando Assistentes</h2>
+                    <p class="modulo-subtitle">"Assistentes Inteligentes no Trabalho"</p>
+                    <p class="modulo-description">
+                        Você vai configurar um assistente de IA para uma necessidade real do seu setor: triagem de documentos, respostas padronizadas, resumos de reuniões ou análise de textos jurídicos. Do conceito ao uso.
+                    </p>
+
+                    <div class="recursos-grid">
+                        <div class="recurso-card" onclick="window.open('https://www.anthropic.com/claude', '_blank')">
+                            <div class="recurso-instituicao">Anthropic</div>
+                            <div class="recurso-nome">Claude — Assistente de IA</div>
+                            <div class="recurso-meta">
+                                <span>Gratuito</span>
+                                <span>•</span>
+                                <span>Português nativo</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://www.escolavirtual.gov.br/curso/1063', '_blank')">
+                            <div class="recurso-instituicao">ENAP • EV.G</div>
+                            <div class="recurso-nome">Uso de IA Generativa na Gestão Pública</div>
+                            <div class="recurso-meta">
+                                <span>8h</span>
+                                <span>•</span>
+                                <span>Casos práticos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercicio-pratico">
+                        <div class="exercicio-header">
+                            <div class="exercicio-icon">🗄️</div>
+                            <h3 class="exercicio-title">Exercício Prático</h3>
+                        </div>
+                        <p class="exercicio-description">
+                            Configure um assistente personalizado para o seu cargo. Defina: persona, restrições, formato de saída. Teste com 5 situações reais e registre o que funcionou e o que precisou de ajuste.
+                        </p>
+                        <div class="exercicio-meta">
+                            <span>⏱️ 2 horas</span>
+                            <span>💻 Claude ou ChatGPT</span>
+                            <span>🎯 Situação real do setor</span>
+                        </div>
+                    </div>
+
+                    <div class="dica-box">
+                        <div class="dica-header">
+                            <div class="dica-icon">🔎</div>
+                            <span class="dica-title">Olhar Analítico</span>
+                        </div>
+                        <p class="dica-text">
+                            Um assistente bem configurado é como ter uma estagiária experiente disponível 24h. Mas você precisa saber dar instruções claras. Este módulo é sobre isso: ser uma boa gestora da IA que você usa.
+                        </p>
+                    </div>
+
+                    <div class="module-complete-checkbox" data-module="3">
+                        <input type="checkbox" id="check-modulo-3">
+                        <label for="check-modulo-3">Marcar este módulo como concluído</label>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- MÓDULO 4 -->
+        <article class="modulo" id="modulo4" data-module="4">
+            <div class="modulo-header">
+                <span class="modulo-number">MÓDULO 4</span>
+                <div class="modulo-content">
+                    <h2 class="modulo-title">IA na Rotina</h2>
+                    <p class="modulo-subtitle">"Automação do Dia a Dia"</p>
+                    <p class="modulo-description">
+                        Agora você integra IA em processos reais: redigir documentos, preparar reuniões, resumir normativos, organizar respostas de ofício. O objetivo é ganhar horas na semana sem abrir mão do julgamento.
+                    </p>
+
+                    <div class="recursos-grid">
+                        <div class="recurso-card" onclick="window.open('https://learn.microsoft.com/pt-br/training/paths/get-started-with-microsoft-365-copilot/', '_blank')">
+                            <div class="recurso-instituicao">Microsoft Learn</div>
+                            <div class="recurso-nome">Introdução ao Microsoft 365 Copilot</div>
+                            <div class="recurso-meta">
+                                <span>~3h</span>
+                                <span>•</span>
+                                <span>Português</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://learn.zapier.com/', '_blank')">
+                            <div class="recurso-instituicao">Zapier Learn</div>
+                            <div class="recurso-nome">Automatize com IA — Cursos Zapier</div>
+                            <div class="recurso-meta">
+                                <span>Variável</span>
+                                <span>•</span>
+                                <span>Gratuito</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercicio-pratico">
+                        <div class="exercicio-header">
+                            <div class="exercicio-icon">📈</div>
+                            <h3 class="exercicio-title">Exercício Prático</h3>
+                        </div>
+                        <p class="exercicio-description">
+                            Escolha 3 tarefas repetitivas da sua semana. Para cada uma, descreva um fluxo com IA: qual ferramenta, qual prompt, qual verificação humana você manteria. Implemente pelo menos uma.
+                        </p>
+                        <div class="exercicio-meta">
+                            <span>⏱️ 2 horas</span>
+                            <span>💻 Copilot, Claude ou Zapier</span>
+                            <span>🎯 Processo real do setor</span>
+                        </div>
+                    </div>
+
+                    <div class="dica-box">
+                        <div class="dica-header">
+                            <div class="dica-icon">📊</div>
+                            <span class="dica-title">Aplicação Prática</span>
+                        </div>
+                        <p class="dica-text">
+                            Automatizar não é substituir o julgamento. É liberá-lo para o que importa. A checklist deste módulo: identificar a tarefa, escolher a ferramenta, definir o ponto de controle humano e documentar o fluxo.
+                        </p>
+                    </div>
+
+                    <div class="module-complete-checkbox" data-module="4">
+                        <input type="checkbox" id="check-modulo-4">
+                        <label for="check-modulo-4">Marcar este módulo como concluído</label>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- MÓDULO 5 -->
+        <article class="modulo" id="modulo5" data-module="5">
+            <div class="modulo-header">
+                <span class="modulo-number">MÓDULO 5</span>
+                <div class="modulo-content">
+                    <h2 class="modulo-title">Agentes e o Futuro</h2>
+                    <p class="modulo-subtitle">"Para Onde a IA Está Indo"</p>
+                    <p class="modulo-description">
+                        Agentes de IA, multimodalidade, raciocínio autônomo. Este módulo apresenta o horizonte próximo e prepara você para acompanhar a evolução sem depender de terceiros para interpretar o que está acontecendo.
+                    </p>
+
+                    <div class="recursos-grid">
+                        <div class="recurso-card" onclick="window.open('https://www.youtube.com/watch?v=aircAruvnKk', '_blank')">
+                            <div class="recurso-instituicao">3Blue1Brown</div>
+                            <div class="recurso-nome">But What is a Neural Network?</div>
+                            <div class="recurso-meta">
+                                <span>19 min</span>
+                                <span>•</span>
+                                <span>Visual e intuitivo</span>
+                            </div>
+                        </div>
+                        <div class="recurso-card" onclick="window.open('https://www.escolavirtual.gov.br/curso/1063', '_blank')">
+                            <div class="recurso-instituicao">ENAP • EV.G</div>
+                            <div class="recurso-nome">IA e o Futuro do Trabalho Público</div>
+                            <div class="recurso-meta">
+                                <span>8h</span>
+                                <span>•</span>
+                                <span>Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exercicio-pratico">
+                        <div class="exercicio-header">
+                            <div class="exercicio-icon">🤖</div>
+                            <h3 class="exercicio-title">Exercício Prático</h3>
+                        </div>
+                        <p class="exercicio-description">
+                            Mapeie 5 inovações em IA que ocorreram nos últimos 12 meses. Para cada uma, responda: que impacto pode ter no serviço público? Como você se prepararia para essa mudança? Compartilhe suas respostas na rede ASCENDA.
+                        </p>
+                        <div class="exercicio-meta">
+                            <span>⏱️ 2 horas</span>
+                            <span>💻 Leitura + reflexão</span>
+                            <span>🌐 Rede ASCENDA</span>
+                        </div>
+                    </div>
+
+                    <div class="dica-box">
+                        <div class="dica-header">
+                            <div class="dica-icon">💡</div>
+                            <span class="dica-title">Dica Estratégica</span>
+                        </div>
+                        <p class="dica-text">
+                            Acompanhar a evolução da IA não exige ler tudo — exige ler certo. Siga fontes confiáveis, questione o sensacionalismo e mantenha o foco em: "o que isso significa para o meu trabalho e para a cidadã que eu sirvo?"
+                        </p>
+                    </div>
+
+                    <div class="module-complete-checkbox" data-module="5">
+                        <input type="checkbox" id="check-modulo-5">
+                        <label for="check-modulo-5">Marcar este módulo como concluído</label>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- PROJETO FINAL -->
+        <section class="projeto-final">
+            <div class="projeto-header">
+                <span class="projeto-badge">🎯 Projeto Final</span>
+                <h2 class="projeto-title">Painel de Dados do Seu Setor</h2>
+            </div>
+            
+            <p class="projeto-intro">
+                Agora que você completou os 5 módulos, é hora de aplicar tudo em um projeto real. Você vai criar um painel de dados simples e relevante para o seu setor usando dados públicos.
+            </p>
+
+            <div class="projeto-etapas">
+                <div class="projeto-etapa">
+                    <div class="projeto-etapa-numero">1</div>
+                    <div class="projeto-etapa-content">
+                        <h3 class="projeto-etapa-titulo">Escolher dados públicos</h3>
+                        <p>Selecione um conjunto de dados relevante para seu trabalho (IBGE, Portal da Transparência, dados abertos do seu órgão).</p>
+                    </div>
+                </div>
+
+                <div class="projeto-etapa">
+                    <div class="projeto-etapa-numero">2</div>
+                    <div class="projeto-etapa-content">
+                        <h3 class="projeto-etapa-titulo">Organizar e limpar</h3>
+                        <p>Use as técnicas de Excel/Planilhas aprendidas no Módulo 2 para organizar, limpar e preparar os dados.</p>
+                    </div>
+                </div>
+
+                <div class="projeto-etapa">
+                    <div class="projeto-etapa-numero">3</div>
+                    <div class="projeto-etapa-content">
+                        <h3 class="projeto-etapa-titulo">Criar visualização</h3>
+                        <p>Construa um painel simples no Power BI ou Looker Studio com as visualizações mais importantes (aplicando Módulo 4).</p>
+                    </div>
+                </div>
+
+                <div class="projeto-etapa">
+                    <div class="projeto-etapa-numero">4</div>
+                    <div class="projeto-etapa-content">
+                        <h3 class="projeto-etapa-titulo">Escrever análise</h3>
+                        <p>Produza uma análise de 1-2 páginas com insights principais e recomendações práticas baseadas nos dados.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="projeto-entrega">
+                <strong>Entrega:</strong> Painel de dados + documento de análise com recomendações para gestores do seu setor.
+            </div>
+        </section>
+
+        <!-- CTA Final -->
+        <section class="cta-final">
+            <h2 class="cta-title">Você entende IA.<br>Agora você comanda.</h2>
+            <p class="cta-description">
+                Completar esta trilha é sair da posição de consumidora de tecnologia para a de profissional que sabe usar, questionar e direcionar a IA com intenção estratégica.
+            </p>
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="window.location.href='#modulo1'">Começar a Trilha</button>
+                <button class="btn-secondary" onclick="window.location.href='../index.html'">Voltar ao Início</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Unlock Badge -->
+    <div class="unlock-badge" id="unlockBadge">
+        <div class="unlock-icon">🌟</div>
+        <div class="unlock-title">Nova habilidade desbloqueada!</div>
+        <div class="unlock-description" id="unlockText">Pensamento Analítico em Dados</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let modulosCompleted = new Set();
+        const totalModules = 5;
+
+        // ==========================================
+        // CHECKBOX MODULE COMPLETION
+        // ==========================================
+        document.querySelectorAll('.module-complete-checkbox').forEach(checkbox => {
+            const moduleNum = checkbox.dataset.module;
+            const input = checkbox.querySelector('input');
+            
+            input.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    markModuleComplete(parseInt(moduleNum));
+                    checkbox.classList.add('checked');
+                } else {
+                    markModuleIncomplete(parseInt(moduleNum));
+                    checkbox.classList.remove('checked');
+                }
+            });
+        });
+
+        function markModuleComplete(moduleNum) {
+            modulosCompleted.add(moduleNum);
+            updateProgress();
+            updateHUD(moduleNum, 'complete');
+            updateAxisNode(moduleNum, 'complete');
+            showUnlockBadge(moduleNum);
+            saveProgress();
+        }
+
+        function markModuleIncomplete(moduleNum) {
+            modulosCompleted.delete(moduleNum);
+            updateProgress();
+            updateHUD(moduleNum, 'incomplete');
+            updateAxisNode(moduleNum, 'incomplete');
+            saveProgress();
+        }
+
+        function updateProgress() {
+            const completedCount = modulosCompleted.size;
+            const percent = (completedCount / totalModules) * 100;
+            
+            // Atualiza barra de progresso da trilha
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressFill) progressFill.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.textContent = `${Math.round(percent)}%`;
+            if (progressText) progressText.textContent = `${completedCount} de ${totalModules} módulos concluídos`;
+            
+            // Atualiza barra superior (progress tracker)
+            const progressBar = document.querySelector('.progress-bar-fill');
+            if (progressBar) progressBar.style.width = `${percent}%`;
+        }
+
+        function updateHUD(moduleNum, state) {
+            const hudItem = document.querySelector(`.hud-item[data-module="${moduleNum}"]`);
+            if (!hudItem) return;
+            
+            hudItem.classList.remove('incomplete', 'in-progress', 'complete');
+            hudItem.classList.add(state);
+        }
+
+        function updateAxisNode(moduleNum, state) {
+            const node = document.querySelector(`.axis-node[data-module="${moduleNum}"]`);
+            if (!node) return;
+            
+            node.classList.remove('incomplete', 'in-progress', 'complete');
+            node.classList.add(state);
+        }
+
+        function showUnlockBadge(moduleNum) {
+            const badge = document.getElementById('unlockBadge');
+            const unlockText = document.getElementById('unlockText');
+            
+            const skills = {
+                1: 'Vocabulário Tecnológico',
+                2: 'Engenharia de Prompts',
+                3: 'Assistentes Inteligentes',
+                4: 'Automação com IA',
+                5: 'Agentes e Futuro da IA'
+            };
+            
+            unlockText.textContent = skills[moduleNum];
+            badge.classList.add('visible');
+            
+            setTimeout(() => {
+                badge.classList.remove('visible');
+            }, 5000);
+        }
+
+        // ==========================================
+        // SCROLL REVEAL
+        // ==========================================
+        const modulos = document.querySelectorAll('.modulo');
+        const hudItems = document.querySelectorAll('.hud-item');
+
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -20% 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    const moduleNum = entry.target.dataset.module;
+                    hudItems.forEach(item => {
+                        if (item.dataset.module === moduleNum) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        modulos.forEach(modulo => observer.observe(modulo));
+
+        // HUD smooth scroll
+        hudItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = item.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // ==========================================
+        // HERO NETWORK CANVAS
+        // ==========================================
+        const networkCanvas = document.getElementById('networkCanvas');
+        const ctx = networkCanvas.getContext('2d');
+        
+        let width = networkCanvas.width = window.innerWidth;
+        let height = networkCanvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 50;
+        
+        class NetworkParticle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(167, 139, 250, 0.6)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new NetworkParticle());
+        }
+
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(167, 139, 250, ${1 - distance / 150})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateNetwork() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            drawConnections();
+            
+            requestAnimationFrame(animateNetwork);
+        }
+        
+        animateNetwork();
+
+        window.addEventListener('resize', () => {
+            width = networkCanvas.width = window.innerWidth;
+            height = networkCanvas.height = window.innerHeight;
+        });
+
+        // ==========================================
+        // PARTÍCULAS FLUTUANTES
+        // ==========================================
+        const particlesContainer = document.getElementById('particlesContainer');
+        
+        function createFloatingParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+            particlesContainer.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 12000);
+        }
+
+        setInterval(createFloatingParticle, 2000);
+
+        // ==========================================
+        // PERSISTÊNCIA (localStorage)
+        // ==========================================
+        function saveProgress() {
+            const progress = {
+                modulosCompleted: Array.from(modulosCompleted),
+                lastAccess: new Date().toISOString()
+            };
+            localStorage.setItem('trilha-1-progress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('trilha-1-progress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                modulosCompleted = new Set(progress.modulosCompleted);
+                
+                modulosCompleted.forEach(moduleNum => {
+                    const checkbox = document.querySelector(`.module-complete-checkbox[data-module="${moduleNum}"]`);
+                    if (checkbox) {
+                        checkbox.classList.add('checked');
+                        checkbox.querySelector('input').checked = true;
+                    }
+                    updateHUD(moduleNum, 'complete');
+                    updateAxisNode(moduleNum, 'complete');
+                });
+                
+                updateProgress();
+            }
+        }
+
+        loadProgress();
+    </script>
+</body>
+</html>

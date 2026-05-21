@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede de Mulheres — Servidoras no Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-ambar: #F5A623;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --accent-cyan: #22D3EE;
+            --accent-blue: #60A5FA;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(52, 211, 153, 0.04) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(167, 139, 250, 0.03) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 5rem 2rem 4rem;
+        }
+
+        /* ── Hero ── */
+        .rd-hero { margin-bottom: 3rem; animation: fadeUp 0.6s ease forwards; }
+
+        .rd-hero-tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-verde);
+            opacity: 0.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .rd-hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+        }
+
+        .rd-hero-desc {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            max-width: 700px;
+        }
+
+        /* ── Section nav ── */
+        .rd-nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .rd-nav a {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .rd-nav a:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            color: var(--text-primary);
+        }
+
+        /* ── Eixo ── */
+        .rd-eixo { margin-bottom: 3.5rem; }
+
+        .rd-eixo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .rd-eixo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .rd-icon-1 { background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.15); }
+        .rd-icon-2 { background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.15); }
+        .rd-icon-3 { background: rgba(245, 166, 35, 0.1); border: 1px solid rgba(245, 166, 35, 0.15); }
+        .rd-icon-4 { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.15); }
+
+        .rd-eixo-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── Rede card ── */
+        .rd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        @media (max-width: 500px) {
+            .rd-grid { grid-template-columns: 1fr; }
+        }
+
+        .rd-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.35rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            transition: all 0.25s ease;
+        }
+
+        .rd-card:hover {
+            border-color: rgba(52, 211, 153, 0.15);
+            background: rgba(52, 211, 153, 0.02);
+        }
+
+        .rd-card-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .rd-card-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .rd-card-note {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .rd-card-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .rd-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .rd-link-site {
+            background: rgba(52, 211, 153, 0.08);
+            color: var(--accent-verde);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+        .rd-link-site:hover { background: rgba(52, 211, 153, 0.15); }
+
+        .rd-link-ig {
+            background: rgba(251, 113, 133, 0.08);
+            color: var(--accent-rosa);
+            border: 1px solid rgba(251, 113, 133, 0.15);
+        }
+        .rd-link-ig:hover { background: rgba(251, 113, 133, 0.15); }
+
+        .rd-link-doc {
+            background: rgba(96, 165, 250, 0.08);
+            color: var(--accent-blue);
+            border: 1px solid rgba(96, 165, 250, 0.15);
+        }
+        .rd-link-doc:hover { background: rgba(96, 165, 250, 0.15); }
+
+        .rd-link-li {
+            background: rgba(167, 139, 250, 0.08);
+            color: var(--accent-lavanda);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+        }
+        .rd-link-li:hover { background: rgba(167, 139, 250, 0.15); }
+
+        .rd-link svg { width: 11px; height: 11px; }
+
+        /* ── CTA ── */
+        .rd-cta {
+            background: rgba(52, 211, 153, 0.04);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            animation: fadeUp 0.6s 0.3s ease both;
+        }
+
+        .rd-cta h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .rd-cta p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 1.25rem;
+            max-width: 540px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .rd-cta-quote {
+            font-size: 0.95rem;
+            color: var(--accent-verde);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* ── Footer ── */
+        .rd-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .rd-footer p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            line-height: 1.6;
+        }
+
+        .rd-footer a { color: var(--accent-verde); text-decoration: none; }
+
+        /* ── Suggest form ── */
+        .rd-suggest {
+            margin-top: 3rem;
+            padding: 2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            animation: fadeUp 0.6s 0.25s ease both;
+        }
+
+        .rd-suggest-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .rd-suggest-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .rd-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .rd-form-row { grid-template-columns: 1fr; }
+        }
+
+        .rd-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .rd-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .rd-input {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .rd-input:focus {
+            border-color: var(--accent-verde);
+        }
+
+        .rd-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.35;
+        }
+
+        .rd-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .rd-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 10px;
+            color: var(--accent-verde);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rd-submit:hover {
+            background: rgba(52, 211, 153, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .rd-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .rd-submit svg { width: 16px; height: 16px; }
+
+        .rd-form-success {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .rd-success-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--accent-verde);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 auto 0.75rem;
+        }
+
+        .rd-form-success p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .rd-form-error p {
+            font-size: 0.85rem;
+            color: var(--accent-rosa);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html#modulosSection" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar para a plataforma
+    </a>
+
+    <div class="page-container">
+
+        <div class="rd-hero">
+            <div class="rd-hero-tag">Módulo 05 · Rede de Mulheres</div>
+            <h1>Redes e Iniciativas<br>de Mulheres</h1>
+            <p class="rd-hero-desc">
+                Tecnologia não é consumo isolado — é construção coletiva. Aqui reunimos redes e iniciativas 
+                verificadas que fortalecem mulheres no setor público e em áreas estratégicas como 
+                tecnologia, diplomacia e empreendedorismo. Todos os links são de fontes oficiais.
+            </p>
+        </div>
+
+        <nav class="rd-nav">
+            <a href="#setor-publico">📊 Setor Público</a>
+            <a href="#diplomacia">🌍 Diplomacia</a>
+            <a href="#tecnologia">💻 Tecnologia e Formação</a>
+            <a href="#empreendedorismo">🧠 Empreendedorismo</a>
+        </nav>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- SETOR PÚBLICO -->
+        <!-- ══════════════════════════════════════ -->
+        <section class="rd-eixo" id="setor-publico">
+            <div class="rd-eixo-header">
+                <div class="rd-eixo-icon rd-icon-1">📊</div>
+                <h2 class="rd-eixo-title">Setor Público e Temas Governamentais</h2>
+            </div>
+
+            <div class="rd-grid">
+                <div class="rd-card">
+                    <div class="rd-card-name">Elas no Orçamento</div>
+                    <div class="rd-card-desc">Movimento colaborativo que reúne mulheres especialistas em orçamento e finanças públicas, promovendo visibilidade de carreira e ocupação de espaços de poder.</div>
+                    <div class="rd-card-note">Não possui portal próprio — presença ativa em redes sociais e referências em matérias públicas (Senado).</div>
+                    <div class="rd-card-links">
+                        <a href="https://www.instagram.com/elasnorcamento/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @elasnorcamento
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">Tributos a Elas</div>
+                    <div class="rd-card-desc">Iniciativa de procuradoras da PGFN para estudar, debater e dar visibilidade a questões de gênero e carreira no contexto tributário e no setor público.</div>
+                    <div class="rd-card-note">Movimento interno à PGFN com link oficial no portal GOV.br, sem portal independente.</div>
+                    <div class="rd-card-links">
+                        <a href="https://www.gov.br/pgfn/pt-br/paginas-avulsas-1/conheca-o-grupo-201ctributos-a-elas201d" target="_blank" rel="noopener" class="rd-link rd-link-doc">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                            GOV.br oficial
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">Movimento Pessoas à Frente — GT Mulheres no Serviço Público</div>
+                    <div class="rd-card-desc">Grupo de trabalho multissetorial que produziu recomendações sobre acesso, ascensão e permanência de mulheres no serviço público brasileiro.</div>
+                    <div class="rd-card-note">Não é uma rede com presença em redes sociais — o material final está publicado como documento pelo Movimento.</div>
+                    <div class="rd-card-links">
+                        <a href="https://movimentopessoasafrente.org.br/materiais/mulheres-no-servico-publico-brasileiro/" target="_blank" rel="noopener" class="rd-link rd-link-doc">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                            Documento oficial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- DIPLOMACIA -->
+        <!-- ══════════════════════════════════════ -->
+        <section class="rd-eixo" id="diplomacia">
+            <div class="rd-eixo-header">
+                <div class="rd-eixo-icon rd-icon-2">🌍</div>
+                <h2 class="rd-eixo-title">Diplomacia e Relações Internacionais</h2>
+            </div>
+
+            <div class="rd-grid">
+                <div class="rd-card">
+                    <div class="rd-card-name">Associação das Mulheres Diplomatas Brasileiras (AMDB)</div>
+                    <div class="rd-card-desc">Associação que representa mulheres diplomatas brasileiras e promove igualdade de gênero no Itamaraty e políticas de diversidade em relações exteriores.</div>
+                    <div class="rd-card-links">
+                        <a href="https://mulheresdiplomatas.org/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                        <a href="https://www.instagram.com/mulheresdiplomatasbrasil/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @mulheresdiplomatasbrasil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- TECNOLOGIA -->
+        <!-- ══════════════════════════════════════ -->
+        <section class="rd-eixo" id="tecnologia">
+            <div class="rd-eixo-header">
+                <div class="rd-eixo-icon rd-icon-3">💻</div>
+                <h2 class="rd-eixo-title">Tecnologia e Formação</h2>
+            </div>
+
+            <div class="rd-grid">
+                <div class="rd-card">
+                    <div class="rd-card-name">PrograMaria</div>
+                    <div class="rd-card-desc">Negócio de impacto social que empodera mulheres por meio da tecnologia. Oferece cursos de introdução à programação, eventos e o PrograMaria Summit — maior festival de diversidade de gênero em tecnologia do Brasil.</div>
+                    <div class="rd-card-links">
+                        <a href="https://www.programaria.org/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                        <a href="https://www.instagram.com/programaria/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @programaria
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">WoMakersCode</div>
+                    <div class="rd-card-desc">Maior comunidade de mulheres na tecnologia da América Latina. Oferece bootcamps, programas de mentoria, grupos de estudo e conexão com empresas para empregabilidade.</div>
+                    <div class="rd-card-links">
+                        <a href="https://womakerscode.org/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                        <a href="https://www.instagram.com/womakerscode/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @womakerscode
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">{reprograma}</div>
+                    <div class="rd-card-desc">Iniciativa de impacto social que oferece cursos gratuitos de programação para mulheres em situação de vulnerabilidade, priorizando mulheres negras, trans e travestis. Já formou mais de 1.500 mulheres desde 2016. Premiada pela UNESCO.</div>
+                    <div class="rd-card-links">
+                        <a href="https://reprograma.com.br/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                        <a href="https://www.instagram.com/reprograma/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @reprograma
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">Brazilians in Tech</div>
+                    <div class="rd-card-desc">Organização que conecta e apoia mulheres brasileiras que estudam e atuam em áreas de tecnologia ao redor do mundo.</div>
+                    <div class="rd-card-links">
+                        <a href="https://braziliansintech.com/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════ -->
+        <!-- EMPREENDEDORISMO -->
+        <!-- ══════════════════════════════════════ -->
+        <section class="rd-eixo" id="empreendedorismo">
+            <div class="rd-eixo-header">
+                <div class="rd-eixo-icon rd-icon-4">🧠</div>
+                <h2 class="rd-eixo-title">Empreendedorismo Feminino</h2>
+            </div>
+
+            <div class="rd-grid">
+                <div class="rd-card">
+                    <div class="rd-card-name">Rede Mulher Empreendedora (RME)</div>
+                    <div class="rd-card-desc">Maior rede de apoio ao empreendedorismo feminino no Brasil, conectando mulheres com cursos, eventos e capacitações para autonomia profissional.</div>
+                    <div class="rd-card-links">
+                        <a href="https://rme.net.br/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                        <a href="https://www.instagram.com/redemulherempreendedora/" target="_blank" rel="noopener" class="rd-link rd-link-ig">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                            @redemulherempreendedora
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rd-card">
+                    <div class="rd-card-name">Instituto Rede Mulher Empreendedora (IRME)</div>
+                    <div class="rd-card-desc">Organização sem fins lucrativos vinculada à RME, com foco em políticas públicas e autonomia econômica de mulheres em vulnerabilidade. Oferece capacitação online gratuita.</div>
+                    <div class="rd-card-links">
+                        <a href="https://institutorme.org.br/" target="_blank" rel="noopener" class="rd-link rd-link-site">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Site oficial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sugerir rede -->
+        <div class="rd-suggest" id="suggestSection">
+            <h2 class="rd-suggest-title">Conhece uma rede que deveria estar aqui?</h2>
+            <p class="rd-suggest-desc">Sugira uma iniciativa de mulheres. Se verificarmos que é ativa e com fonte oficial, incluímos no catálogo.</p>
+            
+            <div class="rd-form" id="suggestForm">
+                <div class="rd-form-row">
+                    <div class="rd-field">
+                        <label class="rd-label" for="rdNome">Nome da rede *</label>
+                        <input type="text" id="rdNome" class="rd-input" placeholder="Ex: PyLadies Brasil" required>
+                    </div>
+                    <div class="rd-field">
+                        <label class="rd-label" for="rdLink">Link oficial *</label>
+                        <input type="url" id="rdLink" class="rd-input" placeholder="https://..." required>
+                    </div>
+                </div>
+                <div class="rd-field">
+                    <label class="rd-label" for="rdDescricao">Descrição curta</label>
+                    <textarea id="rdDescricao" class="rd-input rd-textarea" placeholder="O que essa rede faz? Para quem é?"></textarea>
+                </div>
+                <div class="rd-field">
+                    <label class="rd-label" for="rdContato">Seu contato (opcional)</label>
+                    <input type="text" id="rdContato" class="rd-input" placeholder="E-mail ou Instagram (caso queiramos confirmar algo)">
+                </div>
+                <button class="rd-submit" id="rdSubmit" onclick="enviarSugestao()">
+                    Enviar sugestão
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <div class="rd-form-success" id="suggestSuccess" style="display:none;">
+                <div class="rd-success-icon">✓</div>
+                <p>Sugestão enviada! Vamos verificar e, se estiver tudo certo, incluímos no catálogo.</p>
+            </div>
+
+            <div class="rd-form-error" id="suggestError" style="display:none;">
+                <p>Algo deu errado. Tente novamente em alguns segundos.</p>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="rd-cta">
+            <h2>Junte-se à nossa rede</h2>
+            <p>
+                O projeto Servidoras no Comando Digital também é uma rede. Conectamos mulheres do setor 
+                público que estão construindo autonomia digital — juntas.
+            </p>
+            <div class="rd-cta-quote">
+                "Tecnologia não é consumo isolado. É construção coletiva."
+            </div>
+        </div>
+
+        <div class="rd-footer">
+            <p>
+                Iniciativas verificadas pelo projeto <a href="index.html">Servidoras no Comando</a>.<br>
+                Programa Mulheres que Transformam · MGI
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+    async function enviarSugestao() {
+        const nome = document.getElementById('rdNome').value.trim();
+        const link = document.getElementById('rdLink').value.trim();
+        const descricao = document.getElementById('rdDescricao').value.trim();
+        const contato = document.getElementById('rdContato').value.trim();
+
+        if (!nome || !link) {
+            document.getElementById('rdNome').style.borderColor = nome ? '' : 'var(--accent-rosa)';
+            document.getElementById('rdLink').style.borderColor = link ? '' : 'var(--accent-rosa)';
+            return;
+        }
+
+        const btn = document.getElementById('rdSubmit');
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        try {
+            await fetch('/.netlify/functions/diagnostico-vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    tipo: 'sugestao-rede',
+                    nome, 
+                    link, 
+                    descricao, 
+                    contato 
+                })
+            });
+
+            document.getElementById('suggestForm').style.display = 'none';
+            document.getElementById('suggestError').style.display = 'none';
+            document.getElementById('suggestSuccess').style.display = 'block';
+        } catch (err) {
+            document.getElementById('suggestError').style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Enviar sugestão';
+        }
+    }
+    </script>
+</body>
+</html>

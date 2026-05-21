@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados e Contexto — Servidoras no Comando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #030308;
+            --accent-lavanda: #A78BFA;
+            --accent-ambar: #F5A623;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --accent-cyan: #22D3EE;
+            --accent-blue: #60A5FA;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(167, 139, 250, 0.05) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(34, 211, 238, 0.03) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ── Back button ── */
+        .back-btn {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.1rem;
+            background: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(167, 139, 250, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg { width: 16px; height: 16px; }
+
+        /* ── Container ── */
+        .page-container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 5.5rem 2rem 5rem;
+        }
+
+        /* ── Hero ── */
+        .page-hero {
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        .page-hero-tag {
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--accent-lavanda);
+            opacity: 0.7;
+            margin-bottom: 0.85rem;
+        }
+
+        .page-hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.1rem;
+        }
+
+        .page-hero p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            max-width: 620px;
+        }
+
+        /* ── Section label ── */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .section-label::before,
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        /* ── Dados Grid ── */
+        .dados-block {
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .dados-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .dado-item {
+            padding: 2rem 1.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dado-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top left, rgba(167, 139, 250, 0.04), transparent 60%);
+            pointer-events: none;
+        }
+
+        .dado-item:hover {
+            border-color: rgba(167, 139, 250, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .dado-numero {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-lavanda), var(--accent-rosa));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.6rem;
+        }
+
+        .dado-texto {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .dado-citacao {
+            padding: 1.25rem 1.5rem;
+            border-left: 3px solid var(--accent-lavanda);
+            background: rgba(167, 139, 250, 0.04);
+            border-radius: 0 10px 10px 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .dado-citacao span {
+            color: var(--accent-lavanda);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .dado-citacao span:last-child {
+            color: var(--accent-cyan);
+        }
+
+        /* ── Verdade block ── */
+        .verdade-block {
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s 0.15s ease both;
+        }
+
+        .verdade-texto-grande {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.4rem, 3.5vw, 2rem);
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+        }
+
+        .verdade-texto-grande span {
+            color: var(--accent-rosa);
+        }
+
+        .verdade-texto-medio {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 640px;
+        }
+
+        /* ── Esperança block ── */
+        .esperanca-block {
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        .esperanca-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .esperanca-item {
+            padding: 2rem 1.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .esperanca-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top left, rgba(34, 211, 238, 0.04), transparent 60%);
+            pointer-events: none;
+        }
+
+        .esperanca-item:hover {
+            border-color: rgba(34, 211, 238, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .esperanca-numero {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-verde));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.6rem;
+        }
+
+        .esperanca-texto {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .esperanca-destaque {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            line-height: 1.4;
+        }
+
+        /* ── Divider ── */
+        .block-divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 3.5rem 0;
+        }
+
+        /* ── Fontes ── */
+        .fontes-block {
+            padding: 1.75rem;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            animation: fadeUp 0.6s 0.25s ease both;
+        }
+
+        .fontes-titulo {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .fontes-lista {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .fontes-lista li {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .fontes-lista li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-lavanda);
+            opacity: 0.5;
+        }
+
+        /* ── Barreira block ── */
+        .barreira-block {
+            margin-bottom: 4rem;
+            animation: fadeUp 0.6s 0.18s ease both;
+        }
+
+        .barreira-intro {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 640px;
+            margin-bottom: 2rem;
+        }
+
+        .barreira-item {
+            padding: 1.75rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .barreira-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top left, rgba(245, 166, 35, 0.04), transparent 60%);
+            pointer-events: none;
+        }
+
+        .barreira-item:hover {
+            border-color: rgba(245, 166, 35, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .barreira-titulo {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent-ambar);
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.02em;
+        }
+
+        .barreira-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .barreira-desc strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ── Stat inline ── */
+        .stat-inline {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: var(--accent-rosa);
+        }
+
+        /* ── Citacao forte ── */
+        .citacao-forte {
+            padding: 2rem;
+            background: rgba(167, 139, 250, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .citacao-forte p {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ── Footer ── */
+        .page-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .page-footer p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            line-height: 1.6;
+        }
+
+        .page-footer a {
+            color: var(--accent-lavanda);
+            text-decoration: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .dados-grid,
+            .esperanca-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html#manifestoSection" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar para a plataforma
+    </a>
+
+    <div class="page-container">
+
+        <!-- Hero -->
+        <div class="page-hero">
+            <div class="page-hero-tag">Contexto &amp; Dados</div>
+            <h1>O retrato da realidade</h1>
+            <p>
+                Dados sobre a participação feminina em tecnologia, liderança e no setor público — para entender 
+                o que precisa mudar e por que isso importa agora.
+            </p>
+        </div>
+
+        <!-- Bloco 1: Os números -->
+        <div class="dados-block">
+            <div class="section-label">O retrato da realidade</div>
+
+            <div class="dados-grid">
+                <div class="dado-item">
+                    <div class="dado-numero">19%</div>
+                    <div class="dado-texto">das profissionais de tecnologia no Brasil são mulheres — Brasscom, 2023</div>
+                </div>
+                <div class="dado-item">
+                    <div class="dado-numero">12%</div>
+                    <div class="dado-texto">ocupam cargos de liderança em TI no setor público — OCDE, 2022</div>
+                </div>
+                <div class="dado-item">
+                    <div class="dado-numero">3×</div>
+                    <div class="dado-texto">mais chances de abandonar carreiras em tecnologia em relação aos homens</div>
+                </div>
+                <div class="dado-item">
+                    <div class="dado-numero">68%</div>
+                    <div class="dado-texto">relatam já ter sofrido discriminação de gênero em ambientes tech</div>
+                </div>
+            </div>
+
+            <div class="dado-item" style="margin-bottom: 1.75rem; grid-column: span 2;">
+                <div class="dado-numero" style="font-size: clamp(1.8rem, 4vw, 2.5rem);">83% <span style="font-size: 0.4em; font-family: 'DM Sans', sans-serif; font-weight: 400; -webkit-text-fill-color: var(--text-secondary); background: none; color: var(--text-secondary);">vs 39%</span></div>
+                <div class="dado-texto">das mulheres negras na área relatam sintomas severos da Síndrome do Impostor — contra 39% das mulheres brancas. As opressões não são isoladas: se somam.</div>
+            </div>
+
+            <p class="dado-citacao">
+                Esses números não são <span>acaso</span>. São <span>estrutura</span>.
+            </p>
+        </div>
+
+        <div class="block-divider"></div>
+
+        <!-- Bloco 2: A verdade -->
+        <div class="verdade-block">
+            <p class="verdade-texto-grande">
+                A ausência histórica de mulheres nos espaços de comando <span>não decorre de falta de qualificação</span>.
+            </p>
+            <p class="verdade-texto-medio">
+                São barreiras estruturais, informais e simbólicas que impedem sua ascensão. Barreiras invisíveis. Construídas ao longo de décadas. Naturalizadas. Mas não naturais.
+            </p>
+        </div>
+
+        <div class="block-divider"></div>
+
+        <!-- Bloco 3: Barreiras nomeadas -->
+        <div class="barreira-block">
+            <div class="section-label">Na tecnologia e na liderança, essas barreiras têm nome</div>
+
+            <div class="barreira-item">
+                <div class="barreira-titulo">01 — O Efeito Matilda (Apagamento Histórico)</div>
+                <div class="barreira-desc">
+                    A crença de que tecnologia é "coisa de homem" é uma <strong>construção social recente</strong>. Historicamente, as contribuições femininas foram invisibilizadas ou atribuídas a homens — o chamado Efeito Matilda. A primeira programadora do mundo foi uma mulher (<strong>Ada Lovelace</strong>), e o primeiro computador eletrônico (ENIAC) foi programado por um grupo de mulheres, cujos feitos foram tratados como triviais e esquecidos por décadas.
+                </div>
+            </div>
+
+            <div class="barreira-item">
+                <div class="barreira-titulo">02 — O Degrau Quebrado e o Teto de Vidro</div>
+                <div class="barreira-desc">
+                    A escassez de lideranças femininas começa na base. As poucas que conseguem avançar nos degraus técnicos esbarram no <strong>Teto de Vidro</strong> — uma barreira sutil e transparente, mas impenetrável o suficiente para impedir a ascensão aos níveis de alto comando e tomada de decisão estratégica.
+                </div>
+            </div>
+
+            <div class="barreira-item">
+                <div class="barreira-titulo">03 — Síndrome do Impostor com Recorte de Raça</div>
+                <div class="barreira-desc">
+                    A falta de representatividade e a cultura machista (bro culture) fazem com que as mulheres duvidem de sua própria capacidade. A Síndrome do Impostor afeta <strong>83% das mulheres negras</strong> na TI, contra 39% das mulheres brancas — reflexo das opressões cumulativas e do apagamento institucional.
+                </div>
+            </div>
+
+            <div class="barreira-item">
+                <div class="barreira-titulo">04 — A Segregação Interna na TI</div>
+                <div class="barreira-desc">
+                    Mesmo quando conseguem entrar no setor, as mulheres enfrentam um padrão de segregação. São frequentemente direcionadas a cargos vistos como "mais colaborativos" — Design de Produto, UX/UI — enquanto a participação cai drasticamente nos campos mais técnicos e estratégicos, como <strong>Engenharia de IA e Cloud Computing</strong>. Essa divisão limita a trajetória de carreira e o poder de decisão sobre como a tecnologia do futuro está sendo programada.
+                </div>
+            </div>
+
+            <div class="barreira-item">
+                <div class="barreira-titulo">05 — A Penalidade da Maternidade e a Economia do Cuidado</div>
+                <div class="barreira-desc">
+                    As barreiras não estão apenas no escritório. A responsabilidade histórica pelo trabalho de cuidado não remunerado recai sobre as mulheres. Profissionais de tecnologia relatam <strong>quedas de 50% ou mais em sua produção</strong> devido às demandas exclusivas da maternidade. A falta de estruturas de apoio — espaços kids, locais para amamentação — afasta mulheres de eventos de qualificação e networking, perpetuando o ciclo de exclusão.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="block-divider"></div>
+
+        <!-- Bloco interseccionalidade racial -->
+        <div class="barreira-block" style="animation-delay: 0.22s;">
+            <div class="section-label">Os abismos regionais e a interseccionalidade de raça</div>
+
+            <p class="barreira-intro">
+                A desigualdade não atinge todas as mulheres da mesma forma. Os impactos na renda e nas oportunidades são cumulativos.
+            </p>
+
+            <div class="esperanca-grid">
+                <div class="esperanca-item" style="--accent-cyan: #FB7185;">
+                    <div class="esperanca-numero" style="background: linear-gradient(135deg, #FB7185, #F5A623); -webkit-background-clip: text; background-clip: text;">38%</div>
+                    <div class="esperanca-texto">menor é o rendimento médio de mulheres negras em relação a mulheres brancas no Brasil — IBGE, 2023</div>
+                </div>
+                <div class="esperanca-item">
+                    <div class="esperanca-numero" style="background: linear-gradient(135deg, #FB7185, #F5A623); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">R$2k</div>
+                    <div class="esperanca-texto">de diferença mensal entre o rendimento de homens brancos e de mulheres negras no Brasil — IBGE, 2023</div>
+                </div>
+            </div>
+
+            <p class="dado-citacao" style="margin-top: 1.5rem;">
+                Falar de letramento digital e ocupação de espaços de poder exige, obrigatoriamente, um <span>olhar interseccional</span>.
+            </p>
+
+        <div class="block-divider"></div>
+
+        <!-- Bloco 4: A esperança -->
+        <div class="esperanca-block">
+            <div class="section-label">Mas a mudança está em curso</div>
+
+            <p class="verdade-texto-medio" style="margin-bottom: 2rem;">
+                O letramento digital e a ocupação de espaços de decisão por mulheres tornaram-se <strong style="color: var(--text-primary);">Política de Estado</strong> — Agenda Transversal Mulheres, PPA 2024–2027.
+            </p>
+
+            <div class="esperanca-grid">
+                <div class="esperanca-item">
+                    <div class="esperanca-numero">90%</div>
+                    <div class="esperanca-texto">da população acredita que mais mulheres tornariam o serviço público melhor — Datafolha, 2022</div>
+                </div>
+                <div class="esperanca-item">
+                    <div class="esperanca-numero">71%</div>
+                    <div class="esperanca-texto">teriam mais confiança no Estado se as lideranças se parecessem com elas — Datafolha, 2022</div>
+                </div>
+            </div>
+
+            <div class="citacao-forte">
+                <p>"A transformação digital no serviço público não começa com um edital. Começa com a autoria feminina."</p>
+            </div>
+
+            <p class="esperanca-destaque">O momento é agora. A oportunidade é histórica.</p>
+        </div>
+
+        <div class="block-divider"></div>
+
+        <!-- Fontes -->
+        <div class="fontes-block">
+            <div class="fontes-titulo">Referências e Base Teórica</div>
+            <ul class="fontes-lista">
+                <li>Brasscom — Relatório de Mercado de TI, 2023</li>
+                <li>Centro Universitário UNISOCIESC — Síndrome do Impostor no Mercado de TI (Souza, Morais, Kleine, Schreiber), Blumenau, 2022</li>
+                <li>Datafolha — Percepção sobre representatividade no setor público, 2022</li>
+                <li>IBGE — PNAD e Estatísticas de Gênero: Indicadores Sociais das Mulheres no Brasil, 2023</li>
+                <li>McKinsey & Company — Women in the Workplace: Repairing the broken rung in technical roles, 2021</li>
+                <li>Ministério do Planejamento e Orçamento — Agenda Transversal Mulheres no PPA 2024–2027, Brasília, 2024</li>
+                <li>OCDE — Mulheres em Liderança no Setor Público, 2022</li>
+                <li>Revista Brasileira de Pós-Graduação — Mulheres e Trajetórias Científicas: A maternidade e as desigualdades de gênero, v.19, n.40, 2024</li>
+                <li>Rossiter, M. W. — The Matthew/Matilda Effect in Science. Social Studies of Science, 1993</li>
+                <li>Projeto Servidoras no Comando Digital — Plataforma ASCENDA / Programa Mulheres que Transformam a Tecnologia (MQTT)</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            <p>
+                Plataforma <a href="index.html">Servidoras no Comando</a> · 
+                Programa Mulheres que Transformam · MGI
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

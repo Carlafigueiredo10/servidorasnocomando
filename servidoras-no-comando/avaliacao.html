@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação da Oficina · Servidoras no Comando Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #030308;
+            --bg-card: rgba(10, 10, 18, 0.85);
+            --accent-lavanda: #A78BFA;
+            --accent-ambar: #F5A623;
+            --accent-verde: #34D399;
+            --accent-rosa: #FB7185;
+            --accent-cyan: #22D3EE;
+            --text-primary: #F7F7F8;
+            --text-secondary: #6B6B80;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Glow de fundo ── */
+        .page-glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 20%, rgba(167,139,250,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 80% 80%, rgba(34,211,238,0.05) 0%, transparent 60%);
+        }
+
+        /* ── Layout ── */
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 5rem;
+        }
+
+        /* ── Header ── */
+        .av-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .av-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+        .av-back:hover { color: var(--text-primary); }
+        .av-back svg { width: 14px; height: 14px; }
+
+        .av-badge {
+            display: inline-block;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-lavanda);
+            border: 1px solid rgba(167,139,250,0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .av-titulo {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-lavanda));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .av-subtitulo {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── Card container ── */
+        .av-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ── Grupo de pergunta ── */
+        .av-grupo {
+            margin-bottom: 1.5rem;
+        }
+        .av-grupo:last-child { margin-bottom: 0; }
+
+        .av-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .av-sublabel {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: -0.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.7;
+        }
+
+        /* ── Estrelas ── */
+        .av-stars {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .av-star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: rgba(255,255,255,0.12);
+            transition: color 0.12s, transform 0.12s;
+            user-select: none;
+            line-height: 1;
+        }
+        .av-star.lit { color: #FBBF24; }
+        .av-star:hover { transform: scale(1.2); }
+
+        /* ── Escala Likert ── */
+        .av-likert {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .av-likert-btn {
+            flex: 1;
+            padding: 0.6rem 0;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .av-likert-btn.selected {
+            background: rgba(167,139,250,0.18);
+            border-color: rgba(167,139,250,0.5);
+            color: var(--accent-lavanda);
+        }
+        .av-likert-btn:hover:not(.selected) { background: rgba(255,255,255,0.08); }
+        .av-likert-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            margin-top: 0.35rem;
+            padding: 0 2px;
+        }
+
+        /* ── Chips multi-select ── */
+        .av-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+        .av-chip {
+            padding: 0.45rem 0.9rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .av-chip.selected {
+            background: rgba(34,211,238,0.1);
+            border-color: rgba(34,211,238,0.35);
+            color: var(--accent-cyan);
+        }
+
+        /* ── Textarea ── */
+        .av-textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 90px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .av-textarea::placeholder { color: rgba(255,255,255,0.25); }
+        .av-textarea:focus {
+            border-color: rgba(167,139,250,0.45);
+            background: rgba(167,139,250,0.05);
+        }
+
+        /* ── Checkbox rede ── */
+        .av-check-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .av-check-box {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid rgba(255,255,255,0.18);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.03);
+        }
+        .av-check-box.checked {
+            background: var(--accent-lavanda);
+            border-color: var(--accent-lavanda);
+        }
+        .av-check-box svg { opacity: 0; transition: opacity 0.15s; }
+        .av-check-box.checked svg { opacity: 1; }
+
+        /* ── Divider ── */
+        .av-divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 1.5rem 0;
+        }
+
+        /* ── Botão enviar ── */
+        .av-submit-wrap {
+            margin-top: 1.5rem;
+        }
+
+        .av-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-lavanda), var(--accent-cyan));
+            border: none;
+            border-radius: 12px;
+            color: #0a0a0f;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .av-submit:hover:not(:disabled) {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(167,139,250,0.25);
+        }
+        .av-submit:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+        /* ── Estado enviado ── */
+        .av-sucesso {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            gap: 1rem;
+        }
+        .av-sucesso.visible { display: flex; }
+        .av-sucesso-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(52,211,153,0.12);
+            border: 1px solid rgba(52,211,153,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-verde);
+        }
+        .av-sucesso-titulo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .av-sucesso-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 360px;
+        }
+        .av-voltar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+            padding: 0.7rem 1.4rem;
+            background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.25);
+            border-radius: 10px;
+            color: var(--accent-lavanda);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .av-voltar-btn:hover { background: rgba(167,139,250,0.18); }
+
+        /* ── Rodapé ── */
+        .av-footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            opacity: 0.4;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Animações ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .av-card { animation: fadeInUp 0.5s ease both; }
+        .av-card:nth-child(2) { animation-delay: 0.08s; }
+        .av-card:nth-child(3) { animation-delay: 0.14s; }
+        .av-card:nth-child(4) { animation-delay: 0.20s; }
+        .av-card:nth-child(5) { animation-delay: 0.26s; }
+
+        /* ── Mobile ── */
+        @media (max-width: 480px) {
+            .page-wrap { padding: 2rem 1rem 4rem; }
+            .av-likert-btn { font-size: 0.78rem; padding: 0.5rem 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-glow"></div>
+
+<div class="page-wrap">
+
+    <!-- Header -->
+    <div class="av-header">
+        <a href="index.html" class="av-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Voltar ao início
+        </a>
+        <div class="av-badge">✦ Avaliação</div>
+        <h1 class="av-titulo">O que você achou<br>da oficina?</h1>
+        <p class="av-subtitulo">Sua resposta melhora as próximas edições.<br>Leva menos de 3 minutos.</p>
+    </div>
+
+    <!-- Formulário -->
+    <div id="avForm">
+
+        <!-- Card 1: Experiência geral -->
+        <div class="av-card">
+            <div class="av-grupo">
+                <span class="av-label">Como você avalia a oficina no geral?</span>
+                <div class="av-stars" id="avStars">
+                    <span class="av-star" data-v="1">★</span>
+                    <span class="av-star" data-v="2">★</span>
+                    <span class="av-star" data-v="3">★</span>
+                    <span class="av-star" data-v="4">★</span>
+                    <span class="av-star" data-v="5">★</span>
+                </div>
+            </div>
+
+            <div class="av-divider"></div>
+
+            <div class="av-grupo">
+                <span class="av-label">O tempo foi adequado?</span>
+                <div class="av-likert" id="avTempo">
+                    <button class="av-likert-btn" data-v="1">1</button>
+                    <button class="av-likert-btn" data-v="2">2</button>
+                    <button class="av-likert-btn" data-v="3">3</button>
+                    <button class="av-likert-btn" data-v="4">4</button>
+                    <button class="av-likert-btn" data-v="5">5</button>
+                </div>
+                <div class="av-likert-labels"><span>Muito curto</span><span>Muito longo</span></div>
+            </div>
+        </div>
+
+        <!-- Card 2: Ferramentas e materiais -->
+        <div class="av-card">
+            <div class="av-grupo">
+                <span class="av-label">As ferramentas foram acessíveis e úteis?</span>
+                <div class="av-likert" id="avFerramentas">
+                    <button class="av-likert-btn" data-v="1">1</button>
+                    <button class="av-likert-btn" data-v="2">2</button>
+                    <button class="av-likert-btn" data-v="3">3</button>
+                    <button class="av-likert-btn" data-v="4">4</button>
+                    <button class="av-likert-btn" data-v="5">5</button>
+                </div>
+                <div class="av-likert-labels"><span>Nada úteis</span><span>Muito úteis</span></div>
+            </div>
+
+            <div class="av-divider"></div>
+
+            <div class="av-grupo">
+                <span class="av-label">Os materiais (slides, guias, templates) foram claros?</span>
+                <div class="av-likert" id="avMateriais">
+                    <button class="av-likert-btn" data-v="1">1</button>
+                    <button class="av-likert-btn" data-v="2">2</button>
+                    <button class="av-likert-btn" data-v="3">3</button>
+                    <button class="av-likert-btn" data-v="4">4</button>
+                    <button class="av-likert-btn" data-v="5">5</button>
+                </div>
+                <div class="av-likert-labels"><span>Nada claros</span><span>Muito claros</span></div>
+            </div>
+        </div>
+
+        <!-- Card 3: Destaques -->
+        <div class="av-card">
+            <div class="av-grupo">
+                <span class="av-label">O que você mais gostou?</span>
+                <span class="av-sublabel">Pode marcar mais de um</span>
+                <div class="av-chips" id="avGostou">
+                    <span class="av-chip" data-v="didatica">Didática</span>
+                    <span class="av-chip" data-v="ferramentas">Ferramentas práticas</span>
+                    <span class="av-chip" data-v="ritmo">Ritmo da oficina</span>
+                    <span class="av-chip" data-v="conteudo">Conteúdo relevante</span>
+                    <span class="av-chip" data-v="facilitacao">Facilitação</span>
+                    <span class="av-chip" data-v="troca">Troca com outras participantes</span>
+                    <span class="av-chip" data-v="entrega">O produto que criei</span>
+                </div>
+            </div>
+
+            <div class="av-divider"></div>
+
+            <div class="av-grupo">
+                <span class="av-label">O que poderia melhorar?</span>
+                <div class="av-chips" id="avMelhorar">
+                    <span class="av-chip" data-v="tempo">Mais tempo</span>
+                    <span class="av-chip" data-v="tecnico">Suporte técnico</span>
+                    <span class="av-chip" data-v="materiais">Materiais de apoio</span>
+                    <span class="av-chip" data-v="exemplos">Mais exemplos práticos</span>
+                    <span class="av-chip" data-v="continuidade">Conteúdo de continuidade</span>
+                    <span class="av-chip" data-v="ritmo">Ritmo (mais pausas)</span>
+                    <span class="av-chip" data-v="nada">Nada — estava ótimo!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Comentário livre -->
+        <div class="av-card">
+            <div class="av-grupo">
+                <span class="av-label">Quer deixar um recado ou sugestão?</span>
+                <textarea class="av-textarea" id="avComentario" placeholder="Escreva à vontade — lemos tudo..."></textarea>
+            </div>
+        </div>
+
+        <!-- Card 5: Rede -->
+        <div class="av-card">
+            <div class="av-grupo">
+                <label class="av-check-label" onclick="toggleCheck('avRedeCheck', 'quer_rede')">
+                    <div class="av-check-box" id="avRedeCheck">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="12" height="12">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span>Quero fazer parte da rede de mulheres servidoras digitais e receber novidades do programa.</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botão enviar -->
+        <div class="av-submit-wrap">
+            <button class="av-submit" id="avSubmitBtn" onclick="submitAvaliacao()">
+                Enviar avaliação →
+            </button>
+        </div>
+
+    </div><!-- /avForm -->
+
+    <!-- Estado de sucesso -->
+    <div class="av-sucesso" id="avSucesso">
+        <div class="av-sucesso-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="26" height="26">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="av-sucesso-titulo">Obrigada pela avaliação!</div>
+        <p class="av-sucesso-desc">Sua resposta foi registrada e vai ajudar a melhorar as próximas edições da oficina.</p>
+        <a id="certLink" href="certificado.html" class="av-voltar-btn" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(34,211,238,0.15)); border-color: rgba(167,139,250,0.4); color: var(--accent-lavanda); margin-bottom: 0.5rem;">
+            ✦ Emitir meu certificado
+        </a>
+        <a href="index.html" class="av-voltar-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Voltar ao início
+        </a>
+    </div>
+
+    <div class="av-footer">Programa Mulheres que Transformam · MGI</div>
+
+</div><!-- /page-wrap -->
+
+<script>
+    // ── Estado ──
+    const avState = {
+        nota: 0,
+        tempo: 0,
+        ferramentas: 0,
+        materiais: 0,
+        gostou: [],
+        melhorar: [],
+        comentario: '',
+        quer_rede: false
+    };
+
+    // Pré-preencher nome/orgao/email se vieram via query string (passados do index)
+    const params = new URLSearchParams(window.location.search);
+    const ctx = {
+        nome:  params.get('nome')  || '',
+        orgao: params.get('orgao') || '',
+        email: params.get('email') || ''
+    };
+
+    // ── Estrelas ──
+    const stars = document.querySelectorAll('#avStars .av-star');
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', () => {
+            const v = parseInt(star.dataset.v);
+            stars.forEach(s => s.classList.toggle('lit', parseInt(s.dataset.v) <= v));
+        });
+        star.addEventListener('mouseleave', () => {
+            stars.forEach(s => s.classList.toggle('lit', parseInt(s.dataset.v) <= avState.nota));
+        });
+        star.addEventListener('click', () => {
+            avState.nota = parseInt(star.dataset.v);
+            stars.forEach(s => s.classList.toggle('lit', parseInt(s.dataset.v) <= avState.nota));
+        });
+    });
+
+    // ── Likert ──
+    function setupLikert(groupId, key) {
+        document.querySelectorAll(`#${groupId} .av-likert-btn`).forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll(`#${groupId} .av-likert-btn`).forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                avState[key] = parseInt(btn.dataset.v);
+            });
+        });
+    }
+    setupLikert('avTempo', 'tempo');
+    setupLikert('avFerramentas', 'ferramentas');
+    setupLikert('avMateriais', 'materiais');
+
+    // ── Chips ──
+    function setupChips(groupId, key) {
+        document.querySelectorAll(`#${groupId} .av-chip`).forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('selected');
+                const v = chip.dataset.v;
+                const idx = avState[key].indexOf(v);
+                if (idx >= 0) avState[key].splice(idx, 1);
+                else avState[key].push(v);
+            });
+        });
+    }
+    setupChips('avGostou', 'gostou');
+    setupChips('avMelhorar', 'melhorar');
+
+    // ── Checkbox ──
+    function toggleCheck(boxId, stateKey) {
+        avState[stateKey] = !avState[stateKey];
+        document.getElementById(boxId)?.classList.toggle('checked', avState[stateKey]);
+    }
+
+    // ── Enviar ──
+    async function submitAvaliacao() {
+        const btn = document.getElementById('avSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        avState.comentario = document.getElementById('avComentario')?.value.trim() || '';
+
+        const payload = {
+            tipo: 'avaliacao',
+            nome:  ctx.nome,
+            orgao: ctx.orgao,
+            email: ctx.email,
+            nota_geral:   avState.nota,
+            tempo:        avState.tempo,
+            ferramentas:  avState.ferramentas,
+            materiais:    avState.materiais,
+            gostou:       avState.gostou.join(', '),
+            melhorar:     avState.melhorar.join(', '),
+            comentario:   avState.comentario,
+            quer_rede:    avState.quer_rede ? 'Sim' : 'Não'
+        };
+
+        try {
+            await fetch('/.netlify/functions/diagnostico-vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch(e) {
+            console.warn('Envio falhou, exibindo sucesso local:', e.message);
+        }
+
+        // Mostrar sucesso independente do resultado da rede
+        document.getElementById('avForm').style.display = 'none';
+        document.getElementById('avSucesso').classList.add('visible');
+        sessionStorage.setItem('avAlreadySubmitted', 'true');
+        // Atualizar link do certificado com contexto
+        const certLink = document.getElementById('certLink');
+        if (certLink) {
+            const p = new URLSearchParams({ nome: ctx.nome, orgao: ctx.orgao, email: ctx.email });
+            certLink.href = 'certificado.html?' + p.toString();
+        }
+    }
+
+    // Travar se já enviou nesta sessão
+    if (sessionStorage.getItem('avAlreadySubmitted') === 'true') {
+        document.getElementById('avForm').style.display = 'none';
+        document.getElementById('avSucesso').classList.add('visible');
+    }
+</script>
+
+</body>
+</html>

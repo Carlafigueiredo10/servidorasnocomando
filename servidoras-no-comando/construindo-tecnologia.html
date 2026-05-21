@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Construindo Tecnologia — Servidoras no Comando Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ink:    #06060c;
+      --glass:  rgba(255,255,255,.032);
+      --glass-h:rgba(255,255,255,.062);
+      --rim:    rgba(255,255,255,.068);
+      --rim-h:  rgba(255,255,255,.13);
+      --v:      #7c3aed; --v2:#a78bfa; --vd:rgba(124,58,237,.12); --vg:rgba(124,58,237,.22);
+      --t:      #06b6d4; --t2:#67e8f9; --td:rgba(6,182,212,.10);  --tg:rgba(6,182,212,.18);
+      --a:      #f59e0b; --ad:rgba(245,158,11,.10);
+      --e:      #10b981; --ed:rgba(16,185,129,.10);
+      --ro:     #f43f5e; --rod:rgba(244,63,94,.10);
+      --tx:     #f0f4ff; --tx2:#8a94a8; --tx3:#404860;
+      --mono:   'Space Mono',monospace;
+      --head:   'Syne',sans-serif;
+      --body:   'DM Sans',sans-serif;
+      --r:10px; --rl:18px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--ink);color:var(--tx);font-family:var(--body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+
+    body::after{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='.065'/%3E%3C/svg%3E");
+      opacity:.38;
+    }
+
+    .amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+    .amb span{position:absolute;border-radius:50%;filter:blur(160px);}
+    .amb span:nth-child(1){width:800px;height:800px;background:radial-gradient(circle,rgba(124,58,237,.2),transparent 70%);top:-350px;right:-300px;}
+    .amb span:nth-child(2){width:600px;height:600px;background:radial-gradient(circle,rgba(6,182,212,.12),transparent 70%);bottom:5%;left:-280px;}
+    .amb span:nth-child(3){width:400px;height:400px;background:radial-gradient(circle,rgba(245,158,11,.08),transparent 70%);bottom:-80px;right:8%;}
+
+    #prog{position:fixed;top:0;left:0;height:2px;width:0%;z-index:300;background:linear-gradient(90deg,var(--v),var(--t));box-shadow:0 0 16px var(--tg);transition:width .08s linear;}
+
+    /* MODE SWITCHER */
+    .mode-switcher{
+      position:sticky;top:54px;z-index:90;
+      background:rgba(6,6,12,.88);backdrop-filter:blur(24px) saturate(1.4);
+      border-bottom:1px solid var(--rim);
+    }
+    .mode-switcher-inner{
+      max-width:900px;margin:0 auto;padding:0 28px;
+      display:flex;align-items:center;gap:2px;
+    }
+    .mode-tab{
+      display:flex;align-items:center;gap:8px;
+      padding:14px 20px;
+      border:none;background:transparent;cursor:pointer;
+      font-family:var(--mono);font-size:10px;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--tx3);text-decoration:none;
+      border-bottom:2px solid transparent;
+      transition:color .2s,border-color .2s;
+    }
+    .mode-tab svg{width:13px;height:13px;flex-shrink:0;}
+    .mode-tab:hover{color:var(--tx2);}
+    .mode-tab.active{color:var(--v2);border-bottom-color:var(--v2);}
+    .mode-tab.mobile-tab:hover{color:var(--t);}
+    .mode-tab.mobile-tab.active{color:var(--t);border-bottom-color:var(--t);}
+    .mode-tab.prompt-tab:hover{color:var(--a);}
+    .mode-tab.prompt-tab.active{color:var(--a);border-bottom-color:var(--a);}
+    .mode-badge{
+      font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.1em;
+      padding:2px 6px;border-radius:3px;
+      background:rgba(6,182,212,.15);color:var(--t2);border:1px solid rgba(6,182,212,.25);
+    }
+
+    /* CONTEÚDO TABULADO */
+    .mode-content { display: none; }
+    .mode-content.active { display: block; }
+
+    /* ABA PROMPT */
+    .prompt-section {
+      max-width: 860px; margin: 80px auto 60px; padding: 0 28px;
+    }
+    .prompt-hero {
+      text-align: center; margin-bottom: 48px;
+    }
+    .prompt-hero-emoji { font-size: 3.5rem; margin-bottom: 20px; }
+    .prompt-hero h1 {
+      font-family: var(--head); font-size: clamp(2rem,5vw,3.2rem);
+      font-weight: 800; line-height: 1.1; margin-bottom: 16px; color: var(--tx);
+    }
+    .prompt-hero p {
+      font-size: 1.05rem; color: var(--tx2); line-height: 1.7; max-width: 540px;
+      margin: 0 auto;
+    }
+    .prompt-steps {
+      background: var(--glass); border: 1px solid var(--rim); border-radius: var(--rl);
+      padding: 28px 32px; margin-bottom: 32px;
+    }
+    .prompt-steps h3 {
+      font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--tx3); margin-bottom: 18px;
+    }
+    .prompt-steps ol {
+      list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 12px;
+    }
+    .prompt-steps li {
+      counter-increment: step; font-size: .95rem; color: var(--tx2);
+      padding-left: 38px; position: relative; line-height: 1.6;
+    }
+    .prompt-steps li::before {
+      content: counter(step); position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%; background: var(--a);
+      color: var(--ink); font-size: .8rem; font-weight: 700; font-family: var(--mono);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-copy-full {
+      width: 100%; min-height: 56px; border-radius: 14px; border: none;
+      background: linear-gradient(135deg,var(--a),var(--ro));
+      color: white; font-family: var(--head); font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin-bottom: 36px;
+      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow: 0 4px 20px rgba(245,158,11,.25);
+    }
+    .btn-copy-full:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,.35); }
+    .btn-copy-full:active { transform: scale(.98); }
+    .btn-copy-full.copied { background: var(--e); box-shadow: 0 4px 20px rgba(16,185,129,.25); }
+    .prompt-display {
+      background: rgba(255,255,255,.02); border: 1px solid var(--rim);
+      border-radius: var(--rl); padding: 24px; max-height: 500px; overflow-y: auto;
+    }
+    .prompt-display-title {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--a); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .prompt-display-title::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--a); box-shadow: 0 0 12px var(--a);
+    }
+    .prompt-display pre {
+      font-family: var(--mono); font-size: .82rem; line-height: 1.75;
+      color: var(--tx2); white-space: pre-wrap; word-wrap: break-word;
+    }
+
+    nav{
+      position:fixed;top:0;left:0;right:0;height:54px;padding:0 32px;
+      display:flex;align-items:center;justify-content:space-between;
+      background:rgba(6,6,12,.82);backdrop-filter:blur(28px) saturate(1.4);
+      border-bottom:1px solid var(--rim);z-index:100;
+    }
+    .nl{display:flex;align-items:center;gap:8px;}
+    .nb{display:flex;align-items:center;gap:6px;color:var(--tx2);text-decoration:none;font-family:var(--mono);font-size:10px;letter-spacing:.06em;transition:color .2s;}
+    .nb:hover{color:var(--t);}
+    .nb svg{width:12px;height:12px;}
+    .nsep{color:var(--tx3);font-family:var(--mono);font-size:10px;}
+    .nmod{font-family:var(--mono);font-size:10px;color:var(--tx3);letter-spacing:.04em;}
+    .nr{display:flex;align-items:center;}
+    .nlive{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--e);}
+    .nlive::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--e);box-shadow:0 0 6px var(--e);animation:blink 2.2s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 28px;}
+    section{padding:96px 0;}
+    section+section{border-top:1px solid var(--rim);}
+
+    /* HERO */
+    .hero{padding-top:140px;padding-bottom:96px;position:relative;overflow:hidden;}
+    .hero::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+                 linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+      background-size:48px 48px;
+      mask-image:radial-gradient(ellipse 80% 60% at 50% 10%,black 10%,transparent 65%);
+    }
+    .hero::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:2px;background:linear-gradient(90deg,transparent,var(--v),var(--t),transparent);opacity:.55;}
+    .hero>*{position:relative;z-index:1;}
+
+    .hpipe{
+      display:inline-flex;align-items:center;border:1px solid var(--rim-h);
+      border-radius:4px;overflow:hidden;margin-bottom:44px;
+      background:rgba(255,255,255,.02);backdrop-filter:blur(16px);
+    }
+    .hps{
+      padding:7px 16px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--tx3);border-right:1px solid var(--rim);transition:color .5s,background .5s;
+    }
+    .hps:last-child{border-right:none;}
+    .hps.on{color:var(--t);background:rgba(6,182,212,.08);}
+
+    .hlbl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--v2);margin-bottom:20px;}
+
+    h1{font-family:var(--head);font-size:clamp(3rem,7vw,5rem);font-weight:800;line-height:.95;letter-spacing:-.035em;margin-bottom:28px;}
+    h1 em{font-style:normal;background:linear-gradient(120deg,var(--t2) 0%,var(--v2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+    .hsub{font-size:1.05rem;color:var(--tx2);font-weight:300;max-width:480px;line-height:1.75;margin-bottom:48px;}
+
+    .hcta{
+      display:inline-flex;align-items:center;gap:10px;padding:14px 32px;
+      background:linear-gradient(135deg,var(--v),var(--t));border-radius:5px;color:#fff;
+      font-family:var(--head);font-weight:700;font-size:13px;letter-spacing:.06em;text-decoration:none;
+      box-shadow:0 0 0 1px rgba(124,58,237,.4),0 16px 48px var(--vg);
+      transition:transform .22s,box-shadow .22s;
+    }
+    .hcta:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(6,182,212,.5),0 24px 64px var(--tg);}
+    .hcta svg{width:13px;height:13px;}
+
+    .hstats{display:flex;gap:32px;margin-top:52px;padding-top:40px;border-top:1px solid var(--rim);}
+    .hstat .n{font-family:var(--head);font-size:1.8rem;font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:4px;}
+    .hstat .l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);}
+
+    /* SHARED */
+    .eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:44px;}
+    .eidx{font-family:var(--mono);font-size:9px;color:var(--tx3);letter-spacing:.1em;}
+    .etag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+    .ev{background:var(--vd);border:1px solid rgba(124,58,237,.3);color:var(--v2);}
+    .et{background:var(--td);border:1px solid rgba(6,182,212,.3);color:var(--t2);}
+    .ea{background:var(--ad);border:1px solid rgba(245,158,11,.3);color:var(--a);}
+    .ee{background:var(--ed);border:1px solid rgba(16,185,129,.3);color:var(--e);}
+    .er{background:var(--rod);border:1px solid rgba(244,63,94,.3);color:var(--ro);}
+
+    .stitle{font-family:var(--head);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;letter-spacing:-.028em;line-height:1.08;margin-bottom:14px;}
+    .sdesc{color:var(--tx2);font-size:.92rem;font-weight:300;max-width:560px;line-height:1.7;}
+
+    .card{
+      position:relative;overflow:hidden;
+      background:var(--glass);border:1px solid var(--rim);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 32px rgba(0,0,0,.28);
+      transition:background .2s,border-color .2s,box-shadow .25s;
+    }
+    .card::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 20%,transparent 80%,rgba(255,255,255,.02) 100%);}
+    .card:hover{background:var(--glass-h);border-color:var(--rim-h);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 40px rgba(0,0,0,.35);}
+    .card>*{position:relative;z-index:1;}
+
+    /* PIPELINE */
+    .pipewrap{position:relative;}
+    .pipewrap::before{
+      content:'';position:absolute;left:26px;top:28px;bottom:28px;width:1px;
+      background:linear-gradient(to bottom,transparent 0%,rgba(124,58,237,.5) 8%,rgba(6,182,212,.45) 40%,rgba(16,185,129,.45) 75%,rgba(124,58,237,.4) 92%,transparent 100%);
+    }
+    .pitem{display:grid;grid-template-columns:52px 1fr;align-items:start;gap:20px;padding:4px 0 36px;position:relative;}
+    .pitem:last-child{padding-bottom:4px;}
+    .pnum{width:52px;height:52px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:.9rem;flex-shrink:0;position:relative;z-index:1;transition:box-shadow .3s;}
+    .p1{background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.32);color:var(--v2);}
+    .p2{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);color:var(--t2);}
+    .p3{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.3);color:var(--a);}
+    .p4{background:rgba(16,185,129,.10);border:1px solid rgba(16,185,129,.28);color:var(--e);}
+    .p5{background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.32);color:var(--v2);}
+    .pitem:hover .pnum{box-shadow:0 0 24px currentColor;}
+    .pbody{padding-top:2px;}
+    .pphase{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px;}
+    .pbody h3{font-family:var(--head);font-weight:700;font-size:1.05rem;line-height:1.2;margin-bottom:10px;}
+    .pbody p{color:var(--tx2);font-size:.875rem;font-weight:300;line-height:1.7;}
+    .pdiv{height:1px;margin:0 0 0 52px;background:linear-gradient(90deg,var(--rim),transparent 60%);}
+
+    /* STACK */
+    .srow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;}
+    .sitem{padding:20px 16px;border-radius:var(--rl);text-align:left;}
+    .sitem strong{display:block;font-family:var(--head);font-weight:700;font-size:.9rem;margin-bottom:2px;}
+    .sitem small{font-family:var(--mono);font-size:.7rem;color:var(--tx3);letter-spacing:.06em;display:block;margin-bottom:0;}
+    .shbox{padding:20px 24px;border-radius:var(--rl);margin-bottom:8px;}
+    .shbox strong{display:block;font-family:var(--head);font-weight:700;font-size:.9rem;margin-bottom:4px;}
+    .shbox p{color:var(--tx2);font-size:.85rem;font-weight:300;}
+    .cpanel{border:1px solid rgba(6,182,212,.2);background:rgba(6,182,212,.05);border-radius:var(--rl);padding:24px;}
+    .cphead{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+    .cphead::before{content:'';display:block;width:20px;height:1px;background:var(--t);opacity:.5;}
+    .cpgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+    .cpitem{display:flex;align-items:flex-start;gap:12px;font-size:.85rem;color:var(--tx2);}
+    .cpico{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.95rem;background:rgba(255,255,255,.04);border:1px solid var(--rim);margin-top:2px;}
+
+    /* CRAFT — grid de dicas */
+    .tipgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+    .tipcard{padding:22px 24px;border-radius:var(--rl);display:flex;flex-direction:column;gap:10px;}
+    .tipcard-tag{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);}
+    .tipcard h3{font-family:var(--head);font-weight:700;font-size:.95rem;color:var(--tx);line-height:1.3;}
+    .tipcard-body{font-size:.855rem;color:var(--tx2);font-weight:300;line-height:1.7;}
+    .tipcard-ex{padding:10px 14px;border-radius:7px;background:rgba(255,255,255,.025);border:1px solid var(--rim);}
+    .tipcard-ex-label{font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px;}
+    .tipcard-ex-label.bad{color:var(--ro);}
+    .tipcard-ex-label.good{color:var(--e);}
+    .tipcard-ex p{font-family:var(--mono);font-size:.76rem;color:var(--tx2);line-height:1.6;}
+    @media(max-width:640px){.tipgrid{grid-template-columns:1fr;}}
+
+    /* PROMPT LIBRARY */
+    .libtabs{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:20px;background:rgba(255,255,255,.022);border:1px solid var(--rim);border-radius:var(--r);padding:4px;}
+    .ltab{padding:7px 16px;border-radius:6px;border:none;background:transparent;color:var(--tx3);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+    .ltab:hover{color:var(--tx2);background:var(--glass);}
+    .ltab.on{color:var(--tx);background:var(--glass-h);border:1px solid var(--rim-h)!important;box-shadow:0 0 0 1px rgba(124,58,237,.15),0 0 20px rgba(124,58,237,.1);}
+    .libg{display:none;flex-direction:column;gap:8px;}
+    .libg.on{display:flex;}
+    .pcard{border-radius:var(--rl);overflow:hidden;}
+    .phead{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--rim);}
+    .pcat{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px;}
+    .cs{color:var(--t2);}.cu{color:var(--v2);}.cb{color:var(--a);}.cp{color:#c084fc;}.cd{color:var(--ro);}
+    .ptit{font-family:var(--head);font-weight:700;font-size:.88rem;}
+    .cpbtn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:5px;border:1px solid var(--rim);background:rgba(255,255,255,.03);color:var(--tx3);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;}
+    .cpbtn:hover{background:var(--vd);border-color:rgba(124,58,237,.4);color:var(--v2);}
+    .cpbtn.ok{background:var(--ed);border-color:rgba(16,185,129,.4);color:var(--e);}
+    .pbody{padding:16px 18px;}
+    .pbody pre{font-family:var(--mono);font-size:.74rem;color:var(--tx2);line-height:1.8;white-space:pre-wrap;word-break:break-word;}
+    .pbody pre em{color:var(--t2);font-style:normal;}
+
+    /* ERRORS */
+    .etable{width:100%;border-collapse:collapse;border:1px solid var(--rim);border-radius:var(--rl);overflow:hidden;}
+    .etable thead{background:rgba(255,255,255,.035);}
+    .etable th{padding:12px 20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;text-align:left;}
+    .thn{color:var(--ro);}.thy{color:var(--e);}
+    .etable td{padding:12px 20px;font-size:.875rem;border-top:1px solid var(--rim);}
+    .etable tbody tr{transition:background .12s;}
+    .etable tbody tr:hover td{background:var(--glass);}
+    .dn{color:var(--tx3);}.dy{color:var(--tx);font-weight:500;}
+
+    /* CREDITS */
+    .crgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    .crcell{padding:24px 16px;border-radius:var(--rl);text-align:center;}
+    .crn{font-family:var(--head);font-size:2.2rem;font-weight:800;line-height:1;margin-bottom:5px;}
+    .crn.v{color:var(--v2);}.crn.t{color:var(--t2);}.crn.a{color:var(--a);}.crn.e{color:var(--e);}
+    .crl{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);}
+    .qb{padding:16px 20px;border-left:2px solid var(--v);background:var(--vd);border-radius:0 var(--r) var(--r) 0;margin-bottom:16px;}
+    .qb p{font-size:.88rem;font-style:italic;color:var(--tx2);}
+    .tiplist{display:flex;flex-direction:column;gap:6px;}
+    .tiprow{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:var(--r);font-size:.875rem;}
+    .tdot{width:20px;height:20px;border-radius:5px;flex-shrink:0;background:var(--vd);border:1px solid rgba(124,58,237,.28);color:var(--v2);font-family:var(--mono);font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;}
+
+    /* CTA */
+    .ctablock{padding:80px 0 108px;text-align:center;position:relative;}
+    .ctablock::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 80% at 50% 100%,rgba(124,58,237,.12),transparent);}
+    .ctablock>*{position:relative;z-index:1;}
+    .ctablock h2{font-family:var(--head);font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.0;margin-bottom:16px;}
+    .ctablock h2 span{background:linear-gradient(120deg,var(--v2),var(--t2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .ctablock p{color:var(--tx2);font-size:1rem;font-weight:300;margin-bottom:44px;line-height:1.7;}
+    .ctarow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .btnp{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:linear-gradient(135deg,var(--v),var(--t));border-radius:5px;color:#fff;font-family:var(--head);font-weight:700;font-size:13px;letter-spacing:.06em;text-decoration:none;box-shadow:0 0 0 1px rgba(124,58,237,.4),0 14px 44px var(--vg);transition:transform .22s,box-shadow .22s;}
+    .btnp:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(6,182,212,.5),0 20px 56px var(--tg);}
+    .btns{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--glass);border:1px solid var(--rim-h);border-radius:5px;color:var(--tx2);font-family:var(--head);font-weight:700;font-size:13px;letter-spacing:.06em;text-decoration:none;transition:all .22s;}
+    .btns:hover{background:var(--glass-h);color:var(--tx);transform:translateY(-3px);}
+
+    /* GLOSSÁRIO — accordion */
+    .gacc{ display:flex; flex-direction:column; gap:4px; }
+
+    .gacc-item{ border-radius:var(--r); overflow:hidden; }
+
+    .gacc-trigger{
+      width:100%; display:flex; align-items:center; gap:14px;
+      padding:14px 18px;
+      background:var(--glass); border:1px solid var(--rim);
+      border-radius:var(--r);
+      cursor:pointer; text-align:left;
+      transition:background .18s, border-color .18s;
+      position:relative;
+    }
+    .gacc-trigger:hover{ background:var(--glass-h); border-color:var(--rim-h); }
+    .gacc-item.open .gacc-trigger{
+      background:var(--glass-h); border-color:var(--rim-h);
+      border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom-color:transparent;
+    }
+
+    .gacc-ico{
+      width:32px; height:32px; border-radius:8px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:.9rem;
+      background:rgba(255,255,255,.04); border:1px solid var(--rim);
+    }
+    .gacc-meta{ flex:1; }
+    .gacc-name{
+      font-family:var(--head); font-weight:700; font-size:.9rem; color:var(--tx); line-height:1;
+      margin-bottom:3px;
+    }
+    .gacc-hint{
+      font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--tx3);
+    }
+    .gacc-arrow{
+      width:18px; height:18px; flex-shrink:0; color:var(--tx3);
+      transition:transform .3s cubic-bezier(.16,1,.3,1), color .2s;
+    }
+    .gacc-item.open .gacc-arrow{ transform:rotate(180deg); color:var(--t); }
+
+    .gacc-body{
+      max-height:0; overflow:hidden;
+      transition:max-height .38s cubic-bezier(.16,1,.3,1), opacity .3s ease;
+      opacity:0;
+      background:var(--glass-h);
+      border:1px solid var(--rim-h); border-top:none;
+      border-bottom-left-radius:var(--r); border-bottom-right-radius:var(--r);
+    }
+    .gacc-item.open .gacc-body{ max-height:300px; opacity:1; }
+
+    .gacc-inner{
+      padding:16px 18px 18px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .gacc-desc{ font-size:.875rem; color:var(--tx2); font-weight:300; line-height:1.7; }
+    .gtags{ display:flex; flex-wrap:wrap; gap:5px; }
+    .gtag{
+      padding:3px 9px; border-radius:4px;
+      font-family:var(--mono); font-size:.68rem; letter-spacing:.08em;
+      background:rgba(255,255,255,.04); border:1px solid var(--rim-h); color:var(--tx3);
+    }
+    .ganalogy{
+      display:flex; align-items:flex-start; gap:8px;
+      padding:9px 13px; border-radius:7px;
+      background:rgba(255,255,255,.025); border:1px solid var(--rim);
+      font-family:var(--mono); font-size:.71rem; color:var(--tx2); line-height:1.6;
+    }
+    .ganalogy::before{ content:'//'; color:var(--tx3); flex-shrink:0; margin-top:1px; }
+
+    /* resumo final */
+    .gresume{
+      margin-top:12px; padding:20px 24px; border-radius:var(--rl);
+      border:1px solid rgba(6,182,212,.18); background:rgba(6,182,212,.04);
+    }
+    .gresume-title{
+      font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--t); margin-bottom:16px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .gresume-title::before{ content:''; display:block; width:16px; height:1px; background:var(--t); opacity:.5; }
+    .gresume-rows{ display:flex; flex-direction:column; gap:6px; }
+    .gresume-row{ display:flex; align-items:center; gap:12px; font-size:.86rem; }
+    .gresume-key{
+      font-family:var(--mono); font-size:.74rem; font-weight:700; color:var(--v2);
+      min-width:116px; flex-shrink:0;
+    }
+    .gresume-val{ color:var(--tx2); font-weight:300; }
+
+    /* COMECE AGORA */
+    .start-block{
+      padding:36px; border-radius:var(--rl);
+      border:1px solid rgba(124,58,237,.28);
+      background:linear-gradient(135deg, rgba(124,58,237,.07) 0%, rgba(6,182,212,.05) 100%);
+      display:flex; flex-direction:column; gap:24px;
+    }
+    .start-head{display:flex;flex-direction:column;gap:6px;}
+    .start-eyebrow{
+      font-family:var(--mono); font-size:8px; font-weight:700;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--v2);
+      display:flex; align-items:center; gap:8px;
+    }
+    .start-eyebrow::before{content:'';display:block;width:16px;height:1px;background:var(--v2);opacity:.5;}
+    .start-block h2{
+      font-family:var(--head); font-weight:800; font-size:1.5rem;
+      letter-spacing:-.02em; line-height:1.2; color:var(--tx);
+    }
+    .start-block .start-sub{
+      font-size:.88rem; color:var(--tx2); font-weight:300; line-height:1.7; max-width:560px;
+    }
+    .start-prompt{
+      background:rgba(6,6,12,.6); border:1px solid var(--rim-h);
+      border-radius:var(--r); overflow:hidden;
+    }
+    .start-prompt-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px;
+      background:rgba(255,255,255,.025); border-bottom:1px solid var(--rim);
+    }
+    .start-prompt-label{
+      font-family:var(--mono); font-size:8px; font-weight:700;
+      letter-spacing:.12em; text-transform:uppercase; color:var(--tx3);
+    }
+    .start-copy{
+      padding:6px 14px; border-radius:5px; border:1px solid var(--rim-h);
+      background:var(--glass); color:var(--tx2);
+      font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:.08em;
+      cursor:pointer; transition:all .2s;
+    }
+    .start-copy:hover{background:var(--glass-h);color:var(--tx);}
+    .start-copy.ok{color:var(--e);border-color:rgba(16,185,129,.4);}
+    .start-prompt pre{
+      padding:20px; margin:0;
+      font-family:var(--mono); font-size:.78rem; color:var(--tx2);
+      line-height:1.9; white-space:pre-wrap; word-break:break-word;
+    }
+    .start-prompt pre em{color:var(--t2);font-style:normal;}
+    .start-tip{
+      display:flex; align-items:flex-start; gap:14px;
+      padding:16px 20px; border-radius:var(--r);
+      background:rgba(245,158,11,.06); border:1px solid rgba(245,158,11,.2);
+    }
+    .start-tip-ico{
+      width:28px; height:28px; border-radius:7px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:.9rem;
+      background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25);
+    }
+    .start-tip-body{ font-size:.845rem; color:var(--tx2); font-weight:300; line-height:1.7; }
+    .start-tip-body strong{ color:var(--a); font-weight:600; }
+    .jdiv{
+      display:flex; align-items:center; gap:20px;
+      padding:48px 0 0;
+      opacity:0; transform:translateY(16px);
+      transition:opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1);
+    }
+    .jdiv.in{ opacity:1; transform:none; }
+    .jdiv-line{ flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--rim), transparent); }
+    .jdiv-inner{
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
+    }
+    .jdiv-step{
+      font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:.16em;
+      text-transform:uppercase; color:var(--tx3);
+      white-space:nowrap;
+    }
+    .jdiv-label{
+      font-family:var(--head); font-weight:700; font-size:.82rem; color:var(--tx2);
+      white-space:nowrap;
+    }
+    .jdiv-dot{
+      width:6px; height:6px; border-radius:50%; flex-shrink:0;
+    }
+    .jd1 .jdiv-dot{ background:var(--v); box-shadow:0 0 8px var(--v); }
+    .jd2 .jdiv-dot{ background:var(--t); box-shadow:0 0 8px var(--t); }
+    .jd3 .jdiv-dot{ background:var(--a); box-shadow:0 0 8px var(--a); }
+    .jd4 .jdiv-dot{ background:var(--e); box-shadow:0 0 8px var(--e); }
+    .jd5 .jdiv-dot{ background:var(--ro); box-shadow:0 0 8px var(--ro); }
+    .jd6 .jdiv-dot{ background:var(--v2); box-shadow:0 0 8px var(--v2); }
+    .jd1 .jdiv-step{ color:var(--v2); }
+    .jd2 .jdiv-step{ color:var(--t2); }
+    .jd3 .jdiv-step{ color:var(--a); }
+    .jd4 .jdiv-step{ color:var(--e); }
+    .jd5 .jdiv-step{ color:var(--ro); }
+    .jd6 .jdiv-step{ color:var(--v2); }
+
+    /* frase de orientação no hero */
+    .hroute{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 16px; border-radius:20px;
+      background:rgba(255,255,255,.04); border:1px solid var(--rim-h);
+      font-size:.82rem; color:var(--tx2); font-weight:300;
+      margin-bottom:24px; line-height:1.5;
+    }
+    .hroute-dot{ width:6px; height:6px; border-radius:50%; background:var(--t); box-shadow:0 0 8px var(--t); flex-shrink:0; }
+    .r{opacity:0;transform:translateY(22px) scale(.982);filter:blur(7px);transition:opacity .75s ease,transform .75s cubic-bezier(.16,1,.3,1),filter .75s ease;}
+    .r.in{opacity:1;transform:none;filter:blur(0);}
+
+    @media(max-width:640px){
+      h1{font-size:2.6rem;} main{padding:0 18px;} section{padding:68px 0;} .hero{padding-top:100px;}
+      .hpipe{display:none;} .hstats{gap:20px;flex-wrap:wrap;} .srow{grid-template-columns:repeat(2,1fr);}
+      .cpgrid{grid-template-columns:1fr;} .crgrid{grid-template-columns:repeat(2,1fr);}
+      .etable{font-size:.78rem;} .etable th,.etable td{padding:10px 12px;}
+      .pipewrap::before{left:20px;} .pnum{width:40px;height:40px;font-size:.78rem;}
+      .pitem{grid-template-columns:40px 1fr;gap:14px;} nav{padding:0 18px;} .nlive{display:none;}
+    }
+  </style>
+</head>
+<body>
+  <div class="amb"><span></span><span></span><span></span></div>
+  <div id="prog"></div>
+
+  <nav>
+    <div class="nl">
+      <a href="index.html" class="nb">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        voltar
+      </a>
+      <span class="nsep">/</span>
+      <span class="nmod">módulo_06 · oficina</span>
+    </div>
+    <div class="nr">
+      <span class="nlive">workshop mode</span>
+    </div>
+  </nav>
+
+  <!-- MODE SWITCHER -->
+  <div class="mode-switcher">
+    <div class="mode-switcher-inner">
+      <button class="mode-tab active" onclick="switchMode(0)">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+          <path d="M7 8l3 3-3 3"/><line x1="13" y1="11" x2="17" y2="11"/>
+        </svg>
+        ① Roteiro
+      </button>
+      <a href="oficina-mobile.html" class="mode-tab mobile-tab">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <path d="M12 18h.01"/>
+          <path d="M9 7l2 2 4-4"/>
+        </svg>
+        ② Roteiro Mobile
+        <span class="mode-badge">MOBILE</span>
+      </a>
+      <button class="mode-tab prompt-tab" onclick="switchMode(2)">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 9h6M9 13h6"/>
+        </svg>
+        ③ Meu Aplicativo
+      </button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- CONTEÚDO ABA 1: ROTEIRO DESKTOP -->
+    <div class="mode-content active" id="mode-0">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hpipe" id="hpipe">
+        <span class="hps on">planejar</span>
+        <span class="hps">construir</span>
+        <span class="hps">testar</span>
+        <span class="hps">publicar</span>
+      </div>
+      <div class="hlbl">Servidoras no Comando Digital · Construindo Tecnologia</div>
+      <div class="hroute r"><span class="hroute-dot"></span>Esta página é um roteiro prático para criar um aplicativo funcional em cerca de 20 minutos usando inteligência artificial.</div>
+      <h1>Crie seu<br/>primeiro app<br/><em>em 20 min.</em></h1>
+      <p class="hsub">Guia prático para usar a Lovable na oficina — do primeiro prompt ao deploy, sem precisar saber programar.</p>
+      <a href="https://lovable.dev" target="_blank" class="hcta">
+        Abrir Lovable
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+      </a>
+      <div class="hstats">
+        <div class="hstat"><div class="n">20 min</div><div class="l">do zero ao deploy</div></div>
+        <div class="hstat"><div class="n">~28</div><div class="l">prompts por projeto</div></div>
+        <div class="hstat"><div class="n">5</div><div class="l">etapas do processo</div></div>
+        <div class="hstat"><div class="n">0</div><div class="l">linhas de setup</div></div>
+      </div>
+    </section>
+
+    <!-- COMECE AGORA -->
+    <section style="padding-top:56px;padding-bottom:0">
+      <div class="start-block r">
+        <div class="start-head">
+          <div class="start-eyebrow">Comece agora</div>
+          <h2>Antes de continuar lendo, dê o primeiro passo.</h2>
+          <p class="start-sub">Copie o prompt abaixo e cole na IA que você estiver usando. Se preferir, envie diretamente para a Sueli — ela já está integrada ao projeto e pode te ajudar a estruturar a ideia.</p>
+        </div>
+        <div class="start-prompt">
+          <div class="start-prompt-head">
+            <span class="start-prompt-label">Prompt de início do aplicativo</span>
+            <button class="start-copy" id="startCopyBtn">Copiar</button>
+          </div>
+          <pre>Quero construir um aplicativo simples.
+Pode me ajudar a estruturar a ideia como um MVP?
+
+Primeiro, faça perguntas curtas para entender melhor o projeto.
+
+Pergunte sobre:
+
+1. Qual problema o aplicativo resolve
+2. Quem são os usuários
+3. Qual é a principal ação que o usuário deve conseguir realizar
+4. Quais informações precisam ser registradas
+5. Se o aplicativo precisa apenas registrar dados ou também consultar, editar ou excluir
+6. Se haverá login ou não
+
+Depois que eu responder, organize a proposta em um formato prático contendo:
+
+• objetivo do aplicativo
+• público principal
+• versão mínima viável (MVP)
+• páginas principais
+• funcionalidades essenciais
+• fluxo mínimo de navegação entre as telas
+• modelo de dados principal (campos que precisam ser registrados)
+• sugestão concreta de interface inicial
+
+Para a interface, descreva elementos reais de interface, como:
+
+• lista em cards
+• botões de ação
+• formulários
+• indicadores de status
+• navegação simples entre telas
+
+Considere sempre uma solução simples, com foco em celular, linguagem clara e interface intuitiva.
+
+No final, pergunte se eu quero que você transforme essa definição em um prompt pronto para usar na Lovable.</pre>
+        </div>
+        <div class="start-tip">
+          <div class="start-tip-ico">💡</div>
+          <div class="start-tip-body"><strong>Dica:</strong> não tente criar o aplicativo inteiro de uma vez. Comece pela estrutura inicial, responda às perguntas da IA e evolua o projeto passo a passo. Depois volte a esta página para aprender como melhorar e expandir o sistema usando prompts mais específicos.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JORNADA 1 -->
+    <div class="jdiv jd1">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 1</span>
+        <span class="jdiv-label">Entenda o processo</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- PIPELINE -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">01</span><span class="etag ev">Processo</span></div>
+        <div class="stitle">Do Zero ao Deploy</div>
+        <div class="sdesc">Um método simples para transformar uma ideia em um aplicativo publicado na internet, usando apenas prompts e alguns ajustes visuais.</div>
+      </div>
+      <div class="pipewrap" style="margin-top:48px">
+        <div class="pitem r">
+          <div class="pnum p1">01</div>
+          <div class="pbody">
+            <div class="pphase">Planejamento</div>
+            <h3>Planeje antes de escrever o primeiro prompt</h3>
+            <p>Antes de pedir qualquer coisa para a IA, pense rapidamente no que você quer construir. Responda quatro perguntas: O que é o aplicativo? Para quem ele foi criado? Qual problema ele resolve? Qual é a principal ação do usuário? Depois, imagine a estrutura básica da experiência: página inicial, principais funcionalidades e ação principal do usuário. Esse pequeno planejamento evita retrabalho e melhora muito o resultado dos prompts.</p>
+          </div>
+        </div>
+        <div class="pdiv"></div>
+        <div class="pitem r">
+          <div class="pnum p2">02</div>
+          <div class="pbody">
+            <div class="pphase">Arquitetura</div>
+            <h3>Plan Mode: a IA organiza a estrutura do app</h3>
+            <p>Quando você descreve o que quer construir, a IA cria um plano inicial do aplicativo com páginas, funcionalidades principais e estrutura técnica do projeto. Leia esse plano com atenção antes de continuar. Ajustar o plano agora evita gastar créditos corrigindo coisas depois.</p>
+          </div>
+        </div>
+        <div class="pdiv"></div>
+        <div class="pitem r">
+          <div class="pnum p3">03</div>
+          <div class="pbody">
+            <div class="pphase">Construção</div>
+            <h3>Agent Mode: a IA começa a criar o aplicativo</h3>
+            <p>Depois que o plano é aprovado, a IA começa a gerar o código do aplicativo. Você pode evoluir o projeto de três formas: escrevendo novos prompts, editando visualmente a interface ou ajustando o código manualmente. Essa etapa é onde o aplicativo realmente começa a tomar forma.</p>
+          </div>
+        </div>
+        <div class="pdiv"></div>
+        <div class="pitem r">
+          <div class="pnum p4">04</div>
+          <div class="pbody">
+            <div class="pphase">Validação</div>
+            <h3>Verifique se tudo funciona</h3>
+            <p>Antes de publicar, teste o aplicativo navegando manualmente pelo preview ou usando testes automáticos que simulam o comportamento de um usuário. Verifique especialmente formulários, navegação, login e criação de dados. Detectar problemas agora evita erros depois da publicação.</p>
+          </div>
+        </div>
+        <div class="pdiv"></div>
+        <div class="pitem r">
+          <div class="pnum p5">05</div>
+          <div class="pbody">
+            <div class="pphase">Publicação</div>
+            <h3>Coloque o aplicativo no ar</h3>
+            <p>Quando tudo estiver funcionando, basta clicar em Publish. O sistema ficará disponível em um link público como <code style="font-family:var(--mono);font-size:.82em;color:var(--t2)">seuapp.lovable.app</code>. A plataforma também gera automaticamente favicon, logotipo e imagens de compartilhamento. A partir desse momento, qualquer pessoa pode acessar o aplicativo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JORNADA 2 -->
+    <div class="jdiv jd2">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 2</span>
+        <span class="jdiv-label">Aprenda o vocabulário</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- GLOSSÁRIO -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">02</span><span class="etag et">Glossário</span></div>
+        <div class="stitle">Vocabulário Essencial</div>
+        <div class="sdesc">Antes de construir, é preciso falar a mesma língua. Oito conceitos que aparecem em todo projeto digital.</div>
+      </div>
+
+      <div class="gacc r" style="margin-top:44px">
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">🖥️</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Frontend</div>
+              <div class="gacc-hint">O que o usuário vê</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">A parte do sistema que aparece na tela. Tudo que você toca, clica e lê.</div>
+            <div class="gtags"><span class="gtag">botões</span><span class="gtag">telas</span><span class="gtag">formulários</span><span class="gtag">menus</span><span class="gtag">gráficos</span></div>
+            <div class="ganalogy">Frontend é a interface da casa — o que você vê quando entra.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">⚙️</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Backend</div>
+              <div class="gacc-hint">O que faz funcionar</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">A parte invisível. Cuida de salvar dados, autenticar usuários, enviar e-mails e processar regras do sistema.</div>
+            <div class="gtags"><span class="gtag">encanamento</span><span class="gtag">elétrica</span><span class="gtag">fundação</span></div>
+            <div class="ganalogy">Se o frontend é a fachada, o backend é a estrutura que sustenta tudo.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">🗃️</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Banco de Dados</div>
+              <div class="gacc-hint">Onde ficam as informações</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">Armazena tudo que o sistema precisa guardar. Organizado em tabelas, como linhas e colunas.</div>
+            <div class="gtags"><span class="gtag">usuários</span><span class="gtag">pedidos</span><span class="gtag">documentos</span><span class="gtag">mensagens</span></div>
+            <div class="ganalogy">Funciona como uma planilha gigante — mas feita para o sistema acessar em milissegundos.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">🤝</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">API</div>
+              <div class="gacc-hint">Como sistemas conversam</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">Permite que sistemas diferentes troquem dados. Um app usa APIs para enviar mensagens, processar pagamentos ou acionar IA.</div>
+            <div class="gtags"><span class="gtag">pagamentos</span><span class="gtag">mensagens</span><span class="gtag">IA</span><span class="gtag">dados externos</span></div>
+            <div class="ganalogy">A API é o garçom: você faz o pedido → ela leva → e traz a resposta.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">🚀</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Deploy</div>
+              <div class="gacc-hint">Publicar na internet</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">Processo de colocar um sistema no ar. Antes do deploy, só você vê. Depois, qualquer pessoa pode acessar.</div>
+            <div class="gtags"><span class="gtag">publicar</span><span class="gtag">produção</span><span class="gtag">colocar no ar</span></div>
+            <div class="ganalogy">Deploy é abrir as portas do sistema para o mundo.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">🤖</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">IA Generativa</div>
+              <div class="gacc-hint">Inteligência que cria</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">Tipo de IA que gera conteúdo novo — texto, código, imagens, interfaces — a partir de instruções em linguagem natural.</div>
+            <div class="gtags"><span class="gtag">ChatGPT</span><span class="gtag">Gemini</span><span class="gtag">Claude</span><span class="gtag">Lovable</span></div>
+            <div class="ganalogy">No desenvolvimento, funciona como um copiloto que programa junto com você.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">💬</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Prompt</div>
+              <div class="gacc-hint">Instrução para a IA</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">A instrução que você escreve para a IA executar. Quanto mais claro e específico, melhor o resultado.</div>
+            <div class="gtags"><span class="gtag">instrução</span><span class="gtag">comando</span><span class="gtag">pedido</span></div>
+            <div class="ganalogy">Prompt é explicar para a IA exatamente o que você quer construir — sem espaço para adivinhação.</div>
+          </div></div>
+        </div>
+
+        <div class="gacc-item">
+          <button class="gacc-trigger" onclick="toggleAcc(this)">
+            <div class="gacc-ico">📱</div>
+            <div class="gacc-meta">
+              <div class="gacc-name">Responsivo</div>
+              <div class="gacc-hint">Funciona em qualquer tela</div>
+            </div>
+            <svg class="gacc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="gacc-body"><div class="gacc-inner">
+            <div class="gacc-desc">Um sistema responsivo se adapta automaticamente ao tamanho da tela — celular, tablet ou computador.</div>
+            <div class="gtags"><span class="gtag">mobile</span><span class="gtag">tablet</span><span class="gtag">desktop</span><span class="gtag">mobile-first</span></div>
+            <div class="ganalogy">Hoje o padrão é mobile-first: pensa no celular primeiro, depois adapta para telas maiores.</div>
+          </div></div>
+        </div>
+
+      </div>
+
+      <!-- RESUMO -->
+      <div class="gresume r">
+        <div class="gresume-title">Resumo rápido</div>
+        <div class="gresume-rows">
+          <div class="gresume-row"><span class="gresume-key">Frontend</span><span class="gresume-val">O que o usuário vê e usa</span></div>
+          <div class="gresume-row"><span class="gresume-key">Backend</span><span class="gresume-val">O que faz o sistema funcionar por dentro</span></div>
+          <div class="gresume-row"><span class="gresume-key">Banco de dados</span><span class="gresume-val">Onde ficam armazenados os dados</span></div>
+          <div class="gresume-row"><span class="gresume-key">API</span><span class="gresume-val">Comunicação entre sistemas diferentes</span></div>
+          <div class="gresume-row"><span class="gresume-key">Deploy</span><span class="gresume-val">Publicar o sistema na internet</span></div>
+          <div class="gresume-row"><span class="gresume-key">IA Generativa</span><span class="gresume-val">IA que cria conteúdo a partir de instruções</span></div>
+          <div class="gresume-row"><span class="gresume-key">Prompt</span><span class="gresume-val">Instrução que você dá para a IA executar</span></div>
+          <div class="gresume-row"><span class="gresume-key">Responsivo</span><span class="gresume-val">Funciona bem em qualquer tamanho de tela</span></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- JORNADA 3 -->
+    <div class="jdiv jd3">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 3</span>
+        <span class="jdiv-label">Aprenda a orientar a IA</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- CRAFT -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">03</span><span class="etag et">Arsenal</span></div>
+        <div class="stitle">Boas Práticas de Prompt</div>
+        <div class="sdesc">Quando usamos IA para construir aplicativos, pequenos ajustes na forma de pedir podem melhorar muito o resultado. Estas práticas ajudam a obter respostas mais precisas e reduzir retrabalho durante o desenvolvimento.</div>
+      </div>
+      <div class="tipgrid r" style="margin-top:44px">
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 01</div>
+          <h3>Quebre o sistema em partes</h3>
+          <div class="tipcard-body">Evite pedir páginas inteiras de uma vez. Peça componentes menores e depois combine tudo. Construir por partes dá mais controle sobre o resultado.</div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label good">✓ Melhor</div>
+            <p>Crie um card de perfil com foto, nome e botão seguir.</p>
+          </div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label bad">✗ Evite</div>
+            <p>Crie toda a página de perfil.</p>
+          </div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 02</div>
+          <h3>Use conteúdo real</h3>
+          <div class="tipcard-body">Evite textos genéricos como "lorem ipsum". Conteúdo real ajuda a IA a gerar layout mais coerente, espaçamento correto e botões realistas. Inclua exemplos de títulos, descrições e ações do usuário.</div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 03</div>
+          <h3>Peça perguntas antes de gerar código</h3>
+          <div class="tipcard-body">Se o sistema for mais complexo, peça para a IA entender melhor o problema antes de começar. Isso melhora a arquitetura inicial.</div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label good">Exemplo</div>
+            <p>Antes de gerar o código, me faça perguntas para entender completamente o sistema.</p>
+          </div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 04</div>
+          <h3>Pense mobile-first</h3>
+          <div class="tipcard-body">Grande parte das pessoas usa aplicativos pelo celular. Inclua a instrução de responsividade em todo prompt de interface para evitar problemas de layout depois.</div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label good">Inclua no prompt</div>
+            <p>O design deve ser responsivo com foco em mobile-first.</p>
+          </div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 05</div>
+          <h3>Evolua o aplicativo em etapas</h3>
+          <div class="tipcard-body">Aplicativos reais não são criados em um único prompt. O processo acontece em ciclos: criar estrutura inicial, adicionar funcionalidades, melhorar interface, corrigir erros. Esse processo iterativo produz resultados melhores.</div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 06</div>
+          <h3>Use prompts específicos</h3>
+          <div class="tipcard-body">Prompts muito vagos geram resultados genéricos. Quanto mais específico o pedido, melhor o resultado.</div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label bad">✗ Vago</div>
+            <p>Crie um dashboard.</p>
+          </div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label good">✓ Específico</div>
+            <p>Crie um dashboard com gráfico de vendas, tabela de pedidos e filtros por data.</p>
+          </div>
+        </div>
+
+        <div class="tipcard card">
+          <div class="tipcard-tag">Dica 07</div>
+          <h3>Copie erros no chat</h3>
+          <div class="tipcard-body">Se aparecer um erro no sistema, copie a mensagem e envie para a IA. Ela consegue analisar mensagens de erro e sugerir correções.</div>
+          <div class="tipcard-ex">
+            <div class="tipcard-ex-label good">Exemplo</div>
+            <p>Este erro apareceu ao executar o aplicativo. Pode identificar o problema?</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- JORNADA 4 -->
+    <div class="jdiv jd4">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 4</span>
+        <span class="jdiv-label">Use prompts que funcionam</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- BIBLIOTECA -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">04</span><span class="etag ev">Console</span></div>
+        <div class="stitle">Prompts Prontos</div>
+        <div class="sdesc">Copie, cole e adapte. Organizados pela ordem natural de construção de um app — do início ao lançamento.</div>
+      </div>
+      <div style="margin-top:40px">
+        <div class="libtabs r">
+          <button class="ltab on" data-g="s">Começar o app</button>
+          <button class="ltab" data-g="u">Área do usuário</button>
+          <button class="ltab" data-g="b">Dados e CRUD</button>
+          <button class="ltab" data-g="p">Experiência</button>
+          <button class="ltab" data-g="d">Integração com IA</button>
+        </div>
+
+        <div class="libg on" id="g-s">
+          <div class="pcard card"><div class="phead"><div><div class="pcat cs">Começar o app</div><div class="ptit">Landing page — estrutura inicial</div></div><button class="cpbtn" data-t="Crie uma landing page moderna para [descreva o produto]. O público-alvo é [quem]. A ação principal do usuário é [o quê]. Use um design minimalista com hero section, seção de features com ícones, e CTA final. O design deve ser responsivo com foco em mobile-first.">Copiar</button></div><div class="pbody"><pre>Crie uma landing page moderna para <em>[descreva o produto]</em>. O público-alvo é <em>[quem]</em>. A ação principal do usuário é <em>[o quê]</em>. Use um design minimalista com hero section, seção de features com ícones, e CTA final. O design deve ser responsivo com foco em mobile-first.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cs">Começar o app</div><div class="ptit">Página inicial com layout base</div></div><button class="cpbtn" data-t="Crie a estrutura base do aplicativo com: header com logotipo e menu de navegação, área central de conteúdo, footer simples. O design deve ser responsivo com foco em mobile-first.">Copiar</button></div><div class="pbody"><pre>Crie a estrutura base do aplicativo com: header com logotipo e menu de navegação, área central de conteúdo, footer simples. O design deve ser responsivo com foco em mobile-first.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cs">Começar o app</div><div class="ptit">Perguntas antes de começar</div></div><button class="cpbtn" data-t="Antes de gerar qualquer código, me faça perguntas para entender completamente o sistema que quero construir. Aguarde minhas respostas antes de começar.">Copiar</button></div><div class="pbody"><pre>Antes de gerar qualquer código, me faça perguntas para entender completamente o sistema que quero construir. Aguarde minhas respostas antes de começar.</pre></div></div>
+        </div>
+
+        <div class="libg" id="g-u">
+          <div class="pcard card"><div class="phead"><div><div class="pcat cu">Área do usuário</div><div class="ptit">Login e cadastro</div></div><button class="cpbtn" data-t="Adicione um sistema de login e cadastro com email e senha. Crie as páginas /login e /signup com formulários validados. Após login, redirecione para /dashboard. Use Lovable Cloud para autenticação.">Copiar</button></div><div class="pbody"><pre>Adicione um sistema de login e cadastro com email e senha. Crie as páginas /login e /signup com formulários validados. Após login, redirecione para /dashboard. Use Lovable Cloud para autenticação.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cu">Área do usuário</div><div class="ptit">Dashboard do usuário logado</div></div><button class="cpbtn" data-t="Crie uma página de dashboard para o usuário logado. Deve ter: sidebar com navegação, header com avatar e botão de logout, área central com cards de métricas e uma tabela de dados recentes. Design limpo e responsivo.">Copiar</button></div><div class="pbody"><pre>Crie uma página de dashboard para o usuário logado. Deve ter: sidebar com navegação, header com avatar e botão de logout, área central com cards de métricas e uma tabela de dados recentes. Design limpo e responsivo.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cu">Área do usuário</div><div class="ptit">Perfil editável</div></div><button class="cpbtn" data-t="Crie uma página de perfil do usuário com: foto, nome, email e campos editáveis. Botão salvar que atualiza os dados no banco. Feedback visual de sucesso ou erro.">Copiar</button></div><div class="pbody"><pre>Crie uma página de perfil do usuário com: foto, nome, email e campos editáveis. Botão salvar que atualiza os dados no banco. Feedback visual de sucesso ou erro.</pre></div></div>
+        </div>
+
+        <div class="libg" id="g-b">
+          <div class="pcard card"><div class="phead"><div><div class="pcat cb">Dados e CRUD</div><div class="ptit">CRUD completo</div></div><button class="cpbtn" data-t="Crie um CRUD completo para [recurso] usando Lovable Cloud. Tabela no banco com RLS, listagem com loading state, criação, edição inline, confirmação de exclusão. user_id vinculado automaticamente.">Copiar</button></div><div class="pbody"><pre>Crie um CRUD completo para <em>[recurso]</em> usando Lovable Cloud. Tabela no banco com RLS, listagem com loading state, criação, edição inline, confirmação de exclusão. user_id vinculado automaticamente.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cb">Dados e CRUD</div><div class="ptit">Tabela com filtros e busca</div></div><button class="cpbtn" data-t="Crie uma tabela de dados com: busca por texto, filtro por status (dropdown), ordenação clicável por colunas, paginação. Dados mockados com 20+ itens. Design clean com hover nas linhas.">Copiar</button></div><div class="pbody"><pre>Crie uma tabela de dados com: busca por texto, filtro por status (dropdown), ordenação clicável por colunas, paginação. Dados mockados com 20+ itens. Design clean com hover nas linhas.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cb">Dados e CRUD</div><div class="ptit">Upload de arquivos</div></div><button class="cpbtn" data-t="Adicione upload de arquivos na página [qual]. Lovable Cloud Storage, bucket [público/privado]. Preview antes do upload, barra de progresso, tratamento de erro. Limite 5MB.">Copiar</button></div><div class="pbody"><pre>Adicione upload de arquivos na página <em>[qual]</em>. Lovable Cloud Storage, bucket <em>[público/privado]</em>. Preview antes do upload, barra de progresso, tratamento de erro. Limite 5MB.</pre></div></div>
+        </div>
+
+        <div class="libg" id="g-p">
+          <div class="pcard card"><div class="phead"><div><div class="pcat cp">Experiência</div><div class="ptit">Animações de entrada</div></div><button class="cpbtn" data-t="Adicione animações de entrada suaves em cards e seções. Use framer-motion com fade-in e slide-up. Delay escalonado entre elementos. 0.4s com easing suave.">Copiar</button></div><div class="pbody"><pre>Adicione animações de entrada suaves em cards e seções. Use framer-motion com fade-in e slide-up. Delay escalonado entre elementos. 0.4s com easing suave.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cp">Experiência</div><div class="ptit">Modo escuro</div></div><button class="cpbtn" data-t="Adicione alternância entre modo claro e escuro. Botão toggle no header. A preferência deve ser salva e aplicada automaticamente na próxima visita.">Copiar</button></div><div class="pbody"><pre>Adicione alternância entre modo claro e escuro. Botão toggle no header. A preferência deve ser salva e aplicada automaticamente na próxima visita.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cp">Experiência</div><div class="ptit">Responsividade</div></div><button class="cpbtn" data-t="Revise todas as páginas do aplicativo e ajuste o layout para funcionar bem em celular, tablet e desktop. Priorize a versão mobile. Corrija elementos cortados, fontes pequenas e botões difíceis de tocar.">Copiar</button></div><div class="pbody"><pre>Revise todas as páginas do aplicativo e ajuste o layout para funcionar bem em celular, tablet e desktop. Priorize a versão mobile. Corrija elementos cortados, fontes pequenas e botões difíceis de tocar.</pre></div></div>
+        </div>
+
+        <div class="libg" id="g-d">
+          <div class="pcard card"><div class="phead"><div><div class="pcat cd">Integração com IA</div><div class="ptit">Funcionalidade com IA generativa</div></div><button class="cpbtn" data-t="Adicione uma funcionalidade de IA que [descreva o que deve fazer]. Use Lovable AI com modelo gemini-2.5-flash. Loading state durante processamento. Resultado exibido em formato de texto organizado.">Copiar</button></div><div class="pbody"><pre>Adicione uma funcionalidade de IA que <em>[descreva o que deve fazer]</em>. Use Lovable AI com modelo gemini-2.5-flash. Loading state durante processamento. Resultado exibido em formato de texto organizado.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cd">Integração com IA</div><div class="ptit">Análise de texto</div></div><button class="cpbtn" data-t="Crie uma funcionalidade onde o usuário cola um texto e a IA retorna: resumo em 3 linhas, pontos principais e nível de clareza. Exiba o resultado em cards separados.">Copiar</button></div><div class="pbody"><pre>Crie uma funcionalidade onde o usuário cola um texto e a IA retorna: resumo em 3 linhas, pontos principais e nível de clareza. Exiba o resultado em cards separados.</pre></div></div>
+          <div class="pcard card"><div class="phead"><div><div class="pcat cd">Integração com IA</div><div class="ptit">Investigar um erro</div></div><button class="cpbtn" data-t="Estou recebendo este erro: [cole o erro aqui]. Investigue, explique a causa raiz e corrija. Teste a correção.">Copiar</button></div><div class="pbody"><pre>Estou recebendo este erro: <em>[cole o erro aqui]</em>. Investigue, explique a causa raiz e corrija. Teste a correção.</pre></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JORNADA 5 -->
+    <div class="jdiv jd5">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 5</span>
+        <span class="jdiv-label">Entenda o que está por trás</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- STACK -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">05</span><span class="etag ea">Fundamentos</span></div>
+        <div class="stitle">Stack & Arquitetura</div>
+        <div class="sdesc">Tudo o que você constrói na Lovable roda sobre uma base tecnológica já pronta. Você não precisa dominar essas ferramentas para começar, mas entender o papel de cada uma ajuda a tomar decisões melhores e a conversar com mais clareza com a IA.</div>
+      </div>
+      <div class="r" style="margin-top:44px">
+        <div class="srow">
+          <div class="sitem card">
+            <strong>React 18</strong>
+            <small>Interface</small>
+            <p style="font-size:.8rem;color:var(--tx2);font-weight:300;margin-top:8px;line-height:1.6;">React é a tecnologia usada para montar a parte visual do aplicativo. Ele organiza a tela em blocos reutilizáveis, como cards, botões, menus e formulários.</p>
+          </div>
+          <div class="sitem card">
+            <strong>TypeScript</strong>
+            <small>Segurança</small>
+            <p style="font-size:.8rem;color:var(--tx2);font-weight:300;margin-top:8px;line-height:1.6;">TypeScript ajuda a evitar erros no código. Ele adiciona regras e tipos que tornam o sistema mais previsível e fácil de manter.</p>
+          </div>
+          <div class="sitem card">
+            <strong>Tailwind CSS</strong>
+            <small>Estilo</small>
+            <p style="font-size:.8rem;color:var(--tx2);font-weight:300;margin-top:8px;line-height:1.6;">Tailwind é a ferramenta usada para definir aparência. Com ela, a IA consegue ajustar cores, espaçamentos, tamanhos e layout com rapidez.</p>
+          </div>
+          <div class="sitem card">
+            <strong>Vite</strong>
+            <small>Preparação</small>
+            <p style="font-size:.8rem;color:var(--tx2);font-weight:300;margin-top:8px;line-height:1.6;">Vite prepara o aplicativo para rodar com velocidade durante o desenvolvimento e também na publicação. Ele ajuda o projeto a abrir rápido e compilar sem complicação.</p>
+          </div>
+        </div>
+        <div class="shbox card">
+          <strong>Componentes UI — shadcn/ui</strong>
+          <p>A Lovable já trabalha com uma biblioteca de componentes prontos. Isso significa que você não começa do zero. Você já tem uma base com elementos como botões, cards, modais, abas e tabelas — todos estilizados e organizados, o que acelera muito a construção da interface.</p>
+        </div>
+        <div class="cpanel">
+          <div class="cphead">Lovable Cloud — estrutura já integrada</div>
+          <p style="font-size:.85rem;color:var(--tx2);font-weight:300;margin-bottom:16px;line-height:1.7;">A Lovable também entrega a parte estrutural do sistema já integrada. Isso reduz bastante a complexidade para quem está começando.</p>
+          <div class="cpgrid">
+            <div class="cpitem"><div class="cpico">🗃️</div><div><strong style="display:block;font-size:.82rem;margin-bottom:3px;">Banco PostgreSQL</strong><span style="font-size:.78rem;color:var(--tx3);font-weight:300;">Armazena as informações do aplicativo: usuários, registros, formulários e dados do sistema.</span></div></div>
+            <div class="cpitem"><div class="cpico">🔐</div><div><strong style="display:block;font-size:.82rem;margin-bottom:3px;">Autenticação</strong><span style="font-size:.78rem;color:var(--tx3);font-weight:300;">Permite login com email e senha ou provedores externos como Google e Apple.</span></div></div>
+            <div class="cpitem"><div class="cpico">📁</div><div><strong style="display:block;font-size:.82rem;margin-bottom:3px;">Storage de arquivos</strong><span style="font-size:.78rem;color:var(--tx3);font-weight:300;">Guarda imagens, documentos e outros arquivos enviados pelos usuários.</span></div></div>
+            <div class="cpitem"><div class="cpico">⚡</div><div><strong style="display:block;font-size:.82rem;margin-bottom:3px;">Edge Functions</strong><span style="font-size:.78rem;color:var(--tx3);font-weight:300;">Executam lógicas de backend, automações e integrações sem configurar servidor tradicional.</span></div></div>
+          </div>
+        </div>
+        <div class="gresume r" style="margin-top:10px">
+          <div class="gresume-title">Resumo simples</div>
+          <div class="gresume-rows">
+            <div class="gresume-row"><span class="gresume-key">React + Tailwind</span><span class="gresume-val">Interface visual e aparência do app</span></div>
+            <div class="gresume-row"><span class="gresume-key">TypeScript</span><span class="gresume-val">Organização e segurança do código</span></div>
+            <div class="gresume-row"><span class="gresume-key">Vite</span><span class="gresume-val">Execução e build rápido</span></div>
+            <div class="gresume-row"><span class="gresume-key">shadcn/ui</span><span class="gresume-val">Componentes prontos para usar</span></div>
+            <div class="gresume-row"><span class="gresume-key">Lovable Cloud</span><span class="gresume-val">Dados, autenticação e arquivos integrados</span></div>
+          </div>
+          <p style="font-size:.84rem;color:var(--tx2);font-weight:300;margin-top:14px;line-height:1.7;">A plataforma já entrega toda essa base técnica. Seu foco principal, no começo, é aprender a descrever bem o que quer construir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- JORNADA 6 -->
+    <div class="jdiv jd6">
+      <div class="jdiv-line"></div>
+      <div class="jdiv-inner">
+        <span class="jdiv-dot"></span>
+        <span class="jdiv-step">Etapa 6</span>
+        <span class="jdiv-label">Evite os erros mais comuns</span>
+      </div>
+      <div class="jdiv-line"></div>
+    </div>
+
+    <!-- ERROS -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">06</span><span class="etag er">Contenção</span></div>
+        <div class="stitle">Erros Comuns</div>
+        <div class="sdesc">Alguns erros parecem pequenos, mas costumam gerar retrabalho, confusão e perda de tempo. Evitá-los desde o início deixa a construção muito mais simples.</div>
+      </div>
+      <div class="r" style="margin-top:44px;overflow-x:auto">
+        <table class="etable">
+          <thead><tr><th class="thn">✗ &nbsp;Não faça</th><th class="thy">✓ &nbsp;Faça</th></tr></thead>
+          <tbody>
+            <tr><td class="dn">Escrever prompts longos e confusos</td><td class="dy">Seja direta e específica</td></tr>
+            <tr><td class="dn">Usar textos genéricos como "lorem ipsum"</td><td class="dy">Use conteúdo real desde o início</td></tr>
+            <tr><td class="dn">Tentar construir o aplicativo inteiro de uma vez</td><td class="dy">Quebre o projeto em partes menores</td></tr>
+            <tr><td class="dn">Esquecer de testar no celular</td><td class="dy">Peça responsividade sempre</td></tr>
+            <tr><td class="dn">Mudar nomes de campos sem atenção</td><td class="dy">Mantenha consistência nos nomes e ajustes</td></tr>
+            <tr><td class="dn">Começar a construir sem revisar a estrutura</td><td class="dy">Revise o plano antes de gerar o código</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CRÉDITOS -->
+    <section>
+      <div class="r">
+        <div class="eyebrow"><span class="eidx">07</span><span class="etag ee">Recursos</span></div>
+        <div class="stitle">Créditos & Plano Free</div>
+        <div class="sdesc">Créditos são escassos — use-os com intenção, não com pressa.</div>
+      </div>
+      <div class="r" style="margin-top:44px">
+        <div class="crgrid">
+          <div class="crcell card"><div class="crn v">5</div><div class="crl">créditos/dia</div></div>
+          <div class="crcell card"><div class="crn t">30</div><div class="crl">teto mensal</div></div>
+          <div class="crcell card"><div class="crn a">∞</div><div class="crl">projetos públicos</div></div>
+          <div class="crcell card"><div class="crn e" style="font-size:1.5rem">US$25</div><div class="crl">cloud grátis/mês</div></div>
+        </div>
+        <div class="qb"><p>"Créditos são escassos — use-os com intenção, não com pressa."</p></div>
+        <div class="tiplist">
+          <div class="tiprow card"><span class="tdot">1</span><span>Use <strong>Plan Mode</strong> para revisar arquitetura antes de gerar qualquer código</span></div>
+          <div class="tiprow card"><span class="tdot">2</span><span>Use <strong>Visual Edits</strong> para ajustes de UI — não consome créditos</span></div>
+          <div class="tiprow card"><span class="tdot">3</span><span>Prompts precisos = menos iterações = menos créditos gastos</span></div>
+          <div class="tiprow card"><span class="tdot">4</span><span>3–4 prompts estruturados entregam mais que 20 prompts vagos</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="ctablock">
+      <div class="etag et r" style="display:inline-flex;margin-bottom:28px">✦ Hora de construir</div>
+      <h2 class="r">Agora<br/>é <span>com você.</span></h2>
+      <p class="r" style="max-width:420px;margin:0 auto 44px">Abra a Lovable, crie um projeto novo e use os prompts desta página. Em 20 minutos você tem um app publicado.</p>
+      <div class="ctarow r">
+        <a href="https://lovable.dev" target="_blank" class="btnp">
+          Abrir Lovable
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 7l-10 10M7 7h10v10"/></svg>
+        </a>
+        <a href="index.html" class="btns">← Voltar à oficina</a>
+      </div>
+    </section>
+
+    </div>
+    <!-- FIM ABA 1: ROTEIRO DESKTOP -->
+
+    <!-- CONTEÚDO ABA 3: MEU APLICATIVO -->
+    <div class="mode-content" id="mode-2">
+      <section class="prompt-section">
+        <div class="prompt-hero">
+          <div class="prompt-hero-emoji">🚀</div>
+          <h1>Crie seu aplicativo agora</h1>
+          <p>Use este prompt completo na Lovable para gerar um gerenciador de tarefas profissional em minutos</p>
+        </div>
+
+        <div class="prompt-steps">
+          <h3>Como usar</h3>
+          <ol>
+            <li>Abra <strong>lovable.dev</strong> e faça login</li>
+            <li>Clique no botão abaixo para copiar o prompt</li>
+            <li>Cole na Lovable e clique em <strong>Generate</strong></li>
+            <li>Aguarde ~8 minutos e seu app estará pronto</li>
+          </ol>
+        </div>
+
+        <button class="btn-copy-full" id="btnCopyDesktopPrompt" onclick="copyDesktopPrompt()">
+          <span id="btnCopyDesktopText">📋 Copiar Prompt Completo</span>
+        </button>
+
+        <div class="prompt-display">
+          <div class="prompt-display-title">PROMPT PRONTO — Gerenciador de Tarefas</div>
+          <pre id="desktopPromptText">PERSONA
+Você é um Product Designer sênior, UX Strategist e Arquiteto de Aplicações no-code, especializado em criar sistemas web de alta clareza, alto valor percebido e experiência visual profissional para equipes do setor público.
+Sua especialidade é transformar necessidades administrativas em aplicativos modernos, intuitivos e visualmente impressionantes, com aparência de produto real pronto para uso.
+Seu tom deve ser objetivo, elegante, confiável e profissional. Você projeta interfaces que geram efeito "UAU" sem exagero visual, priorizando:
+clareza
+credibilidade
+facilidade de uso
+excelente organização da informação
+MISSÃO PRINCIPAL
+Crie um aplicativo web completo de gerenciamento de tarefas para uma servidora pública, sua equipe e sua unidade.
+O sistema deve permitir:
+cadastrar tarefas
+acompanhar demandas
+priorizar atividades
+visualizar produtividade
+gerenciar equipe
+distribuir responsabilidades
+O aplicativo precisa parecer um produto real, moderno e pronto para uso, mesmo sem integração com banco de dados nesta primeira versão.
+PRINCÍPIOS DO PRODUTO
+O sistema deve ser construído com foco em:
+simplicidade de uso
+organização visual impecável
+sensação de ferramenta profissional
+navegação intuitiva
+valor percebido já na primeira tela
+forte impacto visual para demonstração em oficina
+ESTRUTURA DO APLICATIVO
+O aplicativo deve possuir as seguintes áreas principais:
+Dashboard
+Tarefas
+Equipe
+Kanban
+Calendário ou Timeline
+Cadastro / edição de tarefa
+1) DASHBOARD PRINCIPAL
+Criar uma tela inicial com visão executiva da operação da unidade.
+Ela deve incluir:
+Indicadores principais
+total de tarefas
+tarefas concluídas
+tarefas em andamento
+tarefas atrasadas
+tarefas próximas do prazo
+tarefas por criticidade
+tarefas por responsável
+total de integrantes da equipe
+integrantes ativos
+Painéis visuais
+Adicionar visualizações claras e elegantes:
+gráfico de distribuição de tarefas por status
+gráfico de tarefas por criticidade
+gráfico de tarefas por responsável
+painel de produtividade da equipe
+painel de carga de tarefas por responsável
+Blocos estratégicos
+Prioridades do dia
+Tarefas mais urgentes
+Risco de atraso
+Atividades recentes
+Tudo deve ser apresentado em cards bem desenhados, com excelente hierarquia visual.
+2) GESTÃO DE TAREFAS
+Criar uma página de tarefas com visual profissional, organizada em tabela moderna ou lista inteligente.
+Cada tarefa deve possuir:
+título
+descrição
+responsável (selecionado da aba Equipe)
+unidade ou equipe
+data de criação
+prazo de entrega
+status
+criticidade
+observações opcionais
+3) STATUS OPERACIONAL
+Cada tarefa deve possuir um status operacional:
+Em andamento
+Concluída
+Atrasada
+Esses status devem ser exibidos com etiquetas visuais claras.
+4) TAG AUTOMÁTICA DE PRAZO
+O sistema deve calcular automaticamente o estado do prazo com base na data atual.
+Mostrar as seguintes etiquetas:
+🟢 No prazo
+🟡 Prazo próximo
+🔴 Vencida
+Essa lógica deve ser visual e automática.
+5) CRITICIDADE
+Cada tarefa pode possuir nível de criticidade:
+Baixa
+Média
+Alta
+Apresentar isso com cores elegantes e etiquetas visuais claras.
+Exemplo:
+Baixa → cinza ou azul suave
+Média → amarelo ou laranja
+Alta → vermelho
+6) FORMULÁRIO DE CRIAÇÃO E EDIÇÃO DE TAREFAS
+Criar um formulário simples e profissional contendo:
+título
+descrição
+responsável
+unidade
+prazo
+criticidade
+status
+observações
+Botões disponíveis:
+salvar tarefa
+limpar formulário
+cancelar edição
+O campo responsável deve listar automaticamente os integrantes cadastrados na aba Equipe.
+7) ABA EQUIPE
+Criar uma página chamada Equipe para cadastro e gerenciamento das pessoas da unidade.
+Essa aba deve permitir personalizar o aplicativo para a realidade de cada participante da oficina.
+Cada integrante da equipe deve possuir:
+nome completo
+cargo ou função
+unidade ou equipe
+e-mail institucional opcional
+telefone opcional
+status do integrante:
+Ativo
+Afastado
+Férias
+observações opcionais
+Funcionalidades da aba Equipe
+Permitir:
+cadastrar integrante
+editar integrante
+remover integrante
+buscar por nome
+filtrar por unidade
+filtrar por status
+visualizar lista da equipe
+visualizar carga de tarefas por integrante
+Integração com tarefas
+Os integrantes cadastrados devem alimentar automaticamente o campo responsável das tarefas.
+Regras:
+mostrar preferencialmente integrantes ativos
+exibir nome e unidade
+integrar dados aos gráficos de produtividade
+integrar dados ao painel de carga por responsável
+8) FILTROS E PRODUTIVIDADE
+Adicionar filtros para:
+responsável
+unidade
+status
+criticidade
+prazo
+busca por palavra-chave
+Ordenação por:
+prazo mais próximo
+maior criticidade
+mais recentes
+responsável
+maior carga de tarefas
+9) VISÕES ALTERNATIVAS
+Para elevar o impacto visual do aplicativo, incluir:
+Kanban
+Colunas:
+Em andamento
+Concluída
+Atrasada
+Cartões com:
+título
+responsável
+prazo
+criticidade
+Calendário ou Timeline
+Exibir tarefas distribuídas por data.
+Permitir visualizar:
+tarefas da semana
+tarefas do mês
+prazos próximos
+10) SEÇÕES DE INTELIGÊNCIA OPERACIONAL
+Adicionar também:
+Prioridades da semana
+Lista automática com tarefas de maior criticidade e prazo próximo.
+Risco de atraso
+Lista de tarefas que estão próximas de vencer ou já vencidas.
+Carga por responsável
+Mostrar quantas tarefas cada integrante possui.
+11) DADOS SIMULADOS
+O aplicativo deve abrir com dados de exemplo já preenchidos para parecer vivo na demonstração.
+Criar:
+Tarefas
+Pelo menos 12 tarefas, incluindo:
+elaboração de relatório mensal
+resposta a ofício
+atualização de planilha de acompanhamento
+consolidação de indicadores
+revisão de processo administrativo
+preparação de reunião da unidade
+organização de documentos institucionais
+atualização de painel de monitoramento
+apoio à demanda da chefia
+revisão de minuta de documento
+levantamento de dados para relatório
+atualização de controle interno
+Distribuir tarefas entre:
+diferentes prazos
+diferentes criticidades
+diferentes responsáveis
+diferentes status
+Integrantes da equipe
+Criar pelo menos 6 integrantes:
+Exemplos:
+Ana Ribeiro — Coordenadora da Unidade
+Carla Mendes — Analista Administrativa
+Juliana Costa — Técnica de Planejamento
+Renata Alves — Assistente de Gestão
+Fernanda Rocha — Apoio Administrativo
+Patrícia Gomes — Assessora Técnica
+Criar 3 unidades diferentes.
+Incluir pelo menos:
+1 integrante em férias
+1 integrante afastado
+12) ESTRUTURA VISUAL
+O aplicativo deve possuir:
+sidebar lateral moderna
+dashboard inicial
+página de tarefas
+página de equipe
+formulário de tarefa
+visão Kanban
+visão calendário ou timeline
+13) ESTILO VISUAL
+Design:
+moderno
+limpo
+elegante
+profissional
+responsivo
+Aplicar:
+cards bem desenhados
+boa tipografia
+espaçamento generoso
+uso inteligente de cores
+indicadores visuais claros
+aparência de software institucional moderno
+O aplicativo deve transmitir eficiência, organização e controle operacional.
+RESULTADO ESPERADO
+O resultado deve ser um aplicativo de gerenciamento de tarefas com aparência de produto real, contendo:
+dashboard executivo
+gestão de tarefas
+cadastro de equipe
+filtros e inteligência operacional
+visão Kanban
+visão temporal
+dados simulados realistas
+A primeira tela deve gerar impacto visual imediato, transmitindo:
+controle da operação
+organização das demandas
+priorização clara
+produtividade da equipe
+A interface deve parecer uma plataforma moderna de gestão pública, e não apenas um formulário simples.
+</pre>
+        </div>
+      </section>
+    </div>
+    <!-- FIM ABA 3: MEU APLICATIVO -->
+
+  </main>
+
+  <script>
+    const prog = document.getElementById('prog');
+    window.addEventListener('scroll', () => {
+      prog.style.width = (window.scrollY / (document.documentElement.scrollHeight - innerHeight) * 100) + '%';
+    }, { passive: true });
+
+    const hps = document.querySelectorAll('.hps');
+    let ci = 0;
+    setInterval(() => {
+      hps.forEach(s => s.classList.remove('on'));
+      hps[ci].classList.add('on');
+      ci = (ci + 1) % hps.length;
+    }, 1000);
+
+    document.querySelectorAll('.ltab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ltab').forEach(t => t.classList.remove('on'));
+        document.querySelectorAll('.libg').forEach(g => g.classList.remove('on'));
+        btn.classList.add('on');
+        document.getElementById('g-' + btn.dataset.g).classList.add('on');
+      });
+    });
+
+    document.querySelectorAll('.cpbtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.t).then(() => {
+          const o = btn.innerHTML;
+          btn.innerHTML = '✓ Copiado';
+          btn.classList.add('ok');
+          setTimeout(() => { btn.innerHTML = o; btn.classList.remove('ok'); }, 1800);
+        });
+      });
+    });
+
+    // NAVEGAÇÃO ENTRE ABAS
+    function switchMode(index) {
+      // Remove active de todas as abas e conteúdos
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
+      
+      // Adiciona active na aba e conteúdo clicados
+      document.querySelectorAll('.mode-tab')[index].classList.add('active');
+      document.getElementById(`mode-${index}`).classList.add('active');
+      
+      // Scroll suave para o topo
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // COPIAR PROMPT COMPLETO (DESKTOP)
+    function copyDesktopPrompt() {
+      const pre = document.getElementById("desktopPromptText");
+      const btn = document.getElementById("btnCopyDesktopPrompt");
+      const btnText = document.getElementById("btnCopyDesktopText");
+      
+      if (!pre || !btn || !btnText) return;
+      
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btnText.textContent = "✅ Prompt Copiado!";
+        btn.classList.add("copied");
+        
+        setTimeout(() => {
+          btnText.textContent = "📋 Copiar Prompt Completo";
+          btn.classList.remove("copied");
+        }, 2500);
+      }).catch(err => {
+        console.error('Erro ao copiar:', err);
+        alert('Não foi possível copiar. Tente selecionar e copiar manualmente.');
+      });
+    }
+
+    const startBtn = document.getElementById('startCopyBtn');
+    if (startBtn) {
+      const promptText = startBtn.closest('.start-prompt').querySelector('pre').textContent;
+      startBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(promptText).then(() => {
+          startBtn.textContent = '✓ Copiado';
+          startBtn.classList.add('ok');
+          setTimeout(() => { startBtn.textContent = 'Copiar'; startBtn.classList.remove('ok'); }, 2000);
+        });
+      });
+    }
+
+    function toggleAcc(trigger) {
+      const item = trigger.closest('.gacc-item');
+      const isOpen = item.classList.contains('open');
+      // fecha todos
+      document.querySelectorAll('.gacc-item.open').forEach(i => i.classList.remove('open'));
+      // abre este se estava fechado
+      if (!isOpen) item.classList.add('open');
+    }
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.07 });
+    document.querySelectorAll('.r, .jdiv').forEach((el, i) => {
+      el.style.transitionDelay = (i % 6) * 60 + 'ms';
+      io.observe(el);
+    });
+  </script>
+</body>
+</html>

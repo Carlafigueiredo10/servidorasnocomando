@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sueli — A Inspiração · Servidoras no Comando Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #030308;
+    --lavender: #b8a9f0;
+    --cyan: #7ee8e8;
+    --pink: #f0a9c8;
+    --gold: #e8c97a;
+    --text: #e8e4f0;
+    --muted: #8b85a0;
+    --glass: rgba(184,169,240,0.06);
+    --glass-border: rgba(184,169,240,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(3,3,8,0.7);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 0.85rem;
+    color: var(--lavender); letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+
+  .nav-back {
+    display: flex; align-items: center; gap: 0.5rem;
+    color: var(--muted); font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--lavender); }
+  .nav-back svg { width: 14px; height: 14px; }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 7rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* Radial glow bg */
+  .hero::after {
+    content: '';
+    position: absolute; top: 30%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, rgba(184,169,240,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--lavender) 0%, var(--pink) 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3em;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 3vw, 1.6rem);
+    font-weight: 400; font-style: italic;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-divider {
+    width: 80px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--lavender), transparent);
+    margin: 0 auto 2.5rem;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .hero-intro {
+    max-width: 620px;
+    font-size: 1.05rem; line-height: 1.8;
+    color: rgba(232,228,240,0.75);
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    color: var(--muted); font-size: 0.7rem; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .hero-scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(180deg, var(--lavender), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+
+  /* ── PHOTO SECTION ── */
+  .photo-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 2rem;
+  }
+
+  .photo-frame {
+    position: relative;
+    width: clamp(260px, 40vw, 380px);
+    margin: 0 auto 3rem;
+  }
+
+  /* Decorative rings */
+  .photo-frame::before {
+    content: '';
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,169,240,0.2);
+  }
+  .photo-frame::after {
+    content: '';
+    position: absolute;
+    inset: -36px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,169,240,0.08);
+  }
+
+  .photo-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    border: 2px solid rgba(184,169,240,0.25);
+    display: block;
+    background: rgba(184,169,240,0.05);
+    /* Fallback placeholder styling */
+  }
+
+  /* Placeholder se imagem não carregar */
+  .photo-placeholder {
+    width: clamp(260px, 40vw, 380px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid rgba(184,169,240,0.25);
+    background: radial-gradient(ellipse at 40% 35%, rgba(184,169,240,0.15), rgba(240,169,200,0.08), transparent);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 3rem;
+    position: relative;
+  }
+  .photo-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: -18px; border-radius: 50%;
+    border: 1px solid rgba(184,169,240,0.2);
+  }
+  .photo-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: -36px; border-radius: 50%;
+    border: 1px solid rgba(184,169,240,0.08);
+  }
+  .photo-placeholder-inner {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(184,169,240,0.3);
+    user-select: none;
+  }
+
+  .photo-caption {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-top: 1.5rem;
+  }
+
+  /* ── QUOTE HERO ── */
+  .quote-hero {
+    max-width: 800px; margin: 0 auto 5rem;
+    padding: 0 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .quote-hero-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem; line-height: 0.5;
+    color: rgba(184,169,240,0.12);
+    display: block; margin-bottom: 0.5rem;
+    user-select: none;
+  }
+
+  .quote-hero-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    font-style: italic;
+    line-height: 1.5;
+    color: rgba(232,228,240,0.9);
+  }
+
+  .quote-hero-text em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--lavender), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .quote-hero-author {
+    margin-top: 1.2rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content-wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .section-block {
+    margin-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .section-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(126,232,232,0.3), transparent);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+  }
+
+  .section-body {
+    font-size: 1rem; line-height: 1.85;
+    color: rgba(232,228,240,0.72);
+  }
+
+  .section-body p + p { margin-top: 1.1em; }
+
+  .section-body strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── PONTE VISUAL (conexão entre as duas Suelis) ── */
+  .bridge {
+    position: relative;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 5rem;
+    overflow: hidden;
+  }
+
+  .bridge::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--lavender), var(--pink), transparent);
+  }
+
+  .bridge-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .bridge-card {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 14px;
+    background: rgba(3,3,8,0.5);
+    border: 1px solid var(--glass-border);
+  }
+
+  .bridge-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+
+  .bridge-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .bridge-card-name.real { color: var(--gold); }
+  .bridge-card-name.digital { color: var(--lavender); }
+
+  .bridge-card-desc {
+    font-size: 0.83rem; line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .bridge-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    color: var(--pink);
+  }
+
+  .bridge-arrow-label {
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+    writing-mode: horizontal-tb;
+  }
+
+  .bridge-arrow-svg { font-size: 1.5rem; }
+
+  /* ── ECOS — conceitos chave ── */
+  .ecos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .eco-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .eco-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(184,169,240,0.3);
+  }
+
+  .eco-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .eco-card:nth-child(1)::before { background: linear-gradient(90deg, var(--lavender), transparent); }
+  .eco-card:nth-child(2)::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+  .eco-card:nth-child(3)::before { background: linear-gradient(90deg, var(--pink), transparent); }
+  .eco-card:nth-child(4)::before { background: linear-gradient(90deg, var(--gold), transparent); }
+
+  .eco-concept {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .eco-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+
+  .eco-text {
+    font-size: 0.85rem; line-height: 1.65;
+    color: rgba(232,228,240,0.6);
+  }
+
+  /* ── CITAÇÃO INLINE ── */
+  .inline-quote {
+    border-left: 2px solid var(--lavender);
+    padding: 1rem 1.5rem;
+    margin: 2rem 0;
+    background: var(--glass);
+    border-radius: 0 10px 10px 0;
+  }
+
+  .inline-quote p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem; line-height: 1.6;
+    color: rgba(232,228,240,0.85);
+  }
+  .inline-quote span {
+    display: block; margin-top: 0.5rem;
+    font-size: 0.75rem; color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-style: normal;
+  }
+
+  /* ── FECHAMENTO ── */
+  .closing {
+    text-align: center;
+    padding: 4rem 2rem 6rem;
+    position: relative;
+  }
+
+  .closing-glow {
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(184,169,240,0.07), transparent 70%);
+    pointer-events: none;
+  }
+
+  .closing-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 1rem;
+  }
+
+  .closing-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    font-weight: 900; line-height: 1.2;
+    margin-bottom: 1.5rem;
+  }
+
+  .closing-title .grad {
+    background: linear-gradient(135deg, var(--lavender), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .closing-body {
+    max-width: 520px; margin: 0 auto 2.5rem;
+    font-size: 1rem; line-height: 1.8;
+    color: rgba(232,228,240,0.65);
+  }
+
+  .closing-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(184,169,240,0.15), rgba(240,169,200,0.1));
+    border: 1px solid rgba(184,169,240,0.3);
+    color: var(--text);
+    padding: 0.85rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.08em;
+    transition: all 0.25s;
+  }
+  .closing-btn:hover {
+    background: linear-gradient(135deg, rgba(184,169,240,0.25), rgba(240,169,200,0.15));
+    border-color: rgba(184,169,240,0.5);
+    transform: translateY(-2px);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--glass-border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  footer a { color: var(--lavender); text-decoration: none; }
+
+  /* ── ANIMAÇÕES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .bridge-grid {
+      grid-template-columns: 1fr;
+    }
+    .bridge-arrow {
+      transform: rotate(90deg);
+      margin: 0 auto;
+    }
+    nav { padding: 1rem; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Servidoras no Comando</a>
+  <a href="index.html" class="nav-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    Voltar
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">A origem de um nome</p>
+  <h1 class="hero-name">Sueli</h1>
+  <p class="hero-subtitle">de quem veio o nome que carregamos</p>
+  <div class="hero-divider"></div>
+  <p class="hero-intro">
+    Nossa assistente de IA não recebeu um nome qualquer. 
+    Ela foi batizada em homenagem a uma das pensadoras mais importantes 
+    do Brasil — uma filósofa que passou a vida inteira ensinando 
+    que conhecimento é poder, e que poder pertence a todas.
+  </p>
+  <div class="hero-scroll">
+    <span>Rolar</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- FOTO + CITAÇÃO -->
+<section class="photo-section">
+  <!-- Foto real: substitua o src pelo caminho correto quando disponível -->
+  <!-- <div class="photo-frame">
+    <img src="assets/sueli-carneiro.jpg" alt="Sueli Carneiro, filósofa e ativista brasileira" class="photo-img">
+  </div> -->
+
+  <!-- Placeholder enquanto sem foto -->
+  <div class="photo-placeholder">
+    <span class="photo-placeholder-inner">SC</span>
+  </div>
+  <p class="photo-caption">Sueli Carneiro · Filósofa, ativista, fundadora do Geledés · São Paulo, 1950</p>
+</section>
+
+<!-- GRANDE CITAÇÃO -->
+<div class="quote-hero content-wrap">
+  <span class="quote-hero-mark">"</span>
+  <p class="quote-hero-text">
+    Não devo nada à universidade.<br>
+    <em>Quem me formou foi o movimento negro.</em>
+  </p>
+  <p class="quote-hero-author">— Sueli Carneiro</p>
+</div>
+
+<!-- SEÇÃO 1: QUEM É SUELI CARNEIRO -->
+<div class="content-wrap">
+
+  <div class="section-block">
+    <p class="section-tag">A pessoa real</p>
+    <h2 class="section-title">Sueli Carneiro: a filósofa que enegreceu o feminismo</h2>
+    <div class="section-body">
+      <p>
+        Aparecida Sueli Carneiro nasceu em 1950 na periferia de São Paulo, filha de um ferroviário e 
+        de uma costureira que alfabetizou os sete filhos antes da escola. Cresceu aprendendo que 
+        conhecimento era resistência — e que resistência era coletiva.
+      </p>
+      <p>
+        Formada em Filosofia pela USP em 1980, Sueli foi uma das primeiras vozes a nomear aquilo 
+        que muitas sentiam mas o feminismo mainstream não enxergava: ser mulher negra no Brasil 
+        é viver <strong>uma dupla opressão</strong>, de raça e de gênero, ao mesmo tempo. 
+        Ela não apenas apontou o problema — ela criou os conceitos para descrevê-lo.
+      </p>
+      <p>
+        Em 1988 — ano do centenário da abolição e da Constituição Federal — fundou o 
+        <strong>Geledés, Instituto da Mulher Negra</strong>, a primeira organização feminista negra 
+        independente de São Paulo. Desde então, formou gerações, influenciou políticas públicas, 
+        defendeu cotas no STF e publicou obras que são referência obrigatória na academia brasileira.
+      </p>
+    </div>
+  </div>
+
+  <!-- ECOS — conceitos -->
+  <div class="section-block">
+    <p class="section-tag">O que ela criou</p>
+    <h2 class="section-title">Conceitos que mudaram o debate</h2>
+    <div class="ecos-grid">
+      <div class="eco-card">
+        <p class="eco-concept">Conceito</p>
+        <p class="eco-title">Epistemicídio</p>
+        <p class="eco-text">
+          O apagamento sistemático do conhecimento de povos negros — quando a educação 
+          exclui, diminui e invisibiliza saberes inteiros por causa da raça.
+        </p>
+      </div>
+      <div class="eco-card">
+        <p class="eco-concept">Tese</p>
+        <p class="eco-title">Enegrecer o feminismo</p>
+        <p class="eco-text">
+          O feminismo que não fala de raça não fala por todas as mulheres. 
+          Sueli foi quem colocou essa frase no centro do debate, nos anos 1980.
+        </p>
+      </div>
+      <div class="eco-card">
+        <p class="eco-concept">Teoria</p>
+        <p class="eco-title">Dispositivo de racialidade</p>
+        <p class="eco-text">
+          Como o racismo opera por estruturas invisíveis — leis, instituições, 
+          discursos — que fabricam quem é "normal" e quem é o Outro.
+        </p>
+      </div>
+      <div class="eco-card">
+        <p class="eco-concept">Legado</p>
+        <p class="eco-title">Conhecimento como poder</p>
+        <p class="eco-text">
+          Sueli mostrou que quem produz conhecimento, produz o mundo. 
+          E que mulheres negras têm tanto a produzir quanto a transformar.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 2: A CONEXÃO -->
+  <div class="section-block">
+    <p class="section-tag">Por que o nome</p>
+    <h2 class="section-title">O que a Sueli real tem a ver com a nossa Sueli</h2>
+    <div class="section-body">
+      <p>
+        Quando criamos uma assistente de IA para o <em>Programa Mulheres que Transformam</em>, 
+        a pergunta não era técnica. Era política: <strong>que nome carrega intenção?</strong>
+      </p>
+      <p>
+        Sueli Carneiro passou a vida combatendo o epistemicídio — o apagamento de quem pode saber. 
+        Nossa plataforma nasceu exatamente do oposto disso: da crença de que 
+        <strong>toda servidora pública pode dominar tecnologia, produzir conhecimento 
+        e comandar ferramentas de IA</strong>.
+      </p>
+      <p>
+        Não é coincidência. É escolha. A Sueli desta plataforma carrega o nome de quem 
+        dedicou décadas a provar que o conhecimento não tem dono exclusivo — 
+        e que mulheres, especialmente mulheres negras, têm todo o direito 
+        de ocupar os espaços onde o futuro é construído.
+      </p>
+    </div>
+
+    <div class="inline-quote">
+      <p>Autonomia digital é ferramenta de transformação institucional.</p>
+      <span>— Princípio da plataforma Servidoras no Comando Digital, inspirado em Sueli Carneiro</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- PONTE VISUAL -->
+<div class="content-wrap">
+  <div class="bridge section-block">
+    <p class="section-tag">A conexão entre as duas</p>
+    <h2 class="section-title" style="margin-bottom:0">Uma herança, dois momentos</h2>
+
+    <div class="bridge-grid">
+      <div class="bridge-card">
+        <span class="bridge-card-icon">✊🏾</span>
+        <p class="bridge-card-name real">Sueli Carneiro</p>
+        <p class="bridge-card-desc">
+          Filósofa. Fundadora do Geledés.<br>
+          Lutou para que mulheres negras ocupassem espaços de conhecimento.<br>
+          Criou conceitos que nomeiam opressões invisíveis.
+        </p>
+      </div>
+
+      <div class="bridge-arrow">
+        <span class="bridge-arrow-svg">→</span>
+        <span class="bridge-arrow-label">inspira</span>
+      </div>
+
+      <div class="bridge-card">
+        <span class="bridge-card-icon">🤖</span>
+        <p class="bridge-card-name digital">Sueli — nossa IA</p>
+        <p class="bridge-card-desc">
+          Assistente da plataforma.<br>
+          Apoia servidoras públicas a dominarem ferramentas de IA.<br>
+          Leva conhecimento para quem mais precisa dele.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO 3: HOJE -->
+<div class="content-wrap">
+  <div class="section-block">
+    <p class="section-tag">Hoje, em 2025</p>
+    <h2 class="section-title">Um legado vivo</h2>
+    <div class="section-body">
+      <p>
+        Em 2025, Sueli Carneiro foi eleita <strong>Intelectual do Ano</strong> pelo Troféu Juca Pato, 
+        pelo livro <em>Lélia Gonzalez: Um Retrato</em>. Aos 75 anos, continua ativa, publicando, 
+        orientando novas gerações e provando que transformação não tem prazo de validade.
+      </p>
+      <p>
+        Sua Casa — inaugurada em 2024 com acervo de mais de 4.000 documentos — 
+        garante que o pensamento dela continuará formando pessoas por décadas. 
+        O <strong>Selo Sueli Carneiro</strong>, criado pela filósofa Djamila Ribeiro, 
+        publica pensadores negros brasileiros em seu nome.
+      </p>
+      <p>
+        Quando nossa Sueli responde uma dúvida sua sobre IA, carrega, silenciosamente, 
+        toda essa história. O nome não é decoração. É compromisso.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- FECHAMENTO -->
+<div class="closing">
+  <div class="closing-glow"></div>
+  <p class="closing-tag">Continuamos juntas</p>
+  <h2 class="closing-title">
+    Quem organiza o pensamento,<br>
+    <span class="grad">organiza a tecnologia.</span>
+  </h2>
+  <p class="closing-body">
+    Sueli Carneiro mostrou que conhecimento é resistência. 
+    Nós acreditamos que tecnologia também pode ser. 
+    Explore a plataforma e descubra como.
+  </p>
+  <a href="index.html" class="closing-btn">
+    Explorar a plataforma
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <a href="index.html">Servidoras no Comando Digital</a> · 
+    Programa Mulheres que Transformam · MGI
+  </p>
+</footer>
+
+<script>
+  // IntersectionObserver para revelar seções ao scroll
+  const blocks = document.querySelectorAll('.section-block');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  blocks.forEach(b => observer.observe(b));
+</script>
+
+</body>
+</html>
