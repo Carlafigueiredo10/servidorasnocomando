@@ -1,0 +1,7 @@
+{
+  "name": "ascenda-functions",
+  "version": "1.0.0",
+  "dependencies": {
+    "googleapis": "^131.0.0"
+  }
+}

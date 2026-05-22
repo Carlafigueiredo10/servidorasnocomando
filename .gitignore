@@ -1,0 +1,6 @@
+# Local Netlify folder
+.netlify
+
+# Dependencies (reinstaladas automaticamente no build)
+node_modules/
+package-lock.json
