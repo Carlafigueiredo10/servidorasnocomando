@@ -4,3 +4,6 @@
 # Dependencies (reinstaladas automaticamente no build)
 node_modules/
 package-lock.json
+
+# Variaveis de ambiente locais (senhas/chaves nunca vao para o GitHub)
+.env
