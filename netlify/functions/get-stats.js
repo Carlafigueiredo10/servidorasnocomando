@@ -9,6 +9,10 @@ const KEY = 'visitas';
 // E-mail da conta Google que pode abrir o painel.
 const EMAIL_ADMIN = (process.env.ADMIN_EMAIL || 'carlacristinesoares@gmail.com').toLowerCase();
 
+// Client ID do Google (projeto CLIC). Nao e segredo — pode ficar no codigo.
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ||
+  '697204129673-03pcobng48aablb5mifaar67h4jhjj28.apps.googleusercontent.com';
+
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -20,14 +24,6 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Metodo nao permitido' }) };
-  }
-
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  if (!clientId) {
-    return {
-      statusCode: 500, headers,
-      body: JSON.stringify({ error: 'Painel nao configurado: falta a variavel GOOGLE_CLIENT_ID no Netlify.' }),
-    };
   }
 
   // 1. Pega o token gerado pelo login do Google
@@ -52,7 +48,7 @@ exports.handler = async (event) => {
   }
 
   // 3. Confere que o token e do nosso app e da conta autorizada
-  if (info.aud !== clientId) {
+  if (info.aud !== GOOGLE_CLIENT_ID) {
     return { statusCode: 401, headers, body: JSON.stringify({ error: 'Login nao reconhecido por este site.' }) };
   }
   const emailVerificado = info.email_verified === true || info.email_verified === 'true';
