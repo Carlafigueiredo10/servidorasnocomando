@@ -64,6 +64,13 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify(stats) };
   } catch (error) {
     console.error('get-stats erro:', error);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erro ao ler as estatisticas.' }) };
+    return {
+      statusCode: 500, headers,
+      body: JSON.stringify({
+        error: 'Erro ao ler as estatisticas.',
+        tipo: (error && error.name) || 'Error',
+        detalhe: (error && (error.message || String(error))) || 'sem detalhe',
+      }),
+    };
   }
 };

@@ -248,7 +248,13 @@
         body: JSON.stringify({ credential: token })
       }).then(function (r) {
         return r.json().then(function (dados) {
-          if (!r.ok) throw (dados.error || 'Erro ' + r.status);
+          if (!r.ok) {
+            var msg = dados.error || ('Erro ' + r.status);
+            if (dados.tipo || dados.detalhe) {
+              msg += ' [' + (dados.tipo || '?') + ': ' + (dados.detalhe || '') + ']';
+            }
+            throw msg;
+          }
           return dados;
         });
       }).catch(function (e) {
