@@ -6,6 +6,19 @@ const { getStore } = require('@netlify/blobs');
 const STORE = 'estatisticas';
 const KEY = 'visitas';
 
+// Abre o store de Blobs. Tenta auto-deteccao primeiro;
+// se NETLIFY_BLOBS_TOKEN estiver definido, usa configuracao manual.
+function abrirStore() {
+  if (process.env.NETLIFY_BLOBS_TOKEN) {
+    return getStore({
+      name: STORE,
+      siteID: process.env.NETLIFY_SITE_ID || process.env.SITE_ID || process.env.BLOB_SITE_ID,
+      token: process.env.NETLIFY_BLOBS_TOKEN,
+    });
+  }
+  return getStore(STORE);
+}
+
 // E-mail da conta Google que pode abrir o painel.
 const EMAIL_ADMIN = (process.env.ADMIN_EMAIL || 'carlacristinesoares@gmail.com').toLowerCase();
 
@@ -59,7 +72,7 @@ exports.handler = async (event) => {
 
   // 4. Acesso liberado: devolve as estatisticas
   try {
-    const store = getStore(STORE);
+    const store = abrirStore();
     const stats = (await store.get(KEY, { type: 'json' })) || { visits: 0, views: 0, pages: {}, daily: {} };
     return { statusCode: 200, headers, body: JSON.stringify(stats) };
   } catch (error) {
